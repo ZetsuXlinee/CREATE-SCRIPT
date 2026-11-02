@@ -2,125 +2,162 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CiKiZz Generate Script Bot</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color: transparent;}
-body{background:#050510;color:#fff;font-family:'Space Grotesk',sans-serif;overflow-x:hidden;background-image:radial-gradient(circle at 20% 30%, rgba(147,51,234,0.12) 0%, transparent 50%),radial-gradient(circle at 80% 70%, rgba(6,182,212,0.12) 0%, transparent 50%)}
-.navbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;margin:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(20px);border-radius:12px}
-.container{display:grid;grid-template-columns:1.3fr 0.7fr;gap:14px;max-width:1400px;margin:0 auto;padding:0 10px 20px}
-.card{background:rgba(15,15,30,0.92);border:1px solid rgba(168,85,247,0.25);border-radius:14px;padding:16px;margin-bottom:12px}
-label{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin:12px 0 6px;display:block}
-.row{display:flex;gap:8px;flex-wrap:wrap} .row>div{flex:1;min-width:110px}
-.plat{padding:11px 8px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;text-align:center;font-size:12px;font-weight:600;flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;user-select:none;transition:.2s}
-.plat.active{background:linear-gradient(135deg, rgba(6,182,212,0.25), rgba(168,85,247,0.25));border-color:#06b6d4;color:#fff;box-shadow:0 0 15px rgba(6,182,212,0.3)}
-input,select{width:100%;padding:12px;border-radius:10px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.feat{display:flex;align-items:center;gap:10px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;font-size:11px;cursor:pointer;min-height:48px;transition:.2s;user-select:none}
-.feat input{width:18px;height:18px;margin:0;flex-shrink:0;accent-color:#06b6d4;pointer-events:none}
-.feat.active{border-color:#06b6d4;background:rgba(6,182,212,0.15)}
-.generate{width:100%;padding:16px;border:none;border-radius:12px;background:linear-gradient(90deg, #06b6d4, #a855f7);color:#fff;font-weight:700;font-size:14px;cursor:pointer;margin-top:12px;min-height:52px}
-.thumb-preview{width:100%;max-height:160px;object-fit:cover;border-radius:8px;margin-top:8px;display:none;border:1px solid #a855f7}
-.code{background:#000;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px;font-size:10px;min-height:180px;white-space:pre-wrap;font-family:'JetBrains Mono',monospace;color:#9ca3af;word-break:break-word}
-@media(max-width:900px){.container{grid-template-columns:1fr;padding-bottom:90px} .grid2{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.grid2{grid-template-columns:1fr} input{font-size:16px}}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#05050f;color:#fff;font-family:'Space Grotesk',sans-serif;overflow-x:hidden;position:relative}
+body::before{content:'';position:fixed;inset:0;z-index:-1;background: radial-gradient(circle at 20% 20%, rgba(168,85,247,0.15), transparent 40%), radial-gradient(circle at 80% 80%, rgba(6,182,212,0.15), transparent 40%)}
+/* SVG BG */
+.svg-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.4;pointer-events:none}
+.navbar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;margin:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(24px);border-radius:16px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
+.container{display:grid;grid-template-columns:1.25fr 0.75fr;gap:16px;max-width:1450px;margin:0 auto;padding:0 12px 40px}
+.card{background:rgba(15,15,30,0.9);border:1px solid rgba(168,85,247,0.2);border-radius:18px;padding:18px;margin-bottom:14px;backdrop-filter:blur(20px);position:relative;overflow:hidden}
+.card::after{content:'';position:absolute;top:-50%;right:-30%;width:200px;height:200px;background:radial-gradient(circle, rgba(168,85,247,0.1), transparent 70%);pointer-events:none}
+label{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin:14px 0 8px;display:flex;align-items:center;gap:6px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.plat{flex:1;min-width:110px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:11px;font-weight:600;transition:.25s;min-height:48px}
+.plat.active{background:linear-gradient(135deg, rgba(6,182,212,0.3), rgba(168,85,247,0.3));border-color:#06b6d4;box-shadow:0 0 20px rgba(6,182,212,0.3);transform:translateY(-1px)}
+.plat svg{flex-shrink:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.feat{display:flex;align-items:center;gap:10px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;font-size:11px;cursor:pointer;min-height:52px;transition:.25s}
+.feat.active{border-color:#06b6d4;background:linear-gradient(135deg, rgba(6,182,212,0.12), rgba(168,85,247,0.12))}
+.feat input{width:0;height:0;opacity:0;position:absolute}
+.feat .check{width:20px;height:20px;border:1.5px solid rgba(255,255,255,0.2);border-radius:6px;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
+.feat.active .check{background:#06b6d4;border-color:#06b6d4}
+input[type=text]{width:100%;padding:12px 14px;border-radius:12px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.12);color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none}
+input:focus{border-color:#a855f7}
+.generate{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(90deg, #06b6d4, #a855f7);color:#fff;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 30px rgba(168,85,247,0.4);transition:.2s}
+.generate:hover{transform:translateY(-1px);box-shadow:0 0 40px rgba(168,85,247,0.6)}
+.wa-preview{background:#111b21;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.1)}
+.wa-header{background:#202c33;padding:10px 14px;display:flex;align-items:center;gap:10px}
+.wa-chat{background:#0b141a;padding:14px;min-height:300px;position:relative}
+.wa-chat::before{content:'';position:absolute;inset:0;opacity:0.05;background-image:url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h100v100H0z' fill='none'/%3E%3C/svg%3E")}
+.bubble{position:relative;background:#202c33;padding:10px 12px;border-radius:0 12px 12px 12px;max-width:92%;font-family:'JetBrains Mono',monospace;font-size:11px;white-space:pre-wrap;line-height:1.5;color:#e9edef;box-shadow:0 1px 2px rgba(0,0,0,0.3)}
+.bubble-img{width:100%;height:110px;border-radius:10px;margin-bottom:8px;background:linear-gradient(135deg,#a855f7,#06b6d4);display:flex;align-items:center;justify-content:center}
+@media(max-width:900px){.container{grid-template-columns:1fr} .grid2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<div class="navbar"><div style="font-weight:700">⬢ <span style="color:#a855f7">CiKiZz</span> <b style="color:#06b6d4">PRO MAX V4</b></div><div style="font-size:10px;background:rgba(255,255,255,0.08);padding:4px 8px;border-radius:20px">Fix Menu & Pairing</div></div>
+<!-- SVG BACKGROUND DECOR -->
+<svg class="svg-bg" viewBox="0 0 1440 800" preserveAspectRatio="none"><defs><linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a855f7" stop-opacity="0.3"/><stop offset="100%" stop-color="#06b6d4" stop-opacity="0.1"/></linearGradient></defs><path d="M0,200 Q400,100 800,250 T1440,200 L1440,0 L0,0 Z" fill="url(#g1)"/><circle cx="200" cy="600" r="120" fill="none" stroke="#a855f7" stroke-width="1" stroke-dasharray="8 8" opacity="0.2"/><circle cx="1200" cy="150" r="80" fill="none" stroke="#06b6d4" stroke-width="1" opacity="0.3"/></svg>
+
+<div class="navbar">
+  <div class="logo">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#a855f7" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 17L12 22L22 17" stroke="#06b6d4" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 12L12 17L22 12" stroke="white" stroke-width="1.5" stroke-opacity="0.5" stroke-linejoin="round"/></svg>
+    <span>CiKiZz <b style="color:#06b6d4">PRO MAX V6</b></span>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;font-size:10px;background:rgba(168,85,247,0.15);padding:6px 12px;border-radius:20px;border:1px solid rgba(168,85,247,0.3)">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z"/></svg> SVG EDITION
+  </div>
+</div>
+
 <div class="container">
 <div>
   <div class="card">
-    <h2 style="font-size:18px">✨ Generate Script Bot</h2><p style="color:#9ca3af;font-size:11px;margin-bottom:14px">HP & PC Support - Pilih fitur bebas, gak cuma 1 lagi</p>
-    <label>Platform</label>
-    <div class="row"><div class="plat active" data-type="whatsapp" onclick="setType('whatsapp',this)">💬 WhatsApp</div><div class="plat" data-type="telegram" onclick="setType('telegram',this)">📨 Telegram</div></div>
-    <div class="row"><div><label>Bot Name</label><input id="botName" placeholder="KizzuBot"></div><div><label>Owner Number</label><input id="owner" placeholder="628xxx"></div></div>
-    <div id="waOptions">
-      <div class="row"><div><label>Koneksi</label><div class="row"><div class="plat active" data-conn="qr" onclick="setConn('qr',this)">QR</div><div class="plat" data-conn="pairing" onclick="setConn('pairing',this)">Pairing</div></div></div><div><label>Base</label><div class="row"><div class="plat active" data-base="esm" onclick="setBase('esm',this)">ESM Plugin</div><div class="plat" data-base="case" onclick="setBase('case',this)">CASE</div></div></div></div>
-      <div id="pairingInput" style="display:none"><label>Nomor Pairing</label><input id="pairingNumber" placeholder="6281234567890"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="1.8"><path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2z"/><path d="M12 6v6l4 2"/></svg>
+      <h2 style="font-size:18px">Generate Script Bot</h2>
     </div>
-    <div id="tgToken" style="display:none"><label>Telegram Token</label><input id="token" placeholder="123456:ABC..."></div>
-    <label>Menu Style</label><div class="row"><div class="plat active" data-btn="nobtn" onclick="setBtn('nobtn',this)">Tanpa Button</div><div class="plat" data-btn="button" onclick="setBtn('button',this)">Dengan Button</div></div>
-    <label>Thumbnail</label><div class="row"><div class="plat active" data-thumb="nothumb" onclick="setThumb('nothumb',this)">Tanpa Thumb</div><div class="plat" data-thumb="thumb" onclick="setThumb('thumb',this)">Pakai Thumb</div></div>
-    <div id="thumbUpload" style="display:none"><label>Upload Thumbnail</label><input type="file" id="thumbFile" accept="image/*" onchange="previewThumb(this)"><img id="thumbPrev" class="thumb-preview"></div>
+    <p style="color:#9ca3af;font-size:11px;margin-bottom:14px">Semua icon SVG, preview live, plugins lengkap 10 file</p>
 
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px"><label style="margin:0">Fitur Lengkap (Bisa pilih banyak)</label><button type="button" onclick="selectAllFeat()" style="font-size:10px;padding:5px 10px;border-radius:6px;border:1px solid #a855f7;background:rgba(168,85,247,0.2);color:#fff;cursor:pointer">PILIH SEMUA</button></div>
-    <div class="grid2" id="featGrid" style="margin-top:8px">
-      <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="welcome" checked><span>WELCOME</span></div>
-      <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="antilink" checked><span>ANTILINK</span></div>
-      <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="sticker" checked><span>STICKER</span></div>
-      <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="downloader" checked><span>DOWNLOADER</span></div>
-      <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="ai" checked><span>AI/GPT</span></div>
-      <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="group" checked><span>GROUP</span></div>
-      <div class="feat" onclick="toggleFeat(this)"><input type="checkbox" value="rpg"><span>RPG</span></div>
-      <div class="feat" onclick="toggleFeat(this)"><input type="checkbox" value="store"><span>STORE</span></div>
-      <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="autoreply" checked><span>AUTOREPLY</span></div>
-      <div class="feat" onclick="toggleFeat(this)"><input type="checkbox" value="broadcast"><span>BROADCAST</span></div>
+    <label><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/></svg> Bot Identity</label>
+    <div class="row"><div style="flex:1"><input id="botName" type="text" value="ZetsuEwean" oninput="updateAll()" placeholder="Nama Bot"></div><div style="flex:1"><input id="owner" type="text" value="6281234567890" oninput="updateAll()" placeholder="Owner Number"></div></div>
+
+    <label><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v12H4z"/><path d="M8 20h8"/></svg> Base & Koneksi</label>
+    <div class="row">
+      <div class="plat active" data-base="esm" onclick="setBase('esm',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ESM Plugin</div>
+      <div class="plat" data-base="case" onclick="setBase('case',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> CASE</div>
+      <div class="plat active" data-conn="pairing" onclick="setConn('pairing',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 6 12a19.79 19.79 0 0 1-3.07-8.68A2 2 0 0 1 4.91 1h3a2 2 0 0 1 2 1.72c.12 1.02.37 2 .74 2.94a2 2 0 0 1-.45 2.11L9 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.94.37 1.92.62 2.94.74A2 2 0 0 1 22 16.92z"/></svg> Pairing</div>
+      <div class="plat" data-conn="qr" onclick="setConn('qr',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> QR</div>
     </div>
-    <button class="generate" id="genBtn">⚡ Generate & Download ZIP</button>
+
+    <label><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg> Tampilan Menu (SVG Preview)</label>
+    <div class="row">
+      <div class="plat active" data-menu="premium" onclick="setMenuStyle('premium',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Premium Box</div>
+      <div class="plat" data-menu="simple" onclick="setMenuStyle('simple',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><path d="M3 6h.01M3 12h.01M3 18h.01"/></svg> Simple</div>
+      <div class="plat" data-menu="button" onclick="setMenuStyle('button',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg> Button</div>
+      <div class="plat" data-menu="image" onclick="setMenuStyle('image',this)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> Image</div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px">
+      <label style="margin:0;display:flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Fitur (10 plugin, bisa semua)</label>
+      <button onclick="selectAllFeat()" style="font-size:10px;padding:6px 12px;border-radius:20px;background:rgba(168,85,247,0.2);border:1px solid #a855f7;color:#fff;cursor:pointer;display:flex;align-items:center;gap:4px"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> PILIH SEMUA</button>
+    </div>
+    <div class="grid2" id="featGrid" style="margin-top:8px">
+      <div class="feat active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" style="display:block"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="welcome" checked><span>WELCOME</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin-left:auto"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg></div>
+      <div class="feat active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="antilink" checked><span>ANTILINK</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin-left:auto"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+      <div class="feat active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="sticker" checked><span>STICKER</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin-left:auto"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
+      <div class="feat active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="downloader" checked><span>DOWNLOADER</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin-left:auto"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+      <div class="feat active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ai" checked><span>AI/GPT</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin-left:auto"><path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2z"/><path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg></div>
+      <div class="feat active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="group" checked><span>GROUP</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin-left:auto"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <div class="feat" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" style="display:none"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="rpg"><span>RPG</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin-left:auto"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+      <div class="feat" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" style="display:none"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="store"><span>STORE</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin-left:auto"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+      <div class="feat active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="autoreply" checked><span>AUTOREPLY</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin-left:auto"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+      <div class="feat" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" style="display:none"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="broadcast"><span>BROADCAST</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin-left:auto"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg></div>
+    </div>
+
+    <button class="generate" id="genBtn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Generate & Download ZIP
+    </button>
   </div>
 </div>
+
 <div>
-  <div class="card"><div class="code" id="preview">Config preview...</div></div>
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <h3 style="font-size:13px">Live Preview di WA</h3>
+      <span style="margin-left:auto;font-size:9px;background:rgba(6,182,212,0.2);padding:3px 8px;border-radius:10px;border:1px solid #06b6d4">SVG MODE</span>
+    </div>
+    <div class="wa-preview">
+      <div class="wa-header">
+        <svg width="32" height="32" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#a855f7"/><path d="M12 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" fill="white" opacity="0.9"/></svg>
+        <div><b id="prevName">ZetsuEwean</b><div style="font-size:10px;color:#8696a0;display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;background:#25D366;border-radius:50%;display:inline-block"></span> online - bot</div></div>
+        <div style="margin-left:auto;display:flex;gap:10px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#aebac1" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 6 12a19.79 19.79 0 0 1-3.07-8.68A2 2 0 0 1 4.91 1h3a2 2 0 0 1 2 1.72c.12 1.02.37 2 .74 2.94a2 2 0 0 1-.45 2.11L9 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.94.37 1.92.62 2.94.74A2 2 0 0 1 22 16.92z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#aebac1" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
+        </div>
+      </div>
+      <div class="wa-chat"><div class="bubble" id="waBubble">Loading...</div><div style="text-align:right;font-size:9px;color:#8696a0;margin-top:6px;display:flex;align-items:center;justify-content:flex-end;gap:3px">00:55 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#53bdeb" stroke-width="2"><polyline points="20 6 9 17 4 12"/><polyline points="20 6 9 17 4 12" transform="translate(4 0)"/></svg></div></div>
+    </div>
+    <div style="margin-top:10px;display:flex;gap:6px">
+      <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:8px;padding:8px;font-size:10px;display:flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> plugins/ 10 file</div>
+      <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:8px;padding:8px;font-size:10px;display:flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> thumb.jpg support</div>
+    </div>
+  </div>
 </div>
 </div>
+
 <script>
-let state = { type:'whatsapp', conn:'qr', base:'esm', btn:'nobtn', thumb:'nothumb', thumbData:null };
-function setType(t,el){state.type=t; document.querySelectorAll('[data-type]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); document.getElementById('waOptions').style.display=t==='whatsapp'?'block':'none'; document.getElementById('tgToken').style.display=t==='telegram'?'block':'none'; updatePreview();}
-function setConn(c,el){state.conn=c; document.querySelectorAll('[data-conn]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); document.getElementById('pairingInput').style.display=c==='pairing'?'block':'none'; updatePreview();}
-function setBase(b,el){state.base=b; document.querySelectorAll('[data-base]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); updatePreview();}
-function setBtn(b,el){state.btn=b; document.querySelectorAll('[data-btn]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); updatePreview();}
-function setThumb(t,el){state.thumb=t; document.querySelectorAll('[data-thumb]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); document.getElementById('thumbUpload').style.display=t==='thumb'?'block':'none'; updatePreview();}
-function previewThumb(input){
-  const file=input.files[0]; if(!file) return;
-  if(file.size>1024*1024*2) return alert('Max 2MB!');
-  const reader=new FileReader();
-  reader.onload=e=>{ state.thumbData=e.target.result; document.getElementById('thumbPrev').src=e.target.result; document.getElementById('thumbPrev').style.display='block'; updatePreview(); };
-  reader.readAsDataURL(file);
+let state={base:'esm',conn:'pairing',menuStyle:'premium'};
+function setBase(b,el){state.base=b; document.querySelectorAll('[data-base]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); updateAll();}
+function setConn(c,el){state.conn=c; document.querySelectorAll('[data-conn]').forEach(e=>e.classList.remove('active')); el.classList.add('active');}
+function setMenuStyle(s,el){state.menuStyle=s; document.querySelectorAll('[data-menu]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); updateAll();}
+function toggleFeat(el){ const cb=el.querySelector('input'); cb.checked=!cb.checked; el.classList.toggle('active',cb.checked); const svg=el.querySelector('.check svg'); if(svg) svg.style.display=cb.checked?'block':'none'; updateAll(); }
+function selectAllFeat(){ const all=document.querySelectorAll('#featGrid input'); const shouldCheck=[...all].some(c=>!c.checked); all.forEach(c=>{ c.checked=shouldCheck; c.closest('.feat').classList.toggle('active',shouldCheck); const svg=c.closest('.feat').querySelector('.check svg'); if(svg) svg.style.display=shouldCheck?'block':'none'; }); updateAll(); }
+function updateAll(){
+  const name=document.getElementById('botName').value||'Bot'; document.getElementById('prevName').textContent=name;
+  const feats=[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value);
+  let text=''; 
+  if(state.menuStyle==='simple') text=`${name} - MENU\n${feats.map(f=>'• .'+f).join('\n')}`;
+  else if(state.menuStyle==='button') text=`✨ *${name} MENU*\n\n${feats.map(f=>'│ ◦ .'+f).join('\n')}\n\n[Button: PING | STICKER | AI]\nPowered by CiKiZz SVG`;
+  else if(state.menuStyle==='image') text=`🖼️ IMAGE PREVIEW\n\n╭─ ${name}\n${feats.map(f=>'│ • .'+f).join('\n')}\n╰─`;
+  else text=`╭━━━〔 *${name}* 〕━━━\n┃ Base: ${state.base} | ${state.conn}\n┣━━━━━━━━\n${feats.map(f=>'┃ • .'+f).join('\n')}\n╰━━━ SVG EDITION`;
+  const bubble=document.getElementById('waBubble');
+  if(state.menuStyle==='image') bubble.innerHTML=`<div class="bubble-img"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> &nbsp; thumb.jpg</div>`+text;
+  else bubble.textContent=text;
 }
-function toggleFeat(el){
-  const cb = el.querySelector('input[type="checkbox"]');
-  cb.checked = !cb.checked;
-  if(cb.checked) el.classList.add('active'); else el.classList.remove('active');
-  updatePreview();
-}
-function selectAllFeat(){
-  const all = document.querySelectorAll('#featGrid input[type="checkbox"]');
-  const shouldCheck = [...all].some(cb => !cb.checked);
-  all.forEach(cb => {
-    cb.checked = shouldCheck;
-    const parent = cb.closest('.feat');
-    if(shouldCheck) parent.classList.add('active'); else parent.classList.remove('active');
-  });
-  updatePreview();
-}
-function updatePreview(){
-  const name=document.getElementById('botName').value||'MyBot';
-  const feats=[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value).join(', ');
-  document.getElementById('preview').textContent = `Bot: ${name}\nType: ${state.type}\nConn: ${state.conn}\nBase: ${state.base}\nFeatures: ${feats}\n\nBisa pilih banyak fitur ✅\nMobile & Desktop OK ✅\nPairing Fix V4 ✅`;
-}
-document.querySelectorAll('input').forEach(i=>i.addEventListener('input',updatePreview));
+updateAll();
 document.getElementById('genBtn').onclick=async()=>{
-  const botName=document.getElementById('botName').value.trim();
-  if(!botName) return alert('Isi nama bot!');
-  const data={
-    botName, owner:document.getElementById('owner').value.trim(),
-    token:document.getElementById('token').value.trim(),
-    pairingNumber:document.getElementById('pairingNumber').value.trim(),
-    type:state.type, conn:state.conn, base:state.base, btn:state.btn, thumb:state.thumb,
-    thumbData:state.thumbData,
-    features:[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value)
-  };
-  const btn=document.getElementById('genBtn'); btn.disabled=true; btn.textContent='⏳ Generating...';
-  try{
-    const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-    if(!res.ok) throw new Error(await res.text());
-    const blob=await res.blob(); const url=URL.createObjectURL(blob);
-    const a=document.createElement('a'); a.href=url; a.download=botName.replace(/\s+/g,'-')+'.zip'; a.click();
-  }catch(e){alert('Gagal: '+e.message)} finally{btn.disabled=false; btn.textContent='⚡ Generate & Download ZIP'}
+  const data={ botName: document.getElementById('botName').value.trim(), owner: document.getElementById('owner').value.trim(), type:'whatsapp', conn: state.conn, base: state.base, menuStyle: state.menuStyle, btn:'nobtn', thumb:'nothumb', thumbData:null, features:[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value), pairingNumber: document.getElementById('owner').value.trim() };
+  if(!data.botName) return alert('Isi nama bot');
+  const btn=document.getElementById('genBtn'); btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.8 1 6.4 2.6L21 8V3h-5l2.6 2.6A7 7 0 1 0 21 12z"/></svg> Generating...'; btn.disabled=true;
+  try{ const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}); if(!res.ok) throw new Error(await res.text()); const blob=await res.blob(); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=data.botName+'.zip'; a.click(); }catch(e){ alert(e.message) } finally{ btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Generate & Download ZIP'; btn.disabled=false }
 };
-updatePreview();
 </script>
 </body>
 </html>
