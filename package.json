@@ -1,13 +1,7 @@
 {
   "name": "cikizz-generate-script",
   "version": "13.0.0",
-  "description": "CiKiZz PRO MAX - Fix Pairing 1 Menit + Full Fitur + SVG",
   "type": "module",
-  "main": "api/generate.js",
-  "dependencies": {
-    "jszip": "^3.10.1"
-  },
-  "engines": {
-    "node": "20.x"
-  }
+  "dependencies": { "jszip": "^3.10.1" },
+  "engines": { "node": "20.x" }
 }
