@@ -1,11 +1,8 @@
 {
   "name": "cikizz-generate-script",
-  "version": "2.1.0",
-  "description": "CiKiZz Generate Script - Generate Telegram & WhatsApp bot script ready for Pterodactyl. Auto ZIP download.",
+  "version": "4.0.0",
+  "description": "CiKiZz PRO MAX - Bot Generator WhatsApp & Telegram - Fix Pairing & Mobile",
   "main": "api/generate.js",
-  "keywords": ["bot", "telegram", "whatsapp", "pterodactyl", "generator", "cikizz"],
-  "author": "CiKiZz",
-  "license": "MIT",
   "dependencies": {
     "jszip": "^3.10.1"
   },
