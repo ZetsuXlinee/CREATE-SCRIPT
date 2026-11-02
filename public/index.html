@@ -6,7 +6,7 @@
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#06070f;--card:rgba(18,19,32,0.85);--line:rgba(255,255,255,0.08);--cyan:#06b6d4;--pur:#a855f7;--lime:#22c55e}
+:root{--bg:#06070f;--card:rgba(18,19,32,0.92);--line:rgba(255,255,255,0.08);--cyan:#06b6d4;--pur:#a855f7;--lime:#22c55e;--wa:#25D366;--tele:#229ED9}
 *{margin:0;padding:0;box-sizing:border-box}body{background:radial-gradient(800px 400px at 20% -10%, rgba(168,85,247,0.15), transparent), radial-gradient(600px 300px at 90% 10%, rgba(6,182,212,0.12), transparent), var(--bg);color:#fff;font-family:'Space Grotesk',sans-serif;min-height:100vh}
 .top{max-width:1520px;margin:0 auto;padding:20px 16px 8px;display:flex;justify-content:space-between;align-items:center}
 .brand{display:flex;gap:12px;align-items:center}.lg{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--cyan),var(--pur));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(168,85,247,0.3)}
@@ -15,11 +15,15 @@
 .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;backdrop-filter:blur(16px);box-shadow:0 10px 30px rgba(0,0,0,0.3)}
 .sec{font-size:11px;letter-spacing:1.2px;color:#8b93a8;font-weight:700;margin:18px 0 10px;display:flex;gap:8px;align-items:center;text-transform:uppercase}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.plat{position:relative;padding:14px 12px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));border:1px solid var(--line);cursor:pointer;display:flex;gap:10px;align-items:center;font-size:12px;font-weight:500;transition:0.2s;min-height:56px}
+.plat{position:relative;padding:14px 12px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));border:1px solid var(--line);cursor:pointer;display:flex;gap:10px;align-items:center;font-size:12px;font-weight:500;transition:0.2s;min-height:60px}
 .plat:hover{border-color:rgba(6,182,212,0.4);transform:translateY(-1px)}
-.plat.active{background:linear-gradient(135deg, rgba(6,182,212,0.22), rgba(168,85,247,0.22));border-color:var(--cyan);box-shadow:0 0 0 1px rgba(6,182,212,0.2), 0 8px 24px rgba(6,182,212,0.15)}
-.plat .ic{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.plat.active{border-color:var(--cyan);box-shadow:0 0 0 1px rgba(6,182,212,0.2), 0 8px 24px rgba(6,182,212,0.15);background:linear-gradient(135deg, rgba(6,182,212,0.22), rgba(168,85,247,0.22))}
+.plat.platform-wa.active{border-color:var(--wa);background:linear-gradient(135deg, rgba(37,211,102,0.22), rgba(6,182,212,0.18));box-shadow:0 0 0 1px rgba(37,211,102,0.2), 0 8px 24px rgba(37,211,102,0.15)}
+.plat.platform-tele.active{border-color:var(--tele);background:linear-gradient(135deg, rgba(34,158,217,0.25), rgba(168,85,247,0.18));box-shadow:0 0 0 1px rgba(34,158,217,0.2), 0 8px 24px rgba(34,158,217,0.15)}
+.plat .ic{width:36px;height:36px;border-radius:11px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .plat.active .ic{background:linear-gradient(135deg,var(--cyan),var(--pur))}
+.plat.platform-wa.active .ic{background:linear-gradient(135deg,#25D366,#128C7E)}
+.plat.platform-tele.active .ic{background:linear-gradient(135deg,#229ED9,#0e7abf)}
 .inp{width:100%;padding:13px 14px;border-radius:12px;background:#0a0b14;border:1px solid var(--line);color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;transition:0.2s}
 .inp:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(6,182,212,0.15)}
 .feat{padding:12px 12px;border-radius:13px;background:rgba(255,255,255,0.03);border:1px solid var(--line);display:flex;gap:10px;align-items:center;font-size:11px;font-weight:600;cursor:pointer;transition:0.2s;user-select:none}
@@ -33,6 +37,7 @@
 .wa-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--pur),var(--cyan));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px}
 .bubble-wrap{padding:14px;background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');background-size:300px;min-height:420px}
 .bub{background:#202c33;padding:10px 12px;border-radius:8px 8px 8px 0;font-family:'JetBrains Mono',monospace;font-size:11.5px;white-space:pre-wrap;max-width:92%;box-shadow:0 1px 1px rgba(0,0,0,0.3);line-height:1.5;word-break:break-word}
+.bub.tele{background:linear-gradient(135deg,#2AABEE,#229ED9);color:#fff;border-radius:12px 12px 12px 0}
 .bub.img{padding:0;overflow:hidden}.bub.img img{width:100%;display:block;max-height:220px;object-fit:cover}
 .bub .time{font-size:9px;color:#8696a0;margin-top:6px;text-align:right;display:flex;justify-content:flex-end;gap:4px;align-items:center}
 .upload{border:1.5px dashed rgba(168,85,247,0.35);border-radius:14px;padding:16px;text-align:center;background:rgba(168,85,247,0.06);cursor:pointer;margin-top:10px}
@@ -44,27 +49,46 @@
 </head>
 <body>
 <div class="top">
-<div class="brand"><div class="lg"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2l7 4v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-4z"/><path d="M9 12l2 2 4-4"/></svg></div><div><div style="font-weight:700;display:flex;gap:8px;align-items:center">CiKiZz <span class="badge"><span class="dot" style="display:inline-block;vertical-align:middle;margin-right:4px"></span>CREATE SCRIPT BOT</span></div><div style="font-size:11px;color:#8b93a8">Baileys 6.7.8 • Pairing & QR • Auto Log</div></div></div>
-<div style="display:flex;gap:8px;align-items:center;font-size:11px;color:#8b93a8"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12l2 2 4-4"/></svg> Baileys Ready</div>
+<div class="brand"><div class="lg"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2l7 4v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-4z"/><path d="M9 12l2 2 4-4"/></svg></div><div><div style="font-weight:700;display:flex;gap:8px;align-items:center">CiKiZz <span class="badge"><span class="dot" style="display:inline-block;vertical-align:middle;margin-right:4px"></span>CREATE SCRIPT BOT</span></div><div style="font-size:11px;color:#8b93a8">Baileys 6.7.8 • Pairing & QR • Auto Log • settings.js + package.json FIX</div></div></div>
+<div style="display:flex;gap:8px;align-items:center;font-size:11px;color:#8b93a8"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12l2 2 4-4"/></svg> Baileys Ready V27 500+ line</div>
 </div>
 
 <div class="wrap">
 <div>
 <div class="card">
-<div class="sec"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> BOT IDENTITY</div>
-<div class="grid"><input id="botName" class="inp" placeholder="Nama Bot - ZetsuYe" oninput="updateAll()"><input id="owner" class="inp" placeholder="Owner - 62882000572938" oninput="updateAll()"></div>
+<div class="sec" style="color:#22d3ee"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M7 12h10"/><path d="M12 7v10"/></svg> PILIH PLATFORM BOT (WAJIB) - WHATSAPP / TELEGRAM</div>
+<div class="grid">
+<div class="plat platform-wa active" data-platform="whatsapp" onclick="setPlatform('whatsapp',this)">
+<div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M19.05 4.91A9.82 9.82 0 0 0 12.03 2C6.49 2 2.05 6.44 2.05 10.98c0 1.58.41 3.12 1.19 4.48L2 22l6.7-1.76a9.84 9.84 0 0 0 4.7 1.2h.02c5.54 0 10.02-4.48 10.02-10.02 0-2.67-1.04-5.18-2.69-7.51zm-7.02 15.35h-.02a8.3 8.3 0 0 1-4.2-1.15l-.3-.18-4 .96.85-3.9-.2-.32A8.19 8.19 0 0 1 3.8 10.98C3.8 6.39 7.5 2.64 12.06 2.64a8.22 8.22 0 0 1 5.81 2.42 8.16 8.16 0 0 1 2.41 5.81c0 4.55-3.73 8.29-8.23 8.29zm4.49-6.2c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12s-.62.78-.76.94c-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.43-1.34-1.67-.14-.24-.02-.37.1-.49.1-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.42-.54-.42h-.46c-.16 0-.42.06-.64.3s-.84.82-.84 2 .86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.1.16 1.52.1.46-.07 1.43-.58 1.63-1.15.2-.56.2-1.04.14-1.15-.06-.1-.22-.16-.46-.28z"/></svg></div>
+<div><div style="font-weight:700">WhatsApp Bot</div><div style="font-size:10px;color:#8b93a8">Baileys 6.7.8 • Pairing & QR • Log fix + settings.js + package.json</div></div>
+</div>
+<div class="plat platform-tele" data-platform="telegram" onclick="setPlatform('telegram',this)">
+<div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
+<div><div style="font-weight:700">Telegram Bot</div><div style="font-size:10px;color:#8b93a8">Telegraf 4.15 • BotFather Token + settings.js</div></div>
+</div>
+</div>
 
-<div class="sec" style="margin-top:18px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00a884" stroke-width="1.8"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 5.18 13.5 19.79 19.79 0 0 1 2.1 4.93a2 2 0 0 1 2-2.18h3a2 2 0 0 1 2 1.72c.2.9.47 1.77.81 2.62a2 2 0 0 1-.45 2.11L7.09 10.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.85.34 1.72.62 2.62.81A2 2 0 0 1 21 16.92v3z"/></svg> NOMOR PAIRING WA (WAJIB)</div>
-<input id="pairingNumber" class="inp" placeholder="62882000572938" oninput="updateAll()">
+<div id="waConfig">
+<div class="sec"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> BOT IDENTITY WA - FIX BotName is not defined</div>
+<div class="grid"><input id="botName" class="inp" placeholder="Nama Bot - ZetsuLuyy" oninput="updateAll()"><input id="owner" class="inp" placeholder="Owner Number - 62882000572938" oninput="updateAll()"></div>
+<div class="grid" style="margin-top:8px"><input id="ownerName" class="inp" placeholder="Owner Name - Pahri" oninput="updateAll()"><input id="pairingNumber" class="inp" placeholder="Pairing Number - 62882..." oninput="updateAll()"></div>
 
-<div class="sec"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg> BASE & KONEKSI</div>
+<div class="sec" style="margin-top:18px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg> BASE & KONEKSI</div>
 <div class="grid">
 <div class="plat active" data-base="esm" onclick="setBase('esm',this)"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div><div>ESM Plugin</div><div style="font-size:10px;color:#8b93a8">Modern • plugins/</div></div></div>
-<div class="plat" data-base="case" onclick="setBase('case',this)"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div><div>CASE</div><div style="font-size:10px;color:#8b93a8">Single file • switch</div></div></div>
+<div class="plat" data-base="case" onclick="setBase('case',this)"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div><div>CASE</div><div style="font-size:10px;color:#8b93a8">Single file • switch • 4 file</div></div></div>
 </div>
 <div class="grid" style="margin-top:10px">
 <div class="plat active" data-conn="pairing" onclick="setConn('pairing',this)"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div><div>Pairing Code</div><div style="font-size:10px;color:#8b93a8">8 digit • Anti gagal</div></div></div>
 <div class="plat" data-conn="qr" onclick="setConn('qr',this)"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div><div><div>QR Code</div><div style="font-size:10px;color:#8b93a8">Scan manual</div></div></div>
+</div>
+</div>
+
+<div id="teleConfig" style="display:none">
+<div class="sec" style="color:#229ED9"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#229ED9" stroke-width="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> TELEGRAM BOT TOKEN + IDENTITY</div>
+<div class="grid"><input id="teleBotName" class="inp" placeholder="Nama Bot Tele - ZetsuLuyy" oninput="updateAll()"><input id="teleUsername" class="inp" placeholder="@zetsuluyy_bot" oninput="updateAll()"></div>
+<div class="grid" style="margin-top:8px"><input id="teleOwner" class="inp" placeholder="Owner Name - Pahri" oninput="updateAll()"><input id="teleToken" class="inp" placeholder="123456:ABC-DEF dari @BotFather" oninput="updateAll()"></div>
+<div style="font-size:10px;color:#8b93a8;margin-top:6px">Ambil token di Telegram > @BotFather > /newbot</div>
 </div>
 
 <div class="sec"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-3.5-3.5-7 7"/></svg> THUMBNAIL MENU</div>
@@ -87,7 +111,7 @@
 <div class="plat" data-btn="btn" onclick="setBtn('btn',this)"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8"><rect x="3" y="8" width="18" height="10" rx="2"/><path d="M7 8V6a5 5 0 0 1 10 0v2"/><circle cx="12" cy="13" r="1"/></svg></div>Button Beneran</div>
 </div>
 
-<div class="sec"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> FITUR BOT</div>
+<div class="sec"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> FITUR BOT (10 FITUR - TANPA TELEGRAM)</div>
 <div class="grid" id="featGrid" style="grid-template-columns:1fr 1fr;gap:8px">
 <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="welcome" checked style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.8"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/></svg> WELCOME</div>
 <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="antilink" checked style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.8"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/><line x1="4" y1="4" x2="20" y2="20"/></svg> ANTILINK</div>
@@ -99,10 +123,9 @@
 <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="store" checked style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg> STORE</div>
 <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="autoreply" checked style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> AUTOREPLY</div>
 <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="broadcast" checked style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> BROADCAST</div>
-<div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="telegram" checked style="display:none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#229ED9" stroke-width="1.8"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> TELEGRAM</div>
 </div>
 
-<button class="btn" onclick="generateClient()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Generate ZIP</button>
+<button class="btn" onclick="generateClient()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Generate ZIP + settings.js + package.json</button>
 <div id="downloadLink" class="dl"><a id="linkA" download>⬇️ Download ZIP</a></div>
 </div>
 </div>
@@ -111,7 +134,7 @@
 <div class="card" style="position:sticky;top:16px">
 <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:12px;display:flex;gap:8px;align-items:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> LIVE PREVIEW MENU</h3><div style="display:flex;gap:6px;align-items:center;font-size:10px;color:#8b93a8"><div class="dot"></div> LIVE</div></div>
 <div class="wa" style="margin-top:12px">
-<div class="wa-h"><div class="wa-av">B</div><div style="flex:1"><div id="prevName" style="font-weight:700;font-size:13px">Nama Bot</div><div id="prevSub" style="font-size:10px;color:#8696a0">Premium Box • Teks • ESM</div></div><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8696a0" stroke-width="1.8"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div></div>
+<div class="wa-h"><div class="wa-av" id="waAv">B</div><div style="flex:1"><div id="prevName" style="font-weight:700;font-size:13px">Nama Bot</div><div id="prevSub" style="font-size:10px;color:#8696a0">Premium Box • Teks • ESM • settings.js</div></div><div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8696a0" stroke-width="1.8"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></div></div>
 <div class="bubble-wrap">
 <div id="imgPreviewWrap" class="bub img" style="display:none"><img id="imgPreview" src=""></div>
 <div class="bub" id="waBubble">Isi BOT IDENTITY dulu...<div class="time"><span id="waTime">02.49</span> <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div></div>
@@ -119,15 +142,16 @@
 </div>
 </div>
 <div style="margin-top:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:12px;border:1px solid var(--line)">
-<div style="font-size:10px;color:#8b93a8;margin-bottom:6px;display:flex;gap:6px;align-items:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> CONSOLE LOG PREVIEW</div>
-<div id="consolePreview" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#22c55e;background:#000;border-radius:8px;padding:8px;min-height:60px">> Bot ready...<br>> Menunggu .menu di WA...</div>
+<div style="font-size:10px;color:#8b93a8;margin-bottom:6px;display:flex;gap:6px;align-items:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> CONSOLE LOG PREVIEW - FIX BotName is not defined + owner</div>
+<div id="consolePreview" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#22c55e;background:#000;border-radius:8px;padding:8px;min-height:80px">> [SETTINGS] Loaded<br>> Bot ready...<br>> Menunggu .menu di WA...</div>
 </div>
 </div>
 </div>
 </div>
 
 <script>
-let state={base:'esm',conn:'pairing',menu:'premium',btn:'nobtn',thumb:'nothumb',thumbData:null};
+let state={platform:'whatsapp',base:'esm',conn:'pairing',menu:'premium',btn:'nobtn',thumb:'nothumb',thumbData:null};
+function setPlatform(p,el){state.platform=p;document.querySelectorAll('[data-platform]').forEach(e=>e.classList.remove('active'));el.classList.add('active');if(p==='whatsapp') el.classList.add('platform-wa'); else el.classList.add('platform-tele');document.getElementById('waConfig').style.display=p==='whatsapp'?'block':'none';document.getElementById('teleConfig').style.display=p==='telegram'?'block':'none';document.getElementById('platformLabel')?document.getElementById('platformLabel').textContent=p.toUpperCase():null;updateAll();}
 function setBase(b,el){state.base=b; document.querySelectorAll('[data-base]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); updateAll();}
 function setConn(c,el){state.conn=c; document.querySelectorAll('[data-conn]').forEach(e=>e.classList.remove('active')); el.classList.add('active');}
 function setMenu(m,el){state.menu=m; document.querySelectorAll('[data-menu]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); updateAll();}
@@ -136,193 +160,257 @@ function setThumb(t,el){state.thumb=t; document.querySelectorAll('[data-thumb]')
 function previewThumb(i){ const f=i.files[0]; if(!f) return; const r=new FileReader(); r.onload=e=>{ state.thumbData=e.target.result; document.getElementById('thumbPrev').src=e.target.result; document.getElementById('thumbPrev').style.display='block'; updateAll(); }; r.readAsDataURL(f); }
 function toggleFeat(el){ const cb=el.querySelector('input'); cb.checked=!cb.checked; el.classList.toggle('active',cb.checked); if(cb.checked){ el.querySelector('.chk').innerHTML='<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>'; } else { el.querySelector('.chk').innerHTML=''; } updateAll(); }
 function updateAll(){
-  const raw=document.getElementById('botName').value.trim();
+  const isWA=state.platform==='whatsapp';
+  const raw=isWA?document.getElementById('botName').value.trim():document.getElementById('teleBotName').value.trim();
   const name=raw||'Nama Bot';
   document.getElementById('prevName').textContent=name;
+  document.getElementById('waAv').textContent=name.charAt(0).toUpperCase();
   const feats=[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value);
-  const pairing=document.getElementById('pairingNumber').value.trim()||'62882...';
+  const ownerName=isWA?(document.getElementById('ownerName').value.trim()||'Pahri'):(document.getElementById('teleOwner').value.trim()||'Pahri');
+  const ownerNum=isWA?(document.getElementById('owner').value.trim()||'62882...'):(document.getElementById('teleUsername').value.trim()||'@bot');
+  const pairing=document.getElementById('pairingNumber')?.value.trim()||'62882...';
+  const teleToken=document.getElementById('teleToken')?.value.trim()||'';
   if(!raw){
     document.getElementById('waBubble').innerHTML='Isi BOT IDENTITY dulu...<div class="time"><span>02.49</span> <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>';
-    document.getElementById('prevSub').textContent='Isi dulu';
-    document.getElementById('consolePreview').innerHTML='> Bot ready...<br>> Isi nama bot dulu';
+    document.getElementById('prevSub').textContent='Isi dulu - settings.js fix';
+    document.getElementById('consolePreview').innerHTML='> [SETTINGS] Belum ada<br>> Isi nama bot dulu';
     return;
   }
-  document.getElementById('prevSub').textContent=(state.menu==='premium'?'Premium Box':state.menu)+' • '+(state.btn==='btn'?'Button':'Teks')+' • '+state.base.toUpperCase();
+  document.getElementById('prevSub').textContent=isWA?(state.menu==='premium'?'Premium Box':state.menu)+' • '+(state.btn==='btn'?'Button':'Teks')+' • '+state.base.toUpperCase()+' • settings.js':'Telegram • '+teleToken.slice(0,10)+'...';
   let menuTxt='';
-  if(state.menu==='simple'){
-    menuTxt='MENU '+name+'\n'+feats.map(f=>'.'+f).join('\n');
-  } else if(state.menu==='image'){
-    menuTxt='╭━━━〔 '+name+' 〕━━━\n'+feats.map(f=>'┃ • .'+f).join('\n')+'\n╰━━━\nOwner: '+(document.getElementById('owner').value||'Owner');
+  if(isWA){
+    if(state.menu==='simple') menuTxt='MENU '+name+'\n'+feats.map(f=>'.'+f).join('\n')+'\n\nOwner: '+ownerName;
+    else if(state.menu==='image') menuTxt='╭━━━〔 '+name+' 〕━━━\n'+feats.map(f=>'┃ • .'+f).join('\n')+'\n╰━━━\nOwner: '+ownerName+' ('+ownerNum+')';
+    else menuTxt='╭━━━〔 '+name+' 〕━━━✦\n┃ Owner: '+ownerName+' ('+ownerNum+')\n┃ Bot: '+name+'\n┃ Prefix: .\n┣━━━〔 FITUR 〕━━━\n'+feats.map(f=>'┃ ❒ .'+f).join('\n')+'\n╰━━━━━━━━━━━━';
   } else {
-    menuTxt='╭━━━〔 '+name+' 〕━━━✦\n┃ Owner: '+(document.getElementById('owner').value||'Owner')+'\n┃ Bot: '+name+'\n┃ Prefix: .\n┣━━━〔 FITUR 〕━━━\n'+feats.map(f=>'┃ ❒ .'+f).join('\n')+'\n╰━━━━━━━━━━━━';
+    menuTxt='🤖 '+name+' (Telegram)\n\n/'+feats.map(f=>f).join(' /')+'\n\nOwner: '+ownerName+'\nUsername: '+ownerNum+'\nToken: '+(teleToken?teleToken.slice(0,12)+'...':'Belum diisi');
   }
-  document.getElementById('waBubble').innerHTML=menuTxt.replace(/\n/g,'<br>')+'<div class="time"><span id="waTime">'+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+'</span> <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>';
+  document.getElementById('waBubble').innerHTML=menuTxt.replace(/\n/g,'<br>')+'<div class="time"><span>'+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+'</span> <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>';
   const imgWrap=document.getElementById('imgPreviewWrap');
   const img=document.getElementById('imgPreview');
-  if(state.thumb==='thumb' && state.thumbData){
-    imgWrap.style.display='block';
-    img.src=state.thumbData;
-  } else if(state.menu==='image'){
-    imgWrap.style.display='block';
-    img.src='https://picsum.photos/seed/'+encodeURIComponent(name)+'/400/220';
-  } else {
-    imgWrap.style.display='none';
-  }
+  if(state.thumb==='thumb' && state.thumbData){ imgWrap.style.display='block'; img.src=state.thumbData; }
+  else if(state.menu==='image'){ imgWrap.style.display='block'; img.src='https://picsum.photos/seed/'+encodeURIComponent(name)+'/400/220'; }
+  else { imgWrap.style.display='none'; }
   const btnPrev=document.getElementById('btnPreview');
-  if(state.btn==='btn'){
-    btnPrev.style.display='flex';
-    btnPrev.innerHTML=feats.slice(0,3).map(f=>`<div style="background:#00a884;padding:8px;border-radius:8px;text-align:center;font-size:11px;font-weight:600">✦ ${f.toUpperCase()}</div>`).join('');
+  if(state.btn==='btn'){ btnPrev.style.display='flex'; btnPrev.innerHTML=feats.slice(0,3).map(f=>`<div style="background:#00a884;padding:8px;border-radius:8px;text-align:center;font-size:11px;font-weight:600">✦ ${f.toUpperCase()} - ${name}</div>`).join(''); }
+  else { btnPrev.style.display='none'; }
+  if(isWA){
+    document.getElementById('consolePreview').innerHTML=`> [SETTINGS] Loaded - BotName: ${name} | Owner: ${ownerNum} | OwnerName: ${ownerName}<br>> 📦 Loaded ${feats.length} plugins - ${name}<br>> 🔑 PAIRING CODE ${name}: XXXX-XXXX (nomor ${pairing})<br>> ✅ Bot ${name} Connected! Owner: ${ownerName}<br>> [MSG] 120363xxx@g.us | ${ownerNum} : .menu<br>> [CMD] menu - via settings.js<br>> [SUCCESS] Menu sent with botName ${name}`;
   } else {
-    btnPrev.style.display='none';
+    document.getElementById('consolePreview').innerHTML=`> [SETTINGS] Telegram Bot ${name} | Owner: ${ownerName}<br>> 🔑 Token: ${teleToken?teleToken.slice(0,10)+'...':'Belum diisi'}<br>> ✅ Bot ${name} Started! Owner: ${ownerName}<br>> [TELE] /start from user<br>> [CMD] /menu - via settings.js`;
   }
-  document.getElementById('consolePreview').innerHTML=`> 📦 Loaded ${feats.length} plugins - ${name}<br>> 🔑 PAIRING CODE ${name}: XXXX-XXXX (nomor ${pairing})<br>> ✅ Bot ${name} Connected!<br>> [MSG] 120363xxx@g.us | 6288... : .menu<br>> [CMD] menu<br>> [MENU] Sent to group`;
 }
 async function generateClient(){
-  const botName=document.getElementById('botName').value.trim()||'ZetsuYe';
-  const owner=document.getElementById('owner').value.trim()||'62882000572938';
-  const pairing=document.getElementById('pairingNumber').value.trim().replace(/[^0-9]/g,'')||'62882000572938';
+  const isWA=state.platform==='whatsapp';
+  const botName=isWA?(document.getElementById('botName').value.trim()||'ZetsuLuyy'):(document.getElementById('teleBotName').value.trim()||'ZetsuLuyy');
+  const ownerNumber=isWA?(document.getElementById('owner').value.trim()||'62882000572938'):(document.getElementById('teleUsername').value.trim()||'@zetsuluyy_bot');
+  const ownerName=isWA?(document.getElementById('ownerName').value.trim()||'Pahri'):(document.getElementById('teleOwner').value.trim()||'Pahri');
+  const pairing=document.getElementById('pairingNumber')?.value.trim().replace(/[^0-9]/g,'')||'62882000572938';
+  const teleToken=document.getElementById('teleToken')?.value.trim()||'YOUR_TELEGRAM_TOKEN';
+  const teleUsername=document.getElementById('teleUsername')?.value.trim()||'@zetsuluyy_bot';
   const features=[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value);
   const safe=botName.replace(/[^a-zA-Z0-9-_]/g,'-').toLowerCase()||'bot';
   const zip=new JSZip();
-  zip.file('package.json', JSON.stringify({name:safe,version:"1.0.0",description:botName,type:state.base==='esm'?"module":"commonjs",main:"index.js",scripts:{start:"node index.js"},dependencies:{"@whiskeysockets/baileys":"^6.7.8","pino":"^9.3.2","qrcode-terminal":"^0.12.0","@hapi/boom":"^10.0.1"}}, null, 2));
-  let indexCode="";
-  if(state.base==='case'){
-    indexCode=`const { Boom } = require('@hapi/boom');
+
+  const settingsCJS = `module.exports = {
+  botName: "${botName}",
+  ownerNumber: "${ownerNumber}",
+  ownerName: "${ownerName}",
+  pairingNumber: "${pairing}",
+  prefix: ".",
+  features: ${JSON.stringify(features)},
+  menuType: "${state.menu}",
+  btnType: "${state.btn}",
+  thumbType: "${state.thumb}",
+  version: "1.0.0"
+};
+`;
+  const settingsESM = `export default {
+  botName: "${botName}",
+  ownerNumber: "${ownerNumber}",
+  ownerName: "${ownerName}",
+  pairingNumber: "${pairing}",
+  prefix: ".",
+  features: ${JSON.stringify(features)},
+  menuType: "${state.menu}",
+  btnType: "${state.btn}",
+  thumbType: "${state.thumb}",
+  version: "1.0.0"
+};
+`;
+
+  if(isWA){
+    if(state.base==='case'){
+      zip.file('settings.js', settingsCJS);
+      zip.file('package.json', JSON.stringify({name:safe,version:"1.0.0",description:botName+" Owner "+ownerName+" - settings.js fix BotName is not defined",type:"commonjs",main:"index.js",scripts:{start:"node index.js"},dependencies:{"@whiskeysockets/baileys":"^6.7.8","pino":"^9.3.2","qrcode-terminal":"^0.12.0","@hapi/boom":"^10.0.1"}}, null, 2));
+      zip.file('README.md', `# ${botName}\nOwner: ${ownerName} (${ownerNumber})\nPairing: ${pairing}\n\n## Fix BotName is not defined\n- File settings.js menyimpan botName, ownerNumber, ownerName\n- index.js require settings.js\n\n## Cara run di panel.fakrul.my/server/b1\n1. Upload ZIP (4 file: settings.js, index.js, package.json, README.md)\n2. npm install\n3. npm start\n4. Pairing code muncul di console\n`);
+      const indexCode = `const settings = require('./settings.js');
+const botName = settings.botName;
+const owner = settings.ownerNumber;
+const ownerName = settings.ownerName;
+const pairingNumber = settings.pairingNumber;
+const prefix = settings.prefix;
+global.rpgDB={}; global.produkDB=[];
+console.log('[SETTINGS] Loaded - BotName:', botName, '| Owner:', owner, '| OwnerName:', ownerName);
+const { Boom } = require('@hapi/boom');
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const pino = require('pino');
-global.rpgDB={};global.produkDB=[];global.telegramDB={};
 async function startBot(){
-console.log('[SYSTEM] Starting bot ${botName}...');
-const { state, saveCreds } = await useMultiFileAuthState('session');
-const sock = makeWASocket({ auth: state, logger: pino({ level: 'silent' }), printQRInTerminal: false });
-sock.ev.on('creds.update', saveCreds);
-if (!sock.authState.creds.registered){
-console.log('[PAIRING] Waiting 3s...');
-setTimeout(async()=>{
-try{
-const pairingCode = await sock.requestPairingCode("${pairing}");
-console.log(\`\\n🔑 PAIRING CODE ${botName}: \${pairingCode}\\n\`);
-}catch(e){ console.log('[PAIRING ERROR]', e.message); }
-},3000);
-}
-sock.ev.on('connection.update', (update)=>{
-const { connection, lastDisconnect } = update;
-console.log('[CONNECTION] Update:', connection);
-if (connection === 'close'){
-const shouldReconnect = (lastDisconnect?.error)?.output?.statusCode !== DisconnectReason.loggedOut;
-console.log('[CLOSE] Reconnect:', shouldReconnect);
-if (shouldReconnect) setTimeout(()=>startBot(),3000);
-} else if (connection === 'open'){
-console.log('✅ Bot ${botName} Connected! Owner: ${owner}');
-console.log('[READY] Bot siap menerima .menu, .s, .stiker dll');
-}
-});
-sock.ev.on('messages.upsert', async (m)=>{
-console.log('[EVENT] messages.upsert triggered, type:', m.type);
-const msg = m.messages[0];
-if(!msg){ console.log('[SKIP] No message'); return; }
-console.log('[RAW] key:', msg.key.remoteJid, 'fromMe:', msg.key.fromMe);
-if (msg.key.fromMe){ console.log('[SKIP] fromMe'); return; }
-let messageContent = msg.message;
-if(messageContent?.ephemeralMessage){ messageContent = messageContent.ephemeralMessage.message; console.log('[EPHEMERAL] Unwrapped'); }
-if(!messageContent){ console.log('[SKIP] No content'); return; }
-const type = Object.keys(messageContent)[0];
-let body='';
-if(type==='conversation') body=messageContent.conversation;
-else if(type==='extendedTextMessage') body=messageContent.extendedTextMessage.text;
-else if(type==='imageMessage') body=messageContent.imageMessage.caption||'';
-else if(type==='videoMessage') body=messageContent.videoMessage.caption||'';
-const remoteJid = msg.key.remoteJid;
-const sender = msg.key.participant || msg.key.remoteJid;
-console.log(\`[MSG] \${remoteJid} | \${sender} : \${body} | type:\${type}\`);
-if (!body){ console.log('[SKIP] Empty body'); return; }
-if(!body.startsWith('.')){ console.log('[SKIP] Not command:', body); return; }
-const args = body.slice(1).trim().split(/ +/);
-const command = args.shift().toLowerCase();
-const text = args.join(' ');
-console.log(\`[CMD] .\${command} from \${sender}\`);
-try{
-switch(command){
-case 'menu': {
-const menu = \`${state.menu==='simple' ? 'MENU ${botName}\\n'+features.map(f=>'.'+f).join('\\n') : '╭━━━〔 ${botName} 〕━━━\\n'+features.map(f=>'┃ ❒ .'+f).join('\\n')+'\\n╰━━\\nOwner: ${owner}'}\`;
-await sock.sendMessage(remoteJid, { text: menu });
-console.log('[SUCCESS] Menu sent to', remoteJid);
-break;
-}
-case 'ping': await sock.sendMessage(remoteJid, { text: 'Pong ${botName}' }); console.log('[PING]'); break;
-${features.includes('sticker')?`case 's': case 'sticker': case 'stiker': try{ const contentForDl = msg.message?.ephemeralMessage ? msg.message.ephemeralMessage.message : msg.message; const buffer = await sock.downloadMediaMessage({ message: contentForDl, key: msg.key }); if(buffer){ await sock.sendMessage(remoteJid, { sticker: buffer }); console.log('[STICKER] Sent'); } }catch(err){ console.log('[STICKER ERROR]', err.message); } break;`:''}
-${features.includes('rpg')?`case 'daily': case 'balance': if(!global.rpgDB[sender]) global.rpgDB[sender]={money:0}; if(command==='daily') global.rpgDB[sender].money+=1000; await sock.sendMessage(remoteJid, { text: 'Balance: '+global.rpgDB[sender].money }); console.log('[RPG]'); break;`:''}
-${features.includes('store')?`case 'addproduk': global.produkDB.push(text); await sock.sendMessage(remoteJid, { text: 'Ditambah: '+text }); console.log('[STORE] Add'); break; case 'listproduk': const list=global.produkDB.length?global.produkDB.map((v,i)=>\`\${i+1}. \${v}\`).join('\\n'):'Kosong'; await sock.sendMessage(remoteJid, { text: list }); console.log('[STORE] List'); break;`:''}
-${features.includes('group')?`case 'hidetag': const meta=await sock.groupMetadata(remoteJid); const mentions=meta.participants.map(p=>p.id); await sock.sendMessage(remoteJid, { text: text||'Hidetag', mentions }); console.log('[HIDETAG] '+mentions.length); break;`:''}
-${features.includes('telegram')?`case 'telegram': await sock.sendMessage(remoteJid, { text: 'Telegram ON - ${botName}' }); console.log('[TELEGRAM]'); break;`:''}
-default: console.log('[UNKNOWN] .'+command); await sock.sendMessage(remoteJid, { text: 'Ketik .menu' });
-}
-}catch(err){ console.log('[ERROR]', err.message); }
-});
-console.log('[SYSTEM] Handlers registered');
+  console.log('[SYSTEM] Starting '+botName+'... Owner '+ownerName+' Platform WhatsApp CASE');
+  const { state, saveCreds } = await useMultiFileAuthState('session');
+  const sock = makeWASocket({ auth: state, logger: pino({ level: 'silent' }) });
+  sock.ev.on('creds.update', saveCreds);
+  if (!sock.authState.creds.registered){
+    console.log('[PAIRING] Waiting 3s for '+pairingNumber+' Bot '+botName);
+    setTimeout(async()=>{ try{ const code=await sock.requestPairingCode(pairingNumber); console.log('\\n🔑 PAIRING CODE '+botName+': '+code+'\\n'); }catch(e){ console.log('[PAIRING ERROR]', e.message); } },3000);
+  }
+  sock.ev.on('connection.update', (u)=>{
+    console.log('[CONNECTION]', u.connection);
+    if(u.connection==='close'){ const shouldReconnect = u.lastDisconnect?.error?.output?.statusCode!==DisconnectReason.loggedOut; console.log('[CLOSE] Reconnect:', shouldReconnect, 'Bot:', botName); if(shouldReconnect) setTimeout(()=>startBot(),3000); }
+    else if(u.connection==='open'){ console.log('✅ Bot '+botName+' Connected! Owner: '+owner+' ('+ownerName+')'); console.log('[READY] Bot siap .menu .s .stiker Owner '+ownerName); }
+  });
+  sock.ev.on('messages.upsert', async (m)=>{
+    console.log('[EVENT] messages.upsert', m.type, 'for', botName);
+    const msg=m.messages[0]; if(!msg){ console.log('[SKIP] No message'); return; }
+    console.log('[RAW]', msg.key.remoteJid, 'fromMe', msg.key.fromMe, 'Bot', botName);
+    if(msg.key.fromMe){ console.log('[SKIP] fromMe'); return; }
+    let content=msg.message; if(content?.ephemeralMessage){ content=content.ephemeralMessage.message; console.log('[EPHEMERAL] Unwrapped for', botName); }
+    if(!content){ console.log('[SKIP] No content'); return; }
+    const type=Object.keys(content)[0]; let body='';
+    if(type==='conversation') body=content.conversation; else if(type==='extendedTextMessage') body=content.extendedTextMessage.text; else if(type==='imageMessage') body=content.imageMessage.caption||''; else if(type==='videoMessage') body=content.videoMessage.caption||'';
+    const remoteJid=msg.key.remoteJid; const sender=msg.key.participant||remoteJid;
+    console.log(\`[MSG] \${remoteJid} | \${sender} : \${body} | type:\${type} | Bot:\${botName} Owner:\${ownerName}\`);
+    if(!body){ console.log('[SKIP] Empty body'); return; }
+    if(!body.startsWith(prefix)){ console.log('[SKIP] Not command:', body); return; }
+    const args=body.slice(1).trim().split(/ +/); const command=args.shift().toLowerCase(); const text=args.join(' ');
+    console.log(\`[CMD] .\${command} from \${sender} - Bot \${botName} Owner \${ownerName}\`);
+    try{
+      switch(command){
+        case 'menu': {
+          const menu = \`╭━━━〔 \${botName} 〕━━━✦
+┃ Owner: \${ownerName} (\${owner})
+┃ Bot: \${botName}
+┃ Prefix: \${prefix}
+┣━━━〔 FITUR 〕━━━
+${features.map(f=>`┃ ❒ .${f}`).join('\\n')}
+╰━━━━━━━━━━━━\`;
+          await sock.sendMessage(remoteJid, { text: menu });
+          console.log('[SUCCESS] Menu sent to', remoteJid, 'with botName', botName, 'ownerName', ownerName);
+          break;
+        }
+        case 'ping': await sock.sendMessage(remoteJid, { text: 'Pong '+botName+' - Owner '+ownerName+' - Prefix '+prefix }); console.log('[PING] Bot', botName); break;
+        case 'owner': await sock.sendMessage(remoteJid, { text: 'Owner: '+ownerName+'\\nNumber: '+owner+'\\nBot: '+botName+'\\nPairing: '+pairingNumber }); break;
+        ${features.includes('sticker')?`case 's': case 'sticker': case 'stiker': try{ const c=msg.message?.ephemeralMessage?msg.message.ephemeralMessage.message:msg.message; const b=await sock.downloadMediaMessage({message:c,key:msg.key}); if(b){ await sock.sendMessage(remoteJid,{sticker:b}); console.log('[STICKER] Sent by', botName, 'Owner', ownerName); } }catch(e){ console.log('[STICKER ERROR]', e.message); } break;`:''}
+        ${features.includes('rpg')?`case 'daily': case 'balance': if(!global.rpgDB[sender]) global.rpgDB[sender]={money:0}; if(command==='daily') global.rpgDB[sender].money+=1000; await sock.sendMessage(remoteJid, { text: '💰 '+botName+' | Balance: '+global.rpgDB[sender].money+' | Owner: '+ownerName }); console.log('[RPG]', sender, 'Bot', botName); break;`:''}
+        ${features.includes('store')?`case 'addproduk': global.produkDB.push(text); await sock.sendMessage(remoteJid, { text: '✅ '+botName+' | Ditambah: '+text+' | Owner: '+ownerName }); console.log('[STORE] Add', text, 'Bot', botName); break; case 'listproduk': const list=global.produkDB.map((v,i)=>\`\${i+1}. \${v}\`).join('\\n')||'Kosong'; await sock.sendMessage(remoteJid, { text: '🛒 '+botName+' Store - Owner '+ownerName+'\\n\\n'+list }); console.log('[STORE] List Bot', botName); break;`:''}
+        ${features.includes('group')?`case 'hidetag': const meta=await sock.groupMetadata(remoteJid); const mentions=meta.participants.map(p=>p.id); await sock.sendMessage(remoteJid, { text: text||'Hidetag by '+botName+' Owner '+ownerName, mentions }); console.log('[HIDETAG] '+mentions.length+' Bot '+botName); break;`:''}
+        default: console.log('[UNKNOWN] .'+command+' Bot '+botName); await sock.sendMessage(remoteJid, { text: 'Command .'+command+' tidak ada, ketik .menu\\nBot: '+botName+' Owner: '+ownerName }); break;
+      }
+    }catch(e){ console.log('[ERROR]', e.message, 'Bot', botName); }
+  });
+  console.log('[SYSTEM] Handlers registered for '+botName+' Owner '+ownerName);
 }
 startBot();
 `;
-  } else {
-    indexCode=`import makeWASocket, { useMultiFileAuthState, DisconnectReason } from '@whiskeysockets/baileys';
+      zip.file('index.js', indexCode);
+      if(state.thumbData){ const b64=state.thumbData.split(',')[1]; if(b64) zip.file('thumb.jpg', b64, {base64:true}); }
+    } else {
+      zip.file('settings.js', settingsESM);
+      zip.file('package.json', JSON.stringify({name:safe,version:"1.0.0",description:botName+" Owner "+ownerName,type:"module",main:"index.js",scripts:{start:"node index.js"},dependencies:{"@whiskeysockets/baileys":"^6.7.8","pino":"^9.3.2","qrcode-terminal":"^0.12.0","@hapi/boom":"^10.0.1"}}, null, 2));
+      zip.file('README.md', `# ${botName} ESM\nOwner: ${ownerName} (${ownerNumber})\n\nFix BotName is not defined - via settings.js\n\nnpm install\nnpm start\n`);
+      const indexESM = `import settings from './settings.js';
+const botName = settings.botName;
+const owner = settings.ownerNumber;
+const ownerName = settings.ownerName;
+const pairingNumber = settings.pairingNumber;
+global.rpgDB={}; global.produkDB={};
+console.log('[SETTINGS] Loaded - BotName:', botName, '| Owner:', owner, '| OwnerName:', ownerName);
+import makeWASocket, { useMultiFileAuthState, DisconnectReason } from '@whiskeysockets/baileys';
 import pino from 'pino';
 import fs from 'fs'; import path from 'path'; import { pathToFileURL } from 'url';
-global.rpgDB={};global.produkDB={};global.telegramDB={};
 async function startBot(){
-console.log('[SYSTEM] Starting ${botName} ESM...');
-const { state, saveCreds } = await useMultiFileAuthState('session');
-const sock = makeWASocket({ auth: state, logger: pino({ level: 'silent' }) });
-sock.ev.on('creds.update', saveCreds);
-if (!sock.authState.creds.registered){
-setTimeout(async()=>{ const c=await sock.requestPairingCode("${pairing}"); console.log(\`PAIRING CODE \${c}\`); },3000);
-}
-sock.ev.on('connection.update', (u)=>{
-console.log('[CONNECTION]', u.connection);
-if(u.connection==='close'){ const r=u.lastDisconnect?.error?.output?.statusCode!==DisconnectReason.loggedOut; if(r) setTimeout(()=>startBot(),3000); }
-else if(u.connection==='open'){ console.log('✅ Bot ${botName} Connected!'); }
-});
-const pluginsDir=path.join(process.cwd(),'plugins');
-if(!fs.existsSync(pluginsDir)) fs.mkdirSync(pluginsDir);
-const plugins=[]; const files=fs.readdirSync(pluginsDir).filter(f=>f.endsWith('.js'));
-for(const file of files){ const module=await import(pathToFileURL(path.join(pluginsDir,file)).href); if(module.default?.handler) plugins.push(module.default); }
-console.log(\`📦 Loaded \${plugins.length} plugins - ${botName}\`);
-sock.ev.on('messages.upsert', async (m)=>{
-console.log('[EVENT] upsert', m.type);
-const msg=m.messages[0]; if(!msg) return;
-console.log('[RAW]', msg.key.remoteJid, 'fromMe', msg.key.fromMe);
-if(msg.key.fromMe) return;
-let messageContent=msg.message; if(messageContent?.ephemeralMessage) messageContent=messageContent.ephemeralMessage.message;
-const type=Object.keys(messageContent||{})[0]||''; let body='';
-if(type==='conversation') body=messageContent.conversation; else if(type==='extendedTextMessage') body=messageContent.extendedTextMessage.text; else if(type==='imageMessage') body=messageContent.imageMessage.caption||'';
-const remoteJid=msg.key.remoteJid; const sender=msg.key.participant||remoteJid;
-console.log(\`[MSG] \${remoteJid} | \${sender} : \${body}\`);
-if(!body||!body.startsWith('.')) return;
-const args=body.slice(1).trim().split(/ +/); const command=args.shift().toLowerCase();
-console.log(\`[CMD] \${command}\`);
-for(const plugin of plugins){ if(plugin.command.includes(command)){ console.log('[PLUGIN] '+command); await plugin.handler(sock,msg,{command,args,text:args.join(' '),sender,remoteJid}); break; } }
-});
+  console.log('[SYSTEM] Starting '+botName+' ESM Owner '+ownerName);
+  const { state, saveCreds } = await useMultiFileAuthState('session');
+  const sock = makeWASocket({ auth: state, logger: pino({ level: 'silent' }) });
+  sock.ev.on('creds.update', saveCreds);
+  if (!sock.authState.creds.registered){ setTimeout(async()=>{ const c=await sock.requestPairingCode(pairingNumber); console.log('PAIRING CODE '+botName+': '+c); },3000); }
+  sock.ev.on('connection.update', (u)=>{ console.log('[CONNECTION]', u.connection, 'Bot', botName); if(u.connection==='open') console.log('✅ Bot '+botName+' Connected! Owner: '+owner+' ('+ownerName+')'); if(u.connection==='close'){ const r=u.lastDisconnect?.error?.output?.statusCode!==DisconnectReason.loggedOut; if(r) setTimeout(()=>startBot(),3000); } });
+  const pluginsDir=path.join(process.cwd(),'plugins'); if(!fs.existsSync(pluginsDir)) fs.mkdirSync(pluginsDir);
+  const plugins=[]; const files=fs.readdirSync(pluginsDir).filter(f=>f.endsWith('.js'));
+  for(const file of files){ const mod=await import(pathToFileURL(path.join(pluginsDir,file)).href); if(mod.default?.handler) plugins.push(mod.default); }
+  console.log(\`📦 Loaded \${plugins.length} plugins - \${botName} Owner \${ownerName}\`);
+  sock.ev.on('messages.upsert', async (m)=>{
+    console.log('[EVENT] upsert', m.type, 'Bot', botName);
+    const msg=m.messages[0]; if(!msg||msg.key.fromMe) return;
+    let content=msg.message; if(content?.ephemeralMessage) content=content.ephemeralMessage.message;
+    const type=Object.keys(content||{})[0]; let body=''; if(type==='conversation') body=content.conversation; else if(type==='extendedTextMessage') body=content.extendedTextMessage.text;
+    const remoteJid=msg.key.remoteJid; const sender=msg.key.participant||remoteJid;
+    console.log(\`[MSG] \${remoteJid} | \${sender} : \${body} | Bot \${botName}\`);
+    if(!body?.startsWith(settings.prefix)) return;
+    const args=body.slice(1).trim().split(/ +/); const command=args.shift().toLowerCase();
+    console.log('[CMD]', command, 'Bot', botName, 'Owner', ownerName);
+    for(const p of plugins){ if(p.command.includes(command)){ console.log('[PLUGIN]', command, 'Bot', botName); await p.handler(sock,msg,{command,args,text:args.join(' '),sender,remoteJid,settings,botName,owner,ownerName}); break; } }
+  });
+  console.log('[SYSTEM] Handlers registered for', botName);
 }
 startBot();
 `;
+      zip.file('index.js', indexESM);
+      const pf=zip.folder('plugins');
+      pf.file('menu.js', `import settings from '../settings.js';
+export default {
+  command: ['menu'],
+  handler: async (sock, msg, { remoteJid }) => {
+    const menu = \`╭━━━〔 \${settings.botName} 〕━━━✦
+┃ Owner: \${settings.ownerName} (\${settings.ownerNumber})
+┃ Bot: \${settings.botName}
+┃ Prefix: \${settings.prefix}
+┣━━━〔 FITUR 〕━━━
+${features.map(f=>`┃ ❒ .${f}`).join('\\n')}
+╰━━━━━━━━━━━━\`;
+    await sock.sendMessage(remoteJid, { text: menu });
+    console.log('[MENU] Sent with botName', settings.botName, 'ownerName', settings.ownerName);
   }
-  zip.file('index.js', indexCode);
-  if(state.thumb==='thumb' && state.thumbData){ const p=state.thumbData.split(','); if(p[1]) zip.file('thumb.jpg', p[1], {base64:true}); }
-  if(state.base==='esm'){
-    const pf=zip.folder('plugins');
-    const menuText = state.menu==='simple' ? `MENU ${botName}\\n${features.map(f=>'.'+f).join('\\n')}` : `╭━━━〔 ${botName} 〕━━━\\n${features.map(f=>'┃ ❒ .'+f).join('\\n')}\\n╰━━`;
-    pf.file('menu.js', `export default { command: ['menu'], handler: async (s,m,{remoteJid})=>{ await s.sendMessage(remoteJid,{text:\`${menuText}\`}); console.log('[MENU] Sent'); } };`);
-    if(features.includes('sticker')) pf.file('sticker.js', `export default { command: ['s','sticker','stiker'], handler: async (sock,msg,{remoteJid})=>{ try{ let content=msg.message?.ephemeralMessage?msg.message.ephemeralMessage.message:msg.message; const b=await sock.downloadMediaMessage({message:content,key:msg.key}); if(b) await sock.sendMessage(remoteJid,{sticker:b}); console.log('[STICKER] Sent'); }catch(e){ console.log(e.message); } } };`);
-    if(features.includes('rpg')) pf.file('rpg.js', `export default { command: ['daily','balance'], handler: async (s,m,{remoteJid,sender,command})=>{ if(!global.rpgDB[sender]) global.rpgDB[sender]={money:0}; if(command==='daily') global.rpgDB[sender].money+=1000; await s.sendMessage(remoteJid,{text:'Balance: '+global.rpgDB[sender].money}); console.log('[RPG]'); } };`);
-    if(features.includes('store')) pf.file('store.js', `export default { command: ['addproduk','listproduk','store'], handler: async (s,m,{remoteJid,text,command})=>{ if(command==='addproduk'){ global.produkDB.push(text); await s.sendMessage(remoteJid,{text:'Ditambah: '+text}); console.log('[STORE] Add'); } else { const list=global.produkDB.length?global.produkDB.map((v,i)=>\`\${i+1}. \${v}\`).join('\\n'):'Kosong'; await s.sendMessage(remoteJid,{text:list}); } } };`);
-    if(features.includes('telegram')) pf.file('telegram.js', `export default { command: ['telegram'], handler: async (s,m,{remoteJid})=>{ await s.sendMessage(remoteJid,{text:'Telegram ON - ${botName}'}); console.log('[TELEGRAM]'); } };`);
-    if(features.includes('group')) pf.file('group.js', `export default { command: ['hidetag','tagall'], handler: async (s,m,{remoteJid,text})=>{ const meta=await s.groupMetadata(remoteJid); const mentions=meta.participants.map(p=>p.id); await s.sendMessage(remoteJid,{text:text||'Hidetag',mentions}); console.log('[HIDETAG]'); } };`);
-    if(features.includes('welcome')) pf.file('welcome.js', `export default { command: ['welcome'], handler: async (s,m,{remoteJid})=>{ await s.sendMessage(remoteJid,{text:'Welcome ON'}); console.log('[WELCOME]'); } };`);
-    if(features.includes('ai')) pf.file('ai.js', `export default { command: ['ai'], handler: async (s,m,{remoteJid,text})=>{ await s.sendMessage(remoteJid,{text:'AI: '+(text||'Halo')}); } };`);
+};`);
+      if(features.includes('sticker')) pf.file('sticker.js', `import settings from '../settings.js'; export default { command: ['s','sticker','stiker'], handler: async (sock,msg,{remoteJid})=>{ const c=msg.message?.ephemeralMessage?msg.message.ephemeralMessage.message:msg.message; const b=await sock.downloadMediaMessage({message:c,key:msg.key}); if(b) await sock.sendMessage(remoteJid,{sticker:b}); console.log('[STICKER] Sent by', settings.botName); } };`);
+      if(features.includes('rpg')) pf.file('rpg.js', `import settings from '../settings.js'; export default { command: ['daily','balance'], handler: async (s,m,{remoteJid,sender,command})=>{ if(!global.rpgDB[sender]) global.rpgDB[sender]={money:0}; if(command==='daily') global.rpgDB[sender].money+=1000; await s.sendMessage(remoteJid,{text:'💰 '+settings.botName+' | Balance: '+global.rpgDB[sender].money+' | Owner: '+settings.ownerName}); console.log('[RPG] Bot', settings.botName); } };`);
+      if(features.includes('store')) pf.file('store.js', `import settings from '../settings.js'; export default { command: ['addproduk','listproduk'], handler: async (s,m,{remoteJid,text,command})=>{ if(command==='addproduk'){ global.produkDB.push(text); await s.sendMessage(remoteJid,{text:'✅ '+settings.botName+' | Ditambah: '+text+' | Owner: '+settings.ownerName}); } else { const l=global.produkDB.map((v,i)=>\`\${i+1}. \${v}\`).join('\\n')||'Kosong'; await s.sendMessage(remoteJid,{text:'🛒 '+settings.botName+' Store - Owner '+settings.ownerName+'\\n\\n'+l}); } console.log('[STORE] Bot', settings.botName); } };`);
+      if(features.includes('welcome')) pf.file('welcome.js', `import settings from '../settings.js'; export default { command: ['welcome'], handler: async (s,m,{remoteJid})=>{ await s.sendMessage(remoteJid,{text:'Welcome ON - '+settings.botName}); console.log('[WELCOME] Bot', settings.botName); } };`);
+      if(state.thumbData){ const b64=state.thumbData.split(',')[1]; if(b64) zip.file('thumb.jpg', b64, {base64:true}); }
+    }
+  } else {
+    const teleSettings = `module.exports = {
+  botName: "${botName}",
+  ownerName: "${ownerName}",
+  username: "${teleUsername}",
+  token: "${teleToken}",
+  features: ${JSON.stringify(features)},
+  version: "1.0.0"
+};
+`;
+    zip.file('settings.js', teleSettings);
+    zip.file('package.json', JSON.stringify({name:safe,version:"1.0.0",description:botName+" Telegram Owner "+ownerName,type:"commonjs",main:"index.js",scripts:{start:"node index.js"},dependencies:{telegraf:"^4.15.3"}}, null, 2));
+    zip.file('README.md', `# ${botName} Telegram\nOwner: ${ownerName}\nUsername: ${teleUsername}\n\nFix BotName is not defined via settings.js\n\nnpm install\nnpm start\n`);
+    const teleCode = `const settings = require('./settings.js');
+const botName = settings.botName;
+const ownerName = settings.ownerName;
+const username = settings.username;
+const { Telegraf } = require('telegraf');
+if(!settings.token || settings.token==="YOUR_TELEGRAM_TOKEN"){ console.log('❌ Token belum diisi - settings.js', settings); process.exit(1); }
+const bot = new Telegraf(settings.token);
+global.rpgDB={}; global.produkDB=[];
+console.log('[SETTINGS] Telegram Bot', settings.botName, 'Owner', settings.ownerName, 'Username', settings.username);
+console.log('🤖 Starting '+botName+' Owner '+ownerName);
+bot.start((ctx)=>{ console.log('[TELE] /start from', ctx.from.id, 'Bot', botName); ctx.reply('Halo '+botName+' 👋\\nOwner: '+ownerName+'\\nUsername: '+username); });
+bot.command('menu', (ctx)=>{ const menu = \`╭━━━〔 \${botName} 〕━━━✦\\n┃ Owner: \${ownerName}\\n┃ Username: \${username}\\n┃ Platform: Telegram\\n┣━━━〔 FITUR 〕━━━\\n${features.map(f=>'┃ ❒ /'+f).join('\\n')}\\n╰━━━━\`; console.log('[TELE] /menu Bot', botName); ctx.reply(menu); });
+bot.launch().then(()=>console.log('✅ Telegram Bot '+botName+' Connected! Owner: '+ownerName+' Username: '+username)).catch(e=>console.log('❌ Launch error', e.message));
+`;
+    zip.file('index.js', teleCode);
   }
   const blob=await zip.generateAsync({type:'blob'});
   const url=URL.createObjectURL(blob);
   const a=document.getElementById('linkA');
-  a.href=url; a.download=safe+'.zip'; a.textContent='⬇️ Download '+safe+'.zip';
+  a.href=url; a.download=safe+'.zip'; a.textContent='⬇️ Download '+safe+'.zip (CASE 4 file + settings.js + package.json)';
   document.getElementById('downloadLink').style.display='block';
   a.click();
 }
