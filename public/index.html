@@ -1,39 +1,87 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CiKiZz Bot Generator Script</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CiKiZz Bot Generator Script Bot</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#050510;color:#fff;font-family:'Space Grotesk',sans-serif;min-height:100vh;background-image:radial-gradient(circle at 20% 30%, rgba(147,51,234,0.15) 0%, transparent 50%),radial-gradient(circle at 80% 70%, rgba(6,182,212,0.15) 0%, transparent 50%)}
-.navbar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;margin:14px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(20px);border-radius:14px}
-.container{display:grid;grid-template-columns:1.3fr 0.7fr;gap:16px;max-width:1400px;margin:0 auto;padding:0 14px 20px}
-@media(max-width:900px){.container{grid-template-columns:1fr}}
-.card{background:rgba(15,15,30,0.9);border:1px solid rgba(168,85,247,0.3);border-radius:16px;padding:20px;margin-bottom:16px}
-h2{font-size:20px;margin-bottom:6px} .sub{color:#9ca3af;font-size:12px;margin-bottom:16px}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color: transparent;}
+body{background:#050510;color:#fff;font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow-x:hidden;background-image:radial-gradient(circle at 20% 30%, rgba(147,51,234,0.12) 0%, transparent 50%),radial-gradient(circle at 80% 70%, rgba(6,182,212,0.12) 0%, transparent 50%)}
+
+/* NAVBAR RESPONSIVE */
+.navbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;margin:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(20px);border-radius:12px;flex-wrap:wrap;gap:8px}
+.logo{font-weight:700;font-size:18px;display:flex;align-items:center;gap:8px} .logo span{color:#a855f7} .logo b{color:#06b6d4}
+.badge{font-size:10px;color:#9ca3af;background:rgba(255,255,255,0.08);padding:4px 8px;border-radius:20px;white-space:nowrap}
+
+/* CONTAINER RESPONSIVE */
+.container{display:grid;grid-template-columns:1.3fr 0.7fr;gap:14px;max-width:1400px;margin:0 auto;padding:0 10px 20px}
+.card{background:rgba(15,15,30,0.92);border:1px solid rgba(168,85,247,0.25);border-radius:14px;padding:16px;margin-bottom:12px;backdrop-filter:blur(20px)}
+h2{font-size:18px;margin-bottom:4px} .sub{color:#9ca3af;font-size:11px;margin-bottom:14px;line-height:1.4}
 label{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin:12px 0 6px;display:block}
-.row{display:flex;gap:10px} .row>div{flex:1}
-.plat{padding:10px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;text-align:center;font-size:13px;font-weight:600;transition:.2s}
-.plat.active{background:linear-gradient(135deg, rgba(6,182,212,0.2), rgba(168,85,247,0.2));border-color:#06b6d4}
-input,select{width:100%;padding:12px;border-radius:10px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none}
+
+/* BUTTONS RESPONSIVE - AUTO WRAP */
+.row{display:flex;gap:8px;flex-wrap:wrap} .row>div{flex:1;min-width:120px}
+.plat{padding:10px 8px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;text-align:center;font-size:12px;font-weight:600;transition:.2s;flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;user-select:none}
+.plat.active{background:linear-gradient(135deg, rgba(6,182,212,0.25), rgba(168,85,247,0.25));border-color:#06b6d4;box-shadow:0 0 15px rgba(6,182,212,0.3);color:#fff}
+
+/* INPUTS */
+input,select{width:100%;padding:12px;border-radius:10px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;-webkit-appearance:none}
 input:focus{border-color:#a855f7}
+
+/* FEATURES GRID RESPONSIVE */
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.feat{display:flex;align-items:center;gap:8px;padding:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font-size:12px;cursor:pointer}
-.feat input{width:auto;margin:0}
-.generate{width:100%;padding:16px;border:none;border-radius:12px;background:linear-gradient(90deg, #06b6d4, #a855f7);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-top:10px}
-.thumb-preview{width:100%;height:100px;object-fit:cover;border-radius:8px;margin-top:8px;display:none;border:1px solid #a855f7}
-.noted{margin-top:12px;background:rgba(6,182,212,0.08);border:1px dashed #06b6d4;border-radius:10px;padding:12px;font-size:11px}
-.code{background:#000;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px;font-size:11px;min-height:200px;white-space:pre-wrap;font-family:'JetBrains Mono',monospace;color:#9ca3af}
+.feat{display:flex;align-items:center;gap:8px;padding:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font-size:11px;cursor:pointer;min-height:44px}
+.feat input{width:16px;height:16px;margin:0;flex-shrink:0}
+
+/* GENERATE BUTTON */
+.generate{width:100%;padding:16px;border:none;border-radius:12px;background:linear-gradient(90deg, #06b6d4, #a855f7);color:#fff;font-weight:700;font-size:14px;cursor:pointer;margin-top:12px;box-shadow:0 0 20px rgba(168,85,247,0.4);min-height:52px}
+.generate:active{transform:scale(0.98)}
+
+/* THUMB PREVIEW */
+.thumb-preview{width:100%;max-height:160px;object-fit:cover;border-radius:8px;margin-top:8px;display:none;border:1px solid #a855f7}
+
+/* NOTED */
+.noted{margin-top:12px;background:rgba(6,182,212,0.08);border:1px dashed #06b6d4;border-radius:10px;padding:10px;font-size:10px;line-height:1.5}
+.code{background:#000;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px;font-size:10px;min-height:180px;white-space:pre-wrap;font-family:'JetBrains Mono',monospace;color:#9ca3af;overflow:auto;word-break:break-word}
+
+/* MOBILE FIXES */
+@media(max-width: 900px){
+  .container{grid-template-columns:1fr;gap:10px;padding:0 10px 80px}
+  .navbar{margin:8px;padding:10px 14px}
+  .logo{font-size:16px}
+  .card{padding:14px;border-radius:12px}
+  h2{font-size:17px}
+  .row>div{min-width:100px}
+}
+@media(max-width: 480px){
+  .grid2{grid-template-columns:1fr}
+  .plat{font-size:11px;padding:12px 6px}
+  .feat{font-size:12px}
+  input,select{font-size:16px} /* biar gak zoom di iPhone */
+  .container{padding-bottom:100px}
+}
+/* TABLET */
+@media(min-width: 901px) and (max-width: 1200px){
+  .container{grid-template-columns:1fr 0.6fr}
+}
+/* DESKTOP LARGE */
+@media(min-width: 1400px){
+  .container{max-width:1500px;gap:20px}
+  .card{padding:20px}
+}
 </style>
 </head>
 <body>
-<div class="navbar"><div style="font-weight:700">⬢ <span style="color:#a855f7">CiKiZz</span> <b style="color:#06b6d4">PRO MAX</b></div><div style="font-size:11px;color:#9ca3af">v3.0 • ESM/Case • Pairing/QR</div></div>
+<div class="navbar">
+  <div class="logo">⬢ <span>CiKiZz</span> <b>PRO MAX</b></div>
+  <div class="badge">v3.0 • Mobile & Desktop • ESM/CASE</div>
+</div>
 
 <div class="container">
 <div>
   <div class="card">
-    <h2>✨ Generate Script Bot</h2><p class="sub">Pilih base, fitur, thumbnail, button. Langsung jadi script premium.</p>
+    <h2>✨ Generate Script Bot</h2><p class="sub">Support HP & PC. Pilih base, fitur, thumbnail, button. Auto jadi script premium.</p>
     
     <label>Platform</label>
     <div class="row">
@@ -41,14 +89,17 @@ input:focus{border-color:#a855f7}
       <div class="plat" data-type="telegram" onclick="setType('telegram',this)">📨 Telegram</div>
     </div>
 
-    <div class="row"><div><label>Bot Name</label><input id="botName" placeholder="KizzuBot"></div><div><label>Owner Number / Admin ID</label><input id="owner" placeholder="628xxx / 123456"></div></div>
+    <div class="row">
+      <div><label>Bot Name</label><input id="botName" placeholder="KizzuBot"></div>
+      <div><label>Owner Number</label><input id="owner" placeholder="628xxx" inputmode="numeric"></div>
+    </div>
 
     <div id="waOptions">
       <div class="row">
-        <div><label>Koneksi</label><div class="row"><div class="plat active" data-conn="qr" onclick="setConn('qr',this)">QR Code</div><div class="plat" data-conn="pairing" onclick="setConn('pairing',this)">Pairing Code</div></div></div>
+        <div><label>Koneksi</label><div class="row"><div class="plat active" data-conn="qr" onclick="setConn('qr',this)">QR</div><div class="plat" data-conn="pairing" onclick="setConn('pairing',this)">Pairing</div></div></div>
         <div><label>Base Script</label><div class="row"><div class="plat active" data-base="esm" onclick="setBase('esm',this)">ESM Plugin</div><div class="plat" data-base="case" onclick="setBase('case',this)">CASE</div></div></div>
       </div>
-      <div id="pairingInput" style="display:none"><label>Nomor untuk Pairing (628xxx)</label><input id="pairingNumber" placeholder="6281234567890"></div>
+      <div id="pairingInput" style="display:none"><label>Nomor Pairing (628xxx)</label><input id="pairingNumber" placeholder="6281234567890" inputmode="numeric"></div>
     </div>
 
     <div id="tgToken"><label>Telegram Token</label><input id="token" placeholder="123456:ABC..."></div>
@@ -59,50 +110,48 @@ input:focus{border-color:#a855f7}
       <div class="plat" data-btn="button" onclick="setBtn('button',this)">Dengan Button</div>
     </div>
 
-    <label>Thumbnail Menu</label>
+    <label>Thumbnail</label>
     <div class="row">
-      <div class="plat active" data-thumb="nothumb" onclick="setThumb('nothumb',this)">Tanpa Thumbnail</div>
-      <div class="plat" data-thumb="thumb" onclick="setThumb('thumb',this)">Pakai Thumbnail</div>
+      <div class="plat active" data-thumb="nothumb" onclick="setThumb('nothumb',this)">Tanpa Thumb</div>
+      <div class="plat" data-thumb="thumb" onclick="setThumb('thumb',this)">Pakai Thumb</div>
     </div>
     <div id="thumbUpload" style="display:none">
-      <label>Upload Foto Thumbnail (Menu)</label>
+      <label>Upload Foto Thumbnail</label>
       <input type="file" id="thumbFile" accept="image/*" onchange="previewThumb(this)">
       <img id="thumbPrev" class="thumb-preview">
-      <p style="font-size:10px;color:#6b7280;margin-top:4px">Foto ini akan jadi thumbnail menu bot. Max 1MB.</p>
     </div>
 
-    <label>Fitur Lengkap (Centang yang mau)</label>
+    <label>Fitur Lengkap</label>
     <div class="grid2">
-      <label class="feat"><input type="checkbox" value="welcome" checked> Welcome/Goodbye</label>
-      <label class="feat"><input type="checkbox" value="antilink" checked> Antilink/Antivirtex</label>
-      <label class="feat"><input type="checkbox" value="sticker" checked> Sticker Maker</label>
-      <label class="feat"><input type="checkbox" value="downloader" checked> Downloader (tiktok/ig/yt)</label>
-      <label class="feat"><input type="checkbox" value="ai" checked> AI / GPT</label>
-      <label class="feat"><input type="checkbox" value="group" checked> Group Manage</label>
-      <label class="feat"><input type="checkbox" value="rpg" > RPG/Game</label>
-      <label class="feat"><input type="checkbox" value="store" > Store / Payment</label>
+      <label class="feat"><input type="checkbox" value="welcome" checked> Welcome</label>
+      <label class="feat"><input type="checkbox" value="antilink" checked> Antilink</label>
+      <label class="feat"><input type="checkbox" value="sticker" checked> Sticker</label>
+      <label class="feat"><input type="checkbox" value="downloader" checked> Downloader</label>
+      <label class="feat"><input type="checkbox" value="ai" checked> AI/GPT</label>
+      <label class="feat"><input type="checkbox" value="group" checked> Group</label>
+      <label class="feat"><input type="checkbox" value="rpg"> RPG</label>
+      <label class="feat"><input type="checkbox" value="store"> Store</label>
       <label class="feat"><input type="checkbox" value="autoreply" checked> Autoreply</label>
-      <label class="feat"><input type="checkbox" value="broadcast" > Broadcast</label>
+      <label class="feat"><input type="checkbox" value="broadcast"> Broadcast</label>
     </div>
 
-    <button class="generate" id="genBtn">⚡ Generate Sekarang & Download ZIP</button>
+    <button class="generate" id="genBtn">⚡ Generate & Download ZIP</button>
     
     <div class="noted">
-      📌 <b>NOTED PTERO:</b> Upload ZIP > Extract > <code style="background:#000;padding:2px 6px;border-radius:4px">npm install</code> > <code style="background:#000;padding:2px 6px;border-radius:4px">npm start</code><br>
-      <span id="noteDep">ESM = npm install | CASE = npm install</span>
+      📌 <b>PTERO:</b> Extract ZIP > <code style="background:#000;padding:1px 4px;border-radius:3px">npm install</code> > <code style="background:#000;padding:1px 4px;border-radius:3px">npm start</code><br>
+      Support: Mobile Chrome, Desktop, Pterodactyl Panel
     </div>
   </div>
 </div>
 
 <div>
-  <div class="card"><h3 style="font-size:13px;margin-bottom:8px">Preview Config</h3><div class="code" id="preview">// Config akan muncul disini...</div></div>
+  <div class="card"><h3 style="font-size:12px;margin-bottom:8px">Preview Config</h3><div class="code" id="preview">Loading...</div></div>
   <div class="card" style="font-size:11px;color:#9ca3af;line-height:1.6">
     <b style="color:#06b6d4">Isi ZIP:</b><br>
-    - bot.js / index.js (sesuai base)<br>
-    - plugins/ (jika ESM)<br>
-    - case.js (jika CASE)<br>
-    - thumb.jpg (jika upload)<br>
-    - package.json + README install
+    • bot.js / index.js<br>
+    • plugins/ (ESM)<br>
+    • thumb.jpg (jika upload)<br>
+    • README + CARA INSTALL
   </div>
 </div>
 </div>
@@ -116,7 +165,7 @@ function setBtn(b,el){state.btn=b; document.querySelectorAll('[data-btn]').forEa
 function setThumb(t,el){state.thumb=t; document.querySelectorAll('[data-thumb]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); document.getElementById('thumbUpload').style.display=t==='thumb'?'block':'none'; updatePreview();}
 function previewThumb(input){
   const file=input.files[0]; if(!file) return;
-  if(file.size>1024*1024) return alert('Max 1MB bos!');
+  if(file.size>1024*1024*2) return alert('Max 2MB bos!');
   const reader=new FileReader();
   reader.onload=e=>{ state.thumbData=e.target.result; document.getElementById('thumbPrev').src=e.target.result; document.getElementById('thumbPrev').style.display='block'; updatePreview(); };
   reader.readAsDataURL(file);
@@ -124,7 +173,7 @@ function previewThumb(input){
 function updatePreview(){
   const name=document.getElementById('botName').value||'MyBot';
   const feats=[...document.querySelectorAll('.feat input:checked')].map(i=>i.value).join(', ');
-  document.getElementById('preview').textContent = `Bot: ${name}\nType: ${state.type}\nConnection: ${state.conn}\nBase: ${state.base}\nButton: ${state.btn}\nThumbnail: ${state.thumb}${state.thumbData?' (uploaded)':''}\nFeatures: ${feats}\n\nnpm install wajib: ${state.base==='esm'?'@whiskeysockets/baileys + plugins':'baileys case'}`;
+  document.getElementById('preview').textContent = `Bot: ${name}\nType: ${state.type}\nConn: ${state.conn}\nBase: ${state.base}\nButton: ${state.btn}\nThumb: ${state.thumb}${state.thumbData?' ✓ uploaded':''}\nFeatures: ${feats}\n\n✅ Mobile & Desktop Ready`;
 }
 document.querySelectorAll('input').forEach(i=>i.addEventListener('input',updatePreview));
 document.querySelectorAll('.feat input').forEach(i=>i.addEventListener('change',updatePreview));
@@ -146,7 +195,7 @@ document.getElementById('genBtn').onclick=async()=>{
     if(!res.ok) throw new Error(await res.text());
     const blob=await res.blob(); const url=URL.createObjectURL(blob);
     const a=document.createElement('a'); a.href=url; a.download=botName.replace(/\s+/g,'-')+'.zip'; a.click();
-  }catch(e){alert('Gagal: '+e.message)} finally{btn.disabled=false; btn.textContent='⚡ Generate Sekarang & Download ZIP'}
+  }catch(e){alert('Gagal: '+e.message)} finally{btn.disabled=false; btn.textContent='⚡ Generate & Download ZIP'}
 };
 updatePreview();
 </script>
