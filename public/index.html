@@ -3,159 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>CiKiZz Bot Generator Script Bot</title>
+<title>CiKiZz Generate Script Bot</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color: transparent;}
-body{background:#050510;color:#fff;font-family:'Space Grotesk',sans-serif;min-height:100vh;overflow-x:hidden;background-image:radial-gradient(circle at 20% 30%, rgba(147,51,234,0.12) 0%, transparent 50%),radial-gradient(circle at 80% 70%, rgba(6,182,212,0.12) 0%, transparent 50%)}
-
-/* NAVBAR RESPONSIVE */
-.navbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;margin:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(20px);border-radius:12px;flex-wrap:wrap;gap:8px}
-.logo{font-weight:700;font-size:18px;display:flex;align-items:center;gap:8px} .logo span{color:#a855f7} .logo b{color:#06b6d4}
-.badge{font-size:10px;color:#9ca3af;background:rgba(255,255,255,0.08);padding:4px 8px;border-radius:20px;white-space:nowrap}
-
-/* CONTAINER RESPONSIVE */
+body{background:#050510;color:#fff;font-family:'Space Grotesk',sans-serif;overflow-x:hidden;background-image:radial-gradient(circle at 20% 30%, rgba(147,51,234,0.12) 0%, transparent 50%),radial-gradient(circle at 80% 70%, rgba(6,182,212,0.12) 0%, transparent 50%)}
+.navbar{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;margin:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(20px);border-radius:12px}
 .container{display:grid;grid-template-columns:1.3fr 0.7fr;gap:14px;max-width:1400px;margin:0 auto;padding:0 10px 20px}
-.card{background:rgba(15,15,30,0.92);border:1px solid rgba(168,85,247,0.25);border-radius:14px;padding:16px;margin-bottom:12px;backdrop-filter:blur(20px)}
-h2{font-size:18px;margin-bottom:4px} .sub{color:#9ca3af;font-size:11px;margin-bottom:14px;line-height:1.4}
+.card{background:rgba(15,15,30,0.92);border:1px solid rgba(168,85,247,0.25);border-radius:14px;padding:16px;margin-bottom:12px}
 label{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin:12px 0 6px;display:block}
-
-/* BUTTONS RESPONSIVE - AUTO WRAP */
-.row{display:flex;gap:8px;flex-wrap:wrap} .row>div{flex:1;min-width:120px}
-.plat{padding:10px 8px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;text-align:center;font-size:12px;font-weight:600;transition:.2s;flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;user-select:none}
-.plat.active{background:linear-gradient(135deg, rgba(6,182,212,0.25), rgba(168,85,247,0.25));border-color:#06b6d4;box-shadow:0 0 15px rgba(6,182,212,0.3);color:#fff}
-
-/* INPUTS */
-input,select{width:100%;padding:12px;border-radius:10px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;-webkit-appearance:none}
-input:focus{border-color:#a855f7}
-
-/* FEATURES GRID RESPONSIVE */
+.row{display:flex;gap:8px;flex-wrap:wrap} .row>div{flex:1;min-width:110px}
+.plat{padding:11px 8px;border-radius:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;text-align:center;font-size:12px;font-weight:600;flex:1;min-height:44px;display:flex;align-items:center;justify-content:center;user-select:none;transition:.2s}
+.plat.active{background:linear-gradient(135deg, rgba(6,182,212,0.25), rgba(168,85,247,0.25));border-color:#06b6d4;color:#fff;box-shadow:0 0 15px rgba(6,182,212,0.3)}
+input,select{width:100%;padding:12px;border-radius:10px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.feat{display:flex;align-items:center;gap:8px;padding:10px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;font-size:11px;cursor:pointer;min-height:44px}
-.feat input{width:16px;height:16px;margin:0;flex-shrink:0}
-
-/* GENERATE BUTTON */
-.generate{width:100%;padding:16px;border:none;border-radius:12px;background:linear-gradient(90deg, #06b6d4, #a855f7);color:#fff;font-weight:700;font-size:14px;cursor:pointer;margin-top:12px;box-shadow:0 0 20px rgba(168,85,247,0.4);min-height:52px}
-.generate:active{transform:scale(0.98)}
-
-/* THUMB PREVIEW */
+.feat{display:flex;align-items:center;gap:10px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;font-size:11px;cursor:pointer;min-height:48px;transition:.2s;user-select:none}
+.feat input{width:18px;height:18px;margin:0;flex-shrink:0;accent-color:#06b6d4;pointer-events:none}
+.feat.active{border-color:#06b6d4;background:rgba(6,182,212,0.15)}
+.generate{width:100%;padding:16px;border:none;border-radius:12px;background:linear-gradient(90deg, #06b6d4, #a855f7);color:#fff;font-weight:700;font-size:14px;cursor:pointer;margin-top:12px;min-height:52px}
 .thumb-preview{width:100%;max-height:160px;object-fit:cover;border-radius:8px;margin-top:8px;display:none;border:1px solid #a855f7}
-
-/* NOTED */
-.noted{margin-top:12px;background:rgba(6,182,212,0.08);border:1px dashed #06b6d4;border-radius:10px;padding:10px;font-size:10px;line-height:1.5}
-.code{background:#000;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px;font-size:10px;min-height:180px;white-space:pre-wrap;font-family:'JetBrains Mono',monospace;color:#9ca3af;overflow:auto;word-break:break-word}
-
-/* MOBILE FIXES */
-@media(max-width: 900px){
-  .container{grid-template-columns:1fr;gap:10px;padding:0 10px 80px}
-  .navbar{margin:8px;padding:10px 14px}
-  .logo{font-size:16px}
-  .card{padding:14px;border-radius:12px}
-  h2{font-size:17px}
-  .row>div{min-width:100px}
-}
-@media(max-width: 480px){
-  .grid2{grid-template-columns:1fr}
-  .plat{font-size:11px;padding:12px 6px}
-  .feat{font-size:12px}
-  input,select{font-size:16px} /* biar gak zoom di iPhone */
-  .container{padding-bottom:100px}
-}
-/* TABLET */
-@media(min-width: 901px) and (max-width: 1200px){
-  .container{grid-template-columns:1fr 0.6fr}
-}
-/* DESKTOP LARGE */
-@media(min-width: 1400px){
-  .container{max-width:1500px;gap:20px}
-  .card{padding:20px}
-}
+.code{background:#000;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px;font-size:10px;min-height:180px;white-space:pre-wrap;font-family:'JetBrains Mono',monospace;color:#9ca3af;word-break:break-word}
+@media(max-width:900px){.container{grid-template-columns:1fr;padding-bottom:90px} .grid2{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.grid2{grid-template-columns:1fr} input{font-size:16px}}
 </style>
 </head>
 <body>
-<div class="navbar">
-  <div class="logo">⬢ <span>CiKiZz</span> <b>PRO MAX</b></div>
-  <div class="badge">v3.0 • Mobile & Desktop • ESM/CASE</div>
-</div>
-
+<div class="navbar"><div style="font-weight:700">⬢ <span style="color:#a855f7">CiKiZz</span> <b style="color:#06b6d4">PRO MAX V4</b></div><div style="font-size:10px;background:rgba(255,255,255,0.08);padding:4px 8px;border-radius:20px">Fix Menu & Pairing</div></div>
 <div class="container">
 <div>
   <div class="card">
-    <h2>✨ Generate Script Bot</h2><p class="sub">Support HP & PC. Pilih base, fitur, thumbnail, button. Auto jadi script premium.</p>
-    
+    <h2 style="font-size:18px">✨ Generate Script Bot</h2><p style="color:#9ca3af;font-size:11px;margin-bottom:14px">HP & PC Support - Pilih fitur bebas, gak cuma 1 lagi</p>
     <label>Platform</label>
-    <div class="row">
-      <div class="plat active" data-type="whatsapp" onclick="setType('whatsapp',this)">💬 WhatsApp</div>
-      <div class="plat" data-type="telegram" onclick="setType('telegram',this)">📨 Telegram</div>
-    </div>
-
-    <div class="row">
-      <div><label>Bot Name</label><input id="botName" placeholder="KizzuBot"></div>
-      <div><label>Owner Number</label><input id="owner" placeholder="628xxx" inputmode="numeric"></div>
-    </div>
-
+    <div class="row"><div class="plat active" data-type="whatsapp" onclick="setType('whatsapp',this)">💬 WhatsApp</div><div class="plat" data-type="telegram" onclick="setType('telegram',this)">📨 Telegram</div></div>
+    <div class="row"><div><label>Bot Name</label><input id="botName" placeholder="KizzuBot"></div><div><label>Owner Number</label><input id="owner" placeholder="628xxx"></div></div>
     <div id="waOptions">
-      <div class="row">
-        <div><label>Koneksi</label><div class="row"><div class="plat active" data-conn="qr" onclick="setConn('qr',this)">QR</div><div class="plat" data-conn="pairing" onclick="setConn('pairing',this)">Pairing</div></div></div>
-        <div><label>Base Script</label><div class="row"><div class="plat active" data-base="esm" onclick="setBase('esm',this)">ESM Plugin</div><div class="plat" data-base="case" onclick="setBase('case',this)">CASE</div></div></div>
-      </div>
-      <div id="pairingInput" style="display:none"><label>Nomor Pairing (628xxx)</label><input id="pairingNumber" placeholder="6281234567890" inputmode="numeric"></div>
+      <div class="row"><div><label>Koneksi</label><div class="row"><div class="plat active" data-conn="qr" onclick="setConn('qr',this)">QR</div><div class="plat" data-conn="pairing" onclick="setConn('pairing',this)">Pairing</div></div></div><div><label>Base</label><div class="row"><div class="plat active" data-base="esm" onclick="setBase('esm',this)">ESM Plugin</div><div class="plat" data-base="case" onclick="setBase('case',this)">CASE</div></div></div></div>
+      <div id="pairingInput" style="display:none"><label>Nomor Pairing</label><input id="pairingNumber" placeholder="6281234567890"></div>
     </div>
+    <div id="tgToken" style="display:none"><label>Telegram Token</label><input id="token" placeholder="123456:ABC..."></div>
+    <label>Menu Style</label><div class="row"><div class="plat active" data-btn="nobtn" onclick="setBtn('nobtn',this)">Tanpa Button</div><div class="plat" data-btn="button" onclick="setBtn('button',this)">Dengan Button</div></div>
+    <label>Thumbnail</label><div class="row"><div class="plat active" data-thumb="nothumb" onclick="setThumb('nothumb',this)">Tanpa Thumb</div><div class="plat" data-thumb="thumb" onclick="setThumb('thumb',this)">Pakai Thumb</div></div>
+    <div id="thumbUpload" style="display:none"><label>Upload Thumbnail</label><input type="file" id="thumbFile" accept="image/*" onchange="previewThumb(this)"><img id="thumbPrev" class="thumb-preview"></div>
 
-    <div id="tgToken"><label>Telegram Token</label><input id="token" placeholder="123456:ABC..."></div>
-
-    <label>Menu Style</label>
-    <div class="row">
-      <div class="plat active" data-btn="nobtn" onclick="setBtn('nobtn',this)">Tanpa Button</div>
-      <div class="plat" data-btn="button" onclick="setBtn('button',this)">Dengan Button</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px"><label style="margin:0">Fitur Lengkap (Bisa pilih banyak)</label><button type="button" onclick="selectAllFeat()" style="font-size:10px;padding:5px 10px;border-radius:6px;border:1px solid #a855f7;background:rgba(168,85,247,0.2);color:#fff;cursor:pointer">PILIH SEMUA</button></div>
+    <div class="grid2" id="featGrid" style="margin-top:8px">
+      <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="welcome" checked><span>WELCOME</span></div>
+      <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="antilink" checked><span>ANTILINK</span></div>
+      <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="sticker" checked><span>STICKER</span></div>
+      <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="downloader" checked><span>DOWNLOADER</span></div>
+      <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="ai" checked><span>AI/GPT</span></div>
+      <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="group" checked><span>GROUP</span></div>
+      <div class="feat" onclick="toggleFeat(this)"><input type="checkbox" value="rpg"><span>RPG</span></div>
+      <div class="feat" onclick="toggleFeat(this)"><input type="checkbox" value="store"><span>STORE</span></div>
+      <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="autoreply" checked><span>AUTOREPLY</span></div>
+      <div class="feat" onclick="toggleFeat(this)"><input type="checkbox" value="broadcast"><span>BROADCAST</span></div>
     </div>
-
-    <label>Thumbnail</label>
-    <div class="row">
-      <div class="plat active" data-thumb="nothumb" onclick="setThumb('nothumb',this)">Tanpa Thumb</div>
-      <div class="plat" data-thumb="thumb" onclick="setThumb('thumb',this)">Pakai Thumb</div>
-    </div>
-    <div id="thumbUpload" style="display:none">
-      <label>Upload Foto Thumbnail</label>
-      <input type="file" id="thumbFile" accept="image/*" onchange="previewThumb(this)">
-      <img id="thumbPrev" class="thumb-preview">
-    </div>
-
-    <label>Fitur Lengkap</label>
-    <div class="grid2">
-      <label class="feat"><input type="checkbox" value="welcome" checked> Welcome</label>
-      <label class="feat"><input type="checkbox" value="antilink" checked> Antilink</label>
-      <label class="feat"><input type="checkbox" value="sticker" checked> Sticker</label>
-      <label class="feat"><input type="checkbox" value="downloader" checked> Downloader</label>
-      <label class="feat"><input type="checkbox" value="ai" checked> AI/GPT</label>
-      <label class="feat"><input type="checkbox" value="group" checked> Group</label>
-      <label class="feat"><input type="checkbox" value="rpg"> RPG</label>
-      <label class="feat"><input type="checkbox" value="store"> Store</label>
-      <label class="feat"><input type="checkbox" value="autoreply" checked> Autoreply</label>
-      <label class="feat"><input type="checkbox" value="broadcast"> Broadcast</label>
-    </div>
-
     <button class="generate" id="genBtn">⚡ Generate & Download ZIP</button>
-    
-    <div class="noted">
-      📌 <b>PTERO:</b> Extract ZIP > <code style="background:#000;padding:1px 4px;border-radius:3px">npm install</code> > <code style="background:#000;padding:1px 4px;border-radius:3px">npm start</code><br>
-      Support: Mobile Chrome, Desktop, Pterodactyl Panel
-    </div>
   </div>
 </div>
-
 <div>
-  <div class="card"><h3 style="font-size:12px;margin-bottom:8px">Preview Config</h3><div class="code" id="preview">Loading...</div></div>
-  <div class="card" style="font-size:11px;color:#9ca3af;line-height:1.6">
-    <b style="color:#06b6d4">Isi ZIP:</b><br>
-    • bot.js / index.js<br>
-    • plugins/ (ESM)<br>
-    • thumb.jpg (jika upload)<br>
-    • README + CARA INSTALL
-  </div>
+  <div class="card"><div class="code" id="preview">Config preview...</div></div>
 </div>
 </div>
-
 <script>
 let state = { type:'whatsapp', conn:'qr', base:'esm', btn:'nobtn', thumb:'nothumb', thumbData:null };
 function setType(t,el){state.type=t; document.querySelectorAll('[data-type]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); document.getElementById('waOptions').style.display=t==='whatsapp'?'block':'none'; document.getElementById('tgToken').style.display=t==='telegram'?'block':'none'; updatePreview();}
@@ -165,19 +74,33 @@ function setBtn(b,el){state.btn=b; document.querySelectorAll('[data-btn]').forEa
 function setThumb(t,el){state.thumb=t; document.querySelectorAll('[data-thumb]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); document.getElementById('thumbUpload').style.display=t==='thumb'?'block':'none'; updatePreview();}
 function previewThumb(input){
   const file=input.files[0]; if(!file) return;
-  if(file.size>1024*1024*2) return alert('Max 2MB bos!');
+  if(file.size>1024*1024*2) return alert('Max 2MB!');
   const reader=new FileReader();
   reader.onload=e=>{ state.thumbData=e.target.result; document.getElementById('thumbPrev').src=e.target.result; document.getElementById('thumbPrev').style.display='block'; updatePreview(); };
   reader.readAsDataURL(file);
 }
+function toggleFeat(el){
+  const cb = el.querySelector('input[type="checkbox"]');
+  cb.checked = !cb.checked;
+  if(cb.checked) el.classList.add('active'); else el.classList.remove('active');
+  updatePreview();
+}
+function selectAllFeat(){
+  const all = document.querySelectorAll('#featGrid input[type="checkbox"]');
+  const shouldCheck = [...all].some(cb => !cb.checked);
+  all.forEach(cb => {
+    cb.checked = shouldCheck;
+    const parent = cb.closest('.feat');
+    if(shouldCheck) parent.classList.add('active'); else parent.classList.remove('active');
+  });
+  updatePreview();
+}
 function updatePreview(){
   const name=document.getElementById('botName').value||'MyBot';
-  const feats=[...document.querySelectorAll('.feat input:checked')].map(i=>i.value).join(', ');
-  document.getElementById('preview').textContent = `Bot: ${name}\nType: ${state.type}\nConn: ${state.conn}\nBase: ${state.base}\nButton: ${state.btn}\nThumb: ${state.thumb}${state.thumbData?' ✓ uploaded':''}\nFeatures: ${feats}\n\n✅ Mobile & Desktop Ready`;
+  const feats=[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value).join(', ');
+  document.getElementById('preview').textContent = `Bot: ${name}\nType: ${state.type}\nConn: ${state.conn}\nBase: ${state.base}\nFeatures: ${feats}\n\nBisa pilih banyak fitur ✅\nMobile & Desktop OK ✅\nPairing Fix V4 ✅`;
 }
 document.querySelectorAll('input').forEach(i=>i.addEventListener('input',updatePreview));
-document.querySelectorAll('.feat input').forEach(i=>i.addEventListener('change',updatePreview));
-
 document.getElementById('genBtn').onclick=async()=>{
   const botName=document.getElementById('botName').value.trim();
   if(!botName) return alert('Isi nama bot!');
@@ -187,7 +110,7 @@ document.getElementById('genBtn').onclick=async()=>{
     pairingNumber:document.getElementById('pairingNumber').value.trim(),
     type:state.type, conn:state.conn, base:state.base, btn:state.btn, thumb:state.thumb,
     thumbData:state.thumbData,
-    features:[...document.querySelectorAll('.feat input:checked')].map(i=>i.value)
+    features:[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value)
   };
   const btn=document.getElementById('genBtn'); btn.disabled=true; btn.textContent='⏳ Generating...';
   try{
