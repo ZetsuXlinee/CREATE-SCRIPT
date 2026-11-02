@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CiKiZz Generate Script Bot</title>
+<title>CiKiZz - Generate Script Bot</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box} body{background:#05050f;color:#fff;font-family:'Space Grotesk',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#05050f;color:#fff;font-family:'Space Grotesk',sans-serif}
 .svg-bg{position:fixed;inset:0;z-index:-1;opacity:0.35;pointer-events:none}
 .navbar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;margin:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);backdrop-filter:blur(24px);border-radius:16px}
 .container{display:grid;grid-template-columns:1.25fr 0.75fr;gap:16px;max-width:1450px;margin:0 auto;padding:0 12px 40px}
@@ -29,8 +30,6 @@ input{width:100%;padding:12px;border-radius:10px;background:#000;border:1px soli
 .wa-btn{background:#182830;border:1px solid #00a884;color:#00a884;padding:10px;border-radius:8px;text-align:center;font-size:11px;font-weight:700;margin-top:6px}
 .thumb-preview{width:100%;max-height:160px;object-fit:cover;border-radius:10px;margin-top:8px;display:none;border:1px solid #a855f7}
 .upload-box{border:1.5px dashed rgba(168,85,247,0.4);border-radius:12px;padding:14px;text-align:center;margin-top:8px;background:rgba(168,85,247,0.05);cursor:pointer}
-@keyframes fadeIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
-.plat.show{animation:fadeIn 0.3s ease}
 @media(max-width:900px){.container{grid-template-columns:1fr}}
 </style>
 </head>
@@ -39,68 +38,72 @@ input{width:100%;padding:12px;border-radius:10px;background:#000;border:1px soli
 
 <div class="navbar">
 <div style="display:flex;align-items:center;gap:10px;font-weight:700">
-<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="#a855f7" stroke-width="1.5"/><path d="M2 17l10 5 10-5" stroke="#06b6d4" stroke-width="1.5"/></svg>
-CiKiZz <span style="color:#06b6d4">V7.1 LOGIC FIX</span></div>
-<div style="padding:6px 12px;border-radius:20px;background:rgba(6,182,212,0.15);border:1px solid #06b6d4;font-size:10px">THUMB → IMAGE</div>
+<svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5z" stroke="#a855f7" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 17l10 5 10-5" stroke="#06b6d4" stroke-width="1.5" stroke-linejoin="round"/><path d="M2 12l10 5 10-5" stroke="#a855f7" stroke-width="1.5" stroke-linejoin="round" opacity="0.6"/></svg>
+CiKiZz Generate Script Bot</div>
+<div style="padding:6px 12px;border-radius:20px;background:rgba(0,168,132,0.15);border:1px solid #00a884;font-size:10px;display:flex;align-items:center;gap:6px"><svg width="12" height="12" viewBox="0 0 24 24" fill="#00a884"><circle cx="12" cy="12" r="10"/></svg> Online</div>
 </div>
 
 <div class="container">
 <div>
 <div class="card">
-<label>BOT IDENTITY</label>
-<div class="row"><div style="flex:1"><input id="botName" value="BotName" oninput="updateAll()"></div><div style="flex:1"><input id="owner" value="6281234567890" oninput="updateAll()"></div></div>
+<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/></svg> BOT IDENTITY</label>
+<div class="row"><div style="flex:1"><input id="botName" value="ZetsuEaaa" placeholder="Bot Name" oninput="updateAll()"></div><div style="flex:1"><input id="owner" value="6281234567890" placeholder="628xxx" oninput="updateAll()"></div></div>
 
-<label>BASE & KONEKSI</label>
-<div class="row"><div class="plat active" data-base="esm" onclick="setBase('esm',this)">ESM Plugin</div><div class="plat" data-base="case" onclick="setBase('case',this)">CASE</div></div>
-<div class="row" style="margin-top:8px"><div class="plat active" data-conn="pairing" onclick="setConn('pairing',this)">Pairing</div><div class="plat" data-conn="qr" onclick="setConn('qr',this)">QR</div></div>
-
-<!-- THUMBNAIL DULU - KARENA NGATUR MENU IMAGE -->
-<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/></svg> THUMBNAIL IYA / TIDAK - NGATUR MENU IMAGE</label>
+<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> BASE & KONEKSI</label>
 <div class="row">
-<div class="plat active" data-thumb="nothumb" onclick="setThumb('nothumb',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="18" y1="6" x2="6" y2="18"/></svg> Tanpa Thumbnail</div>
-<div class="plat" data-thumb="thumb" onclick="setThumb('thumb',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/></svg> Pakai Thumbnail</div>
+<div class="plat active" data-base="esm" onclick="setBase('esm',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> ESM Plugin</div>
+<div class="plat" data-base="case" onclick="setBase('case',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> CASE</div>
 </div>
-<div id="thumbUpload" style="display:none"><div class="upload-box" onclick="document.getElementById('thumbFile').click()"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/></svg><div style="font-size:11px;color:#9ca3af;margin-top:6px">Upload thumbnail (PNG/JPG max 2MB)</div><input type="file" id="thumbFile" accept="image/*" style="display:none" onchange="previewThumb(this)"><img id="thumbPrev" class="thumb-preview"></div></div>
+<div class="row" style="margin-top:8px">
+<div class="plat active" data-conn="pairing" onclick="setConn('pairing',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg> Pairing</div>
+<div class="plat" data-conn="qr" onclick="setConn('qr',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> QR</div>
+</div>
 
-<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> TAMPILAN MENU <span id="menuHint" style="color:#06b6d4;font-size:9px;text-transform:none;letter-spacing:0">- IMAGE hanya muncul jika Pakai Thumbnail</span></label>
+<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-3.5-3.5-7 7"/></svg> THUMBNAIL IYA / TIDAK</label>
+<div class="row">
+<div class="plat active" data-thumb="nothumb" onclick="setThumb('nothumb',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> Tanpa Thumbnail</div>
+<div class="plat" data-thumb="thumb" onclick="setThumb('thumb',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-3.5-3.5a2 2 0 00-2.8 0L3 21"/></svg> Pakai Thumbnail</div>
+</div>
+<div id="thumbUpload" style="display:none"><div class="upload-box" onclick="document.getElementById('thumbFile').click()"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><div style="font-size:11px;color:#9ca3af;margin-top:6px">Klik upload gambar</div><input type="file" id="thumbFile" accept="image/*" style="display:none" onchange="previewThumb(this)"><img id="thumbPrev" class="thumb-preview"></div></div>
+
+<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> TAMPILAN MENU</label>
 <div class="row" id="menuRow">
-<div class="plat active" data-menu="premium" onclick="setMenuStyle('premium',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> Premium Box</div>
-<div class="plat" data-menu="simple" onclick="setMenuStyle('simple',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/></svg> Simple</div>
-<div class="plat hidden" data-menu="image" id="imagePlat" onclick="setMenuStyle('image',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-3.5-3.5-7 7"/></svg> Image+Caption</div>
+<div class="plat active" data-menu="premium" onclick="setMenuStyle('premium',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> Premium Box</div>
+<div class="plat" data-menu="simple" onclick="setMenuStyle('simple',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg> Simple</div>
+<div class="plat hidden" data-menu="image" id="imagePlat" onclick="setMenuStyle('image',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-3.5-3.5-7 7"/></svg> Image</div>
 </div>
 
-<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00a884" stroke-width="2"><rect x="3" y="8" width="18" height="10" rx="2"/><path d="M7 8V6a5 5 0 0110 0v2"/></svg> GAYA TOMBOL (TERPISAH)</label>
+<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00a884" stroke-width="1.5"><rect x="3" y="8" width="18" height="10" rx="2"/><path d="M7 8V6a5 5 0 0110 0v2"/><line x1="12" y1="12" x2="12" y2="12"/></svg> GAYA TOMBOL</label>
 <div class="row">
-<div class="plat active" data-btn="nobtn" onclick="setBtn('nobtn',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/></svg> Teks Biasa</div>
-<div class="plat" data-btn="btn" onclick="setBtn('btn',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00a884" stroke-width="2"><rect x="3" y="8" width="18" height="10" rx="2"/></svg> Button Beneran</div>
+<div class="plat active" data-btn="nobtn" onclick="setBtn('nobtn',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg> Teks Biasa</div>
+<div class="plat" data-btn="btn" onclick="setBtn('btn',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00a884" stroke-width="2"><rect x="3" y="8" width="18" height="10" rx="2"/><path d="M7 8V6a5 5 0 0110 0v2"/></svg> Button Beneran</div>
 </div>
 
-<label>FITUR (10 FILE)</label>
+<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> FITUR (10 FILE)</label>
 <div class="grid2" id="featGrid">
-<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="welcome" checked><span>WELCOME</span></div>
-<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="antilink" checked><span>ANTILINK</span></div>
-<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="sticker" checked><span>STICKER</span></div>
-<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="downloader" checked><span>DOWNLOADER</span></div>
-<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="ai" checked><span>AI</span></div>
-<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="group" checked><span>GROUP</span></div>
-<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="rpg" checked><span>RPG</span></div>
-<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="store" checked><span>STORE</span></div>
-<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="autoreply" checked><span>AUTOREPLY</span></div>
-<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="broadcast" checked><span>BROADCAST</span></div>
+<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="welcome" checked><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg><span>WELCOME</span></div>
+<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="antilink" checked><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg><span>ANTILINK</span></div>
+<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="sticker" checked><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg><span>STICKER</span></div>
+<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="downloader" checked><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>DOWNLOADER</span></div>
+<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="ai" checked><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 8a4 4 0 100 8 4 4 0 000-8z"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M4.93 19.07l1.41-1.41"/><path d="M17.66 6.34l1.41-1.41"/></svg><span>AI</span></div>
+<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="group" checked><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg><span>GROUP</span></div>
+<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="rpg" checked><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span>RPG</span></div>
+<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="store" checked><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg><span>STORE</span></div>
+<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="autoreply" checked><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg><span>AUTOREPLY</span></div>
+<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="broadcast" checked><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 11a9 9 0 019 9"/><path d="M4 4a16 16 0 0116 16"/><circle cx="5" cy="19" r="1"/></svg><span>BROADCAST</span></div>
 </div>
 
-<button class="generate" id="genBtn">⚡ Generate ZIP</button>
+<button class="generate" id="genBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Generate ZIP</button>
 </div>
 </div>
 
 <div>
 <div class="card">
-<h3 style="font-size:12px;display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> PREVIEW LIVE</h3>
+<h3 style="font-size:12px;display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> PREVIEW</h3>
 <div class="wa-preview" style="margin-top:10px">
-<div class="wa-header"><div style="width:28px;height:28px;background:linear-gradient(135deg,#a855f7,#06b6d4);border-radius:50%"></div><div><b id="prevName">ZetsuEaaa</b><div style="font-size:10px;color:#8696a0" id="prevSub">Tanpa Thumb • Premium • Teks</div></div></div>
+<div class="wa-header"><div style="width:28px;height:28px;background:linear-gradient(135deg,#a855f7,#06b6d4);border-radius:50%;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div><b id="prevName">ZetsuEaaa</b><div style="font-size:10px;color:#8696a0" id="prevSub">Premium Box • Teks Biasa</div></div></div>
 <div class="wa-chat"><div class="bubble" id="waBubble">Loading...</div></div>
 </div>
-<div style="margin-top:8px;font-size:10px;color:#9ca3af" id="logicInfo">💡 Pilih Tanpa Thumbnail = pilihan IMAGE di menu otomatis hilang</div>
 </div>
 </div>
 </div>
@@ -117,35 +120,19 @@ function setThumb(t,el){
   el.classList.add('active'); 
   const uploadBox=document.getElementById('thumbUpload');
   const imagePlat=document.getElementById('imagePlat');
-  const menuHint=document.getElementById('menuHint');
-  const logicInfo=document.getElementById('logicInfo');
-  
   if(t==='thumb'){
     uploadBox.style.display='block';
-    // MUNCULKAN PILIHAN IMAGE
     imagePlat.classList.remove('hidden');
-    imagePlat.classList.add('show');
-    menuHint.textContent='- IMAGE tersedia karena Pakai Thumbnail ✓';
-    menuHint.style.color='#00a884';
-    logicInfo.textContent='✅ Pakai Thumbnail = Pilihan IMAGE muncul di Tampilan Menu';
-    logicInfo.style.color='#00a884';
   } else {
     uploadBox.style.display='none';
     state.thumbData=null;
     document.getElementById('thumbPrev').style.display='none';
-    // HILANGKAN PILIHAN IMAGE
     if(state.menuStyle==='image'){
-      // Kalo lagi pilih IMAGE terus ganti ke Tanpa Thumb, auto pindah ke Premium
       state.menuStyle='premium';
       document.querySelectorAll('[data-menu]').forEach(e=>e.classList.remove('active'));
       document.querySelector('[data-menu="premium"]').classList.add('active');
     }
     imagePlat.classList.add('hidden');
-    imagePlat.classList.remove('show');
-    menuHint.textContent='- IMAGE hanya muncul jika Pakai Thumbnail';
-    menuHint.style.color='#06b6d4';
-    logicInfo.textContent='💡 Pilih Tanpa Thumbnail = pilihan IMAGE di menu otomatis hilang';
-    logicInfo.style.color='#9ca3af';
   }
   updateAll();
 }
@@ -156,27 +143,16 @@ function updateAll(){
   const feats=[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value);
   const bubble=document.getElementById('waBubble');
   const sub=document.getElementById('prevSub');
-  const menuLabel = state.menuStyle==='premium'?'Premium Box': state.menuStyle==='simple'?'Simple': 'Image+Caption';
-  const btnLabel = state.btn==='btn'?'Button Beneran':'Teks Biasa';
-  const thumbLabel = state.thumb==='thumb'?'Pakai Thumb':'Tanpa Thumb';
-  sub.textContent = `${thumbLabel} • ${menuLabel} • ${btnLabel}`;
-
+  sub.textContent = `${state.menuStyle==='premium'?'Premium Box':state.menuStyle==='simple'?'Simple':'Image'} • ${state.btn==='btn'?'Button':'Teks'} • ${state.thumb==='thumb'?'Thumb':'No Thumb'}`;
   let textContent = '';
   if(state.menuStyle==='simple') textContent=`MENU ${name}\n${feats.map(f=>'• .'+f).join('\n')}`;
-  else if(state.menuStyle==='image') textContent=`╭─「 *${name}* 」\n│ Thumb: thumb.jpg\n${feats.map(f=>'│ • .'+f).join('\n')}\n╰─ CiKiZz`;
-  else textContent=`╭━━━〔 *${name}* 〕━━━\n┃ Base: ${state.base} | ${thumbLabel}\n┣━━━━━━━━\n${feats.map(f=>'┃ • .'+f).join('\n')}\n╰━━ V7.1`;
-
+  else if(state.menuStyle==='image') textContent=`╭─「 ${name} 」\n${feats.map(f=>'│ • .'+f).join('\n')}\n╰─ Image Menu`;
+  else textContent=`╭━━━〔 ${name} 〕━━━\n${feats.map(f=>'┃ • .'+f).join('\n')}\n╰━━━━━━━━━━━━`;
   let html = '';
   if(state.thumb==='thumb' && state.thumbData) html+=`<img src="${state.thumbData}" style="width:100%;height:110px;object-fit:cover;border-radius:8px;margin-bottom:8px">`;
-  else if(state.thumb==='thumb' && state.menuStyle==='image') html+=`<div style="width:100%;height:90px;background:linear-gradient(135deg,#a855f7,#06b6d4);border-radius:8px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff">THUMB.jpg - IMAGE MODE</div>`;
   html+=`<div style="white-space:pre-wrap">${textContent}</div>`;
-
   if(state.btn==='btn') {
-    html+=`<div style="margin-top:10px;display:flex;flex-direction:column;gap:6px">
-      <div class="wa-btn">📶 PING BOT</div>
-      <div class="wa-btn">🎨 STICKER</div>
-      <div class="wa-btn">🤖 AI CHAT</div>
-    </div>`;
+    html+=`<div style="margin-top:10px;display:flex;flex-direction:column;gap:6px"><div class="wa-btn">📶 PING BOT</div><div class="wa-btn">🎨 STICKER</div><div class="wa-btn">🤖 AI CHAT</div></div>`;
   }
   bubble.innerHTML=html;
 }
@@ -190,17 +166,13 @@ document.getElementById('genBtn').onclick=async()=>{
     features:[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value),
     pairingNumber: document.getElementById('owner').value.trim()
   };
-  // VALIDASI LOGIC BARU
-  if(data.menuStyle==='image' && data.thumb==='nothumb'){
-    alert('❌ Menu IMAGE butuh thumbnail! Pilih Pakai Thumbnail dulu atau ganti style menu.');
-    return;
-  }
+  if(data.menuStyle==='image' && data.thumb!=='thumb'){ alert('Pilih Pakai Thumbnail dulu untuk menu Image'); return; }
   const btn=document.getElementById('genBtn'); btn.textContent='Generating...'; btn.disabled=true;
   try{
     const res=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
     if(!res.ok) throw new Error(await res.text());
     const blob=await res.blob(); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=data.botName+'.zip'; a.click();
-  }catch(e){ alert(e.message) } finally{ btn.textContent='⚡ Generate ZIP'; btn.disabled=false }
+  }catch(e){ alert(e.message) } finally{ btn.innerHTML='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Generate ZIP'; btn.disabled=false }
 };
 </script>
 </body>
