@@ -1,258 +1,229 @@
 const JSZip = require('jszip');
 
-// TEMPLATE TELEGRAM
-function getTelegramTemplate(botName, token, features) {
-  return `require('dotenv').config();
-const { Bot } = require('grammy');
-
-const bot = new Bot(process.env.BOT_TOKEN || '${token}');
-
-console.log('[CiKiZz] Starting ${botName}...');
-
-// START
-bot.command('start', async (ctx) => {
-  await ctx.reply(
-    '⚡ Halo! Saya *${botName}*\\n' +
-    'Dibuat dengan CiKiZz Generate Script\\n\\n' +
-    '/help untuk bantuan',
-    { parse_mode: 'Markdown' }
-  );
-});
-
-// HELP
-bot.command('help', async (ctx) => {
-  await ctx.reply('📜 Menu ${botName}:\\n/start - Mulai\\n/help - Bantuan' + 
-  ${features.includes('broadcast') ? "'\\n/bc <pesan> - Broadcast (admin)'" : "''"});
-});
-
-${features.includes('autoreply') ? `
-// AUTO REPLY
-bot.on('message:text', async (ctx) => {
-  const text = ctx.message.text.toLowerCase();
-  if(text.includes('halo') || text.includes('hai')) {
-    await ctx.reply('Halo juga! Ada yang bisa dibantu?');
-  }
-});
-` : ''}
-
-${features.includes('broadcast') ? `
-// BROADCAST - Set ADMIN_ID di .env
-const ADMIN_ID = process.env.ADMIN_ID || '';
-bot.command('bc', async (ctx) => {
-  if(ADMIN_ID && ctx.from.id.toString() !== ADMIN_ID) return ctx.reply('⛔ Bukan admin!');
-  const msg = ctx.match;
-  if(!msg) return ctx.reply('Cara: /bc Halo semua');
-  await ctx.reply('✅ Broadcast terkirim (demo, tambah DB untuk real broadcast)');
-});
-` : ''}
-
-${features.includes('logging') ? `
-// LOGGING
-bot.use(async (ctx, next) => {
-  console.log(\`[LOG] \${ctx.from?.id} - \${ctx.message?.text}\`);
-  await next();
-});
-` : ''}
-
-bot.catch((err) => console.error('[ERROR]', err));
-
-bot.start();
-console.log('[CiKiZz] ${botName} RUNNING! ✅');
-`;
-}
-
-// TEMPLATE WHATSAPP
-function getWhatsappTemplate(botName, features) {
-  return `require('dotenv').config();
+function getCaseTemplate(cfg) {
+  const { botName, owner, btn, thumb, features } = cfg;
+  return `// ${botName} - CASE BASE by CiKiZz
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
 const P = require('pino');
+const fs = require('fs');
+
+const ownerNumber = '${owner || '628xxx'}';
+const thumbPath = ${thumb==='thumb' ? "'./thumb.jpg'" : "null"};
+${features.includes('antilink') ? "const antilink = true;" : ""}
+${features.includes('welcome') ? "const welcome = true;" : ""}
 
 async function startBot() {
   const { state, saveCreds } = await useMultiFileAuthState('auth_info');
   const sock = makeWASocket({
-    auth: state,
-    logger: P({ level: 'silent' }),
-    printQRInTerminal: true,
-    browser: ['CiKiZz Bot', 'Chrome', '1.0']
+    auth: state, logger: P({ level: 'silent' }),
+    printQRInTerminal: ${cfg.conn==='qr' ? 'true' : 'false'},
+    browser: ['${botName}', 'Chrome', '1.0']
   });
-
+  ${cfg.conn==='pairing' ? `
+  if(!sock.authState.creds.registered) {
+    const phoneNumber = '${cfg.pairingNumber || owner}';
+    setTimeout(async () => {
+      const code = await sock.requestPairingCode(phoneNumber);
+      console.log('PAIRING CODE:', code);
+    }, 3000);
+  }` : ''}
   sock.ev.on('creds.update', saveCreds);
-  
-  sock.ev.on('connection.update', (update) => {
-    const { connection, lastDisconnect } = update;
-    if(connection === 'close') {
-      const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
-      console.log('[CiKiZz] Connection closed, reconnecting:', shouldReconnect);
-      if(shouldReconnect) startBot();
-    } else if(connection === 'open') {
-      console.log('[CiKiZz] ${botName} Connected ✅');
-    }
-  });
-
   sock.ev.on('messages.upsert', async ({ messages }) => {
-    const m = messages[0];
-    if(!m.message || m.key.fromMe) return;
-    const text = m.message.conversation || m.message.extendedTextMessage?.text || '';
+    const m = messages[0]; if(!m.message || m.key.fromMe) return;
     const from = m.key.remoteJid;
+    const body = m.message.conversation || m.message.extendedTextMessage?.text || '';
+    const isCmd = body.startsWith('.');
+    const command = isCmd ? body.slice(1).trim().split(' ').shift().toLowerCase() : '';
+    const args = body.trim().split(/ +/).slice(1);
 
-    if(text.toLowerCase() === '.menu') {
-      await sock.sendMessage(from, { text: '⚡ *${botName}*\\n\\n.menu - Menu\\n.ping - Cek bot\\n.sticker - Jadikan sticker\\n\\nDibuat dengan CiKiZz Generate Script' });
+    // CASE HANDLER
+    switch(command) {
+      case 'menu':
+        let menuText = '*${botName} MENU*\\n\\n';
+        menuText += '• .ping\\n• .sticker\\n';
+        ${features.includes('downloader') ? "menuText += '• .tiktok / .ig / .yt\\n';" : ""}
+        ${features.includes('ai') ? "menuText += '• .ai / .gpt\\n';" : ""}
+        menuText += '\\nPowered by CiKiZz';
+        ${btn==='button' ? `
+        await sock.sendMessage(from, {
+          text: menuText,
+          footer: '${botName}',
+          buttons: [{ buttonId: '.ping', buttonText: { displayText: 'PING' }, type: 1 }],
+          headerType: 1,
+          ${thumb==='thumb' ? "image: fs.existsSync('./thumb.jpg') ? fs.readFileSync('./thumb.jpg') : undefined" : ""}
+        });` : `
+        ${thumb==='thumb' ? "const thumb = fs.existsSync('./thumb.jpg') ? { image: fs.readFileSync('./thumb.jpg'), caption: menuText } : { text: menuText }; await sock.sendMessage(from, thumb);" : "await sock.sendMessage(from, { text: menuText });" }
+        `}
+        break;
+      case 'ping': await sock.sendMessage(from, { text: 'Pong! ✅' }); break;
+      ${features.includes('sticker') ? "case 's': case 'sticker': await sock.sendMessage(from, { sticker: m.message }); break;" : ""}
+      ${features.includes('autoreply') ? "default: if(!isCmd && body.toLowerCase().includes('halo')) { await sock.sendMessage(from, { text: 'Halo juga!' }); } break;" : ""}
     }
-    if(text.toLowerCase() === '.ping') {
-      await sock.sendMessage(from, { text: 'Pong! ✅ ${botName} aktif' });
-    }
-    ${features.includes('autoreply') ? `
-    if(text.toLowerCase().includes('halo')) {
-      await sock.sendMessage(from, { text: 'Halo juga! Saya ${botName}' });
-    }` : ''}
-
-    ${features.includes('logging') ? `console.log(\`[LOG] \${from}: \${text}\`);` : ''}
   });
 }
-
 startBot();
-console.log('[CiKiZz] Starting ${botName}...');
-console.log('[CiKiZz] Tunggu QR Code muncul lalu scan pakai WhatsApp!');
+`;
+}
+
+function getEsmTemplate(cfg) {
+  return `// ${cfg.botName} - ESM PLUGIN BASE
+// index.js
+import makeWASocket, { useMultiFileAuthState, DisconnectReason } from '@whiskeysockets/baileys';
+import P from 'pino';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const plugins = {};
+
+async function loadPlugins() {
+  const pluginFolder = path.join(__dirname, 'plugins');
+  if(!fs.existsSync(pluginFolder)) return;
+  for(const file of fs.readdirSync(pluginFolder)) {
+    if(file.endsWith('.js')) {
+      const plugin = await import('./plugins/'+file);
+      plugins[file.replace('.js','')] = plugin.default;
+    }
+  }
+}
+
+async function startBot() {
+  const { state, saveCreds } = await useMultiFileAuthState('auth_info');
+  const sock = makeWASocket({
+    auth: state, logger: P({ level: 'silent' }),
+    printQRInTerminal: ${cfg.conn==='qr' ? 'true' : 'false'},
+    browser: ['${cfg.botName}', 'Chrome', '1.0']
+  });
+  ${cfg.conn==='pairing' ? `
+  if(!sock.authState.creds.registered) {
+    setTimeout(async () => {
+      const code = await sock.requestPairingCode('${cfg.pairingNumber || cfg.owner}');
+      console.log('PAIRING CODE:', code);
+    }, 3000);
+  }` : ''}
+  sock.ev.on('creds.update', saveCreds);
+  await loadPlugins();
+  sock.ev.on('messages.upsert', async ({ messages }) => {
+    const m = messages[0]; if(!m.message) return;
+    for(const name in plugins) { try { await plugins[name](m, sock); } catch(e){console.log(e)} }
+  });
+}
+startBot();
+`;
+}
+
+function getTelegramProTemplate(cfg) {
+  const { botName, token, btn, thumb, features } = cfg;
+  return `// ${botName} TELEGRAM PRO
+require('dotenv').config();
+const { Bot, InlineKeyboard } = require('grammy');
+const fs = require('fs');
+const bot = new Bot(process.env.BOT_TOKEN || '${token}');
+
+bot.command('start', async (ctx) => {
+  const text = '⚡ *${botName}*\\nPowered by CiKiZz PRO MAX';
+  ${btn==='button' ? `const keyboard = new InlineKeyboard().text('Menu', 'menu').text('Ping', 'ping');
+  await ctx.reply(text, { parse_mode: 'Markdown', reply_markup: keyboard });` : `await ctx.reply(text, { parse_mode: 'Markdown' });`}
+});
+
+bot.command('menu', async (ctx) => {
+  let menu = '*MENU ${botName}*\\n';
+  ${features.map(f=>`menu += '• ${f}\\n';`).join('')}
+  ${thumb==='thumb' && btn==='button' ? `
+  if(fs.existsSync('./thumb.jpg')) {
+    await ctx.replyWithPhoto(fs.createReadStream('./thumb.jpg'), { caption: menu, parse_mode: 'Markdown', reply_markup: new InlineKeyboard().text('Support', 'support') });
+  } else { await ctx.reply(menu, { parse_mode: 'Markdown' }); }` : `await ctx.reply(menu, { parse_mode: 'Markdown' });`}
+});
+
+bot.start();
 `;
 }
 
 module.exports = async (req, res) => {
-  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  if(req.method === 'OPTIONS') return res.status(200).end();
-  if(req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  if(req.method==='OPTIONS') return res.status(200).end();
+  if(req.method!=='POST') return res.status(405).json({error:'POST only'});
 
   try {
-    const { botName, token, type, features } = req.body;
-    
-    if(!botName || !type) return res.status(400).json({ error: 'botName & type wajib diisi' });
+    const cfg = req.body;
+    if(!cfg.botName) return res.status(400).json({error:'botName wajib'});
 
     const zip = new JSZip();
-    const safeName = botName.replace(/[^a-zA-Z0-9-_]/g, '-').replace(/\s+/g, '-');
-    let botCode, dependencies;
+    const safeName = cfg.botName.replace(/[^a-zA-Z0-9-_]/g,'-');
+    let botCode = '';
+    let deps = {};
+    let fileName = 'bot.js';
 
-    if(type === 'telegram') {
-      botCode = getTelegramTemplate(botName, token || 'YOUR_TOKEN_HERE', features || []);
-      dependencies = {
-        "grammy": "^1.24.0",
-        "dotenv": "^16.4.5"
-      };
+    if(cfg.type==='telegram') {
+      botCode = getTelegramProTemplate(cfg);
+      deps = { "grammy": "^1.24.0", "dotenv": "^16.4.5" };
     } else {
-      botCode = getWhatsappTemplate(botName, features || []);
-      dependencies = {
-        "@whiskeysockets/baileys": "^6.7.8",
-        "pino": "^8.17.2",
-        "dotenv": "^16.4.5"
-      };
+      if(cfg.base==='case') {
+        botCode = getCaseTemplate(cfg);
+        fileName = 'index.js';
+        deps = { "@whiskeysockets/baileys": "^6.7.8", "pino": "^8.17.2", "dotenv": "^16.4.5" };
+      } else {
+        botCode = getEsmTemplate(cfg);
+        fileName = 'index.js';
+        deps = { "@whiskeysockets/baileys": "^6.7.8", "pino": "^8.17.2", "dotenv": "^16.4.5" };
+        // Buat plugin contoh
+        zip.folder('plugins').file('menu.js', `export default async (m, sock) => {
+  const from = m.key.remoteJid;
+  const body = m.message?.conversation || m.message?.extendedTextMessage?.text || '';
+  if(body==='.menu') {
+    await sock.sendMessage(from, { text: '*MENU ${cfg.botName}*\\n\\n.ping\\n.sticker'${cfg.btn==='button' ? " + '\\nButton aktif'" : ""} });
+  }
+  if(body==='.ping') await sock.sendMessage(from, { text: 'Pong!' });
+};`);
+      }
     }
 
-    const pkg = {
+    zip.file(fileName, botCode);
+    zip.file("package.json", JSON.stringify({
       name: safeName.toLowerCase(),
       version: "1.0.0",
-      main: "bot.js",
-      scripts: { "start": "node bot.js" },
-      dependencies: dependencies
-    };
+      type: cfg.base==='esm' && cfg.type==='whatsapp' ? "module" : "commonjs",
+      main: fileName,
+      scripts: { start: `node ${fileName}` },
+      dependencies: deps
+    }, null, 2));
 
-    // README LENGKAP + NOTED NPM INSTALL
-    const readmeContent = `
-
- CiKiZz Generate Script - ${botName}
-
-Tipe Bot: ${type.toUpperCase()}
-Dibuat: ${new Date().toLocaleString('id-ID')}
-Fitur: ${(features || []).join(', ') || 'basic'}
-
- [ CARA INSTALL DI PTERODACTYL PANEL ]
-
-
-LANGKAH 1: UPLOAD & EXTRACT
-1. Upload file ${safeName}.zip ke File Manager Ptero
-2. Klik kanan file zip > Unarchive / Extract
-
-LANGKAH 2: WAJIB NPM INSTALL (PENTING!)
-Buka tab Console / Terminal di Ptero, ketik:
-
-   npm install
-
-Tekan Enter, tunggu sampai selesai 100%.
-Jangan skip langkah ini! Kalau tidak, error "Cannot find module"
-
-Perintah "npm install" akan otomatis install:
-${type === 'telegram' 
-? `   - grammy (framework bot telegram) -> WAJIB
-   - dotenv (baca token dari .env) -> WAJIB`
-: `   - @whiskeysockets/baileys (WA connection) -> WAJIB
-   - pino (logger) -> WAJIB
-   - dotenv -> WAJIB`}
-
-Cukup ketik "npm install" saja, semua akan terinstall otomatis dari package.json!
-
-LANGKAH 3: ISI TOKEN
-${type === 'telegram' 
-? `BUKA file .env.example, ganti isinya jadi:
-BOT_TOKEN=${token || 'ISI_TOKEN_BOT_KAMU_DISINI'}
-ADMIN_ID=ID_TELEGRAM_KAMU
-
-Atau langsung edit di bot.js baris:
-const bot = new Bot('TOKEN_KAMU')
-
-Cara dapet token: Chat @BotFather di Telegram -> /newbot`
-: `WA BOT TIDAK BUTUH TOKEN!
-Nanti pas kamu start, QR Code akan muncul di Console.
-Scan QR pakai WhatsApp kamu (Linked Devices).
-Folder auth_info akan terbuat otomatis, JANGAN DIHAPUS!`}
-
-LANGKAH 4: START BOT
-Startup Command di Ptero harus: npm start
-Atau ketik manual di Console:
-   npm start
-
-Jika berhasil, akan muncul:
-[CiKiZz] ${botName} RUNNING! ✅
-
- [ JIKA ERROR ]
-
-- Error "Cannot find module 'grammy' / 'baileys'" 
-  => Solusi: Belum npm install! Ketik npm install
-
-- Error 401 Unauthorized (Telegram)
-  => Solusi: Token salah, cek lagi token dari @BotFather
-
-- QR WhatsApp tidak muncul
-  => Solusi: Hapus folder auth_info, lalu npm start lagi
-
-- Bot mati setelah start
-  => Solusi: Cek log di Console, pastikan token benar & sudah npm install
-
- Support: kizzshopgame.store
- Dibuat dengan CiKiZz Generate Script PRO v2.1.0
-
-`;
-
-    zip.file("bot.js", botCode);
-    zip.file("package.json", JSON.stringify(pkg, null, 2));
-    zip.file("README.txt", readmeContent);
-    zip.file("CARA-INSTALL.txt", readmeContent);
-    zip.file(".env.example", type === 'telegram' 
-      ? `BOT_TOKEN=${token || 'ISI_TOKEN_BOT_DISINI'}\nADMIN_ID=ISI_ID_KAMU\n# Dapatkan token di @BotFather\n# Dapatkan ID di @userinfobot`
-      : `# WA BOT - TIDAK PERLU TOKEN\n# QR akan muncul di console saat npm start\n# Scan dengan WhatsApp kamu\n`
-    );
-    zip.file(".gitignore", "node_modules\n.auth_info\nauth_info\n.env\n");
-
-    if(type === 'whatsapp') {
-      zip.file("auth_info/.keep", "");
+    // Thumbnail jika ada
+    if(cfg.thumb==='thumb' && cfg.thumbData) {
+      const base64Data = cfg.thumbData.split(',')[1];
+      zip.file("thumb.jpg", base64Data, { base64: true });
     }
 
-    const content = await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE", compressionOptions: { level: 9 } });
+    const readme = `
+${cfg.botName} - PRO MAX
+Type: ${cfg.type} | Base: ${cfg.base} | Conn: ${cfg.conn} | Button: ${cfg.btn} | Thumb: ${cfg.thumb}
+Features: ${cfg.features?.join(', ')}
 
+INSTALL DI PTERO:
+1. Extract ZIP
+2. npm install
+   -> akan install: ${Object.keys(deps).join(', ')}
+3. ${cfg.type==='telegram' ? 'Isi BOT_TOKEN di .env' : cfg.conn==='pairing' ? 'Isi nomor pairing di index.js / siapin nomor WA, code akan muncul di console' : 'QR akan muncul di console, scan pakai WA'}
+4. npm start
+
+Jika button aktif: menu akan pakai button
+Jika thumbnail aktif: pakai thumb.jpg yang kamu upload
+Base ESM: pakai folder plugins/
+Base CASE: semua fitur di case.js (switch case)
+`;
+    zip.file("README.txt", readme);
+    zip.file(".env.example", cfg.type==='telegram' ? `BOT_TOKEN=${cfg.token||''}` : "# WA tidak butuh token");
+    zip.file(".gitignore", "node_modules\nauth_info\n.env");
+
+    const buf = await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE", compressionOptions: { level: 9 } });
     res.setHeader('Content-Type', 'application/zip');
     res.setHeader('Content-Disposition', `attachment; filename=${safeName}.zip`);
-    res.send(content);
+    res.send(buf);
 
-  } catch (e) {
+  } catch(e) {
     console.error(e);
     res.status(500).json({ error: e.message });
   }
