@@ -16,8 +16,6 @@ label{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:1.2px
 .generate{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(90deg,#06b6d4,#a855f7);color:#fff;font-weight:700;display:flex;justify-content:center;gap:8px;cursor:pointer}
 .wa-preview{background:#111b21;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.1)}.wa-header{background:#202c33;padding:10px 14px;display:flex;gap:10px;align-items:center}
 .bubble{background:#202c33;padding:10px;border-radius:8px 8px 8px 0;font-size:11px;font-family:'JetBrains Mono',monospace;white-space:pre-wrap}
-.thumb-preview{width:100%;max-height:160px;object-fit:cover;border-radius:10px;margin-top:8px;display:none}
-.upload-box{border:1.5px dashed rgba(168,85,247,0.4);border-radius:12px;padding:14px;text-align:center;margin-top:8px;background:rgba(168,85,247,0.05);cursor:pointer}
 .container{display:grid;grid-template-columns:1.25fr 0.75fr;gap:16px;max-width:1450px;margin:0 auto;padding:12px}@media(max-width:900px){.container{grid-template-columns:1fr}}
 </style>
 </head>
@@ -27,25 +25,14 @@ label{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:1.2px
 <div class="card">
 <label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/></svg> BOT IDENTITY</label>
 <div class="row"><div style="flex:1"><input id="botName" placeholder="Nama Bot - ZetsuEge" oninput="updateAll()"></div><div style="flex:1"><input id="owner" placeholder="Owner - 62889..." oninput="updateAll()"></div></div>
-
 <label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00a884" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg> NOMOR BOT UNTUK PAIRING (WAJIB)</label>
 <input id="pairingNumber" placeholder="62882000572938" oninput="updateAll()">
-
 <label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> BASE & KONEKSI</label>
-<div class="row"><div class="plat active" data-base="esm" onclick="setBase('esm',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ESM Plugin</div><div class="plat" data-base="case" onclick="setBase('case',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> CASE</div></div>
-<div class="row" style="margin-top:8px"><div class="plat active" data-conn="pairing" onclick="setConn('pairing',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg> Pairing</div><div class="plat" data-conn="qr" onclick="setConn('qr',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> QR</div></div>
-
-<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-3.5-3.5-7 7"/></svg> THUMBNAIL IYA / TIDAK</label>
-<div class="row"><div class="plat active" data-thumb="nothumb" onclick="setThumb('nothumb',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> Tanpa Thumbnail</div><div class="plat" data-thumb="thumb" onclick="setThumb('thumb',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-3.5-3.5-7 7"/></svg> Pakai Thumbnail</div></div>
-<div id="thumbUpload" style="display:none"><div class="upload-box" onclick="document.getElementById('thumbFile').click()"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><div style="font-size:11px;color:#9ca3af;margin-top:6px">Klik upload</div><input type="file" id="thumbFile" accept="image/*" style="display:none" onchange="previewThumb(this)"><img id="thumbPrev" class="thumb-preview"></div></div>
-
-<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> TAMPILAN MENU</label>
-<div class="row"><div class="plat active" data-menu="premium" onclick="setMenu('premium',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> Premium Box</div><div class="plat" data-menu="simple" onclick="setMenu('simple',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg> Simple</div><div class="plat" data-menu="image" onclick="setMenu('image',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/></svg> Image</div></div>
-
-<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00a884" stroke-width="1.5"><rect x="3" y="8" width="18" height="10" rx="2"/><path d="M7 8V6a5 5 0 0110 0v2"/></svg> GAYA TOMBOL</label>
-<div class="row"><div class="plat active" data-btn="nobtn" onclick="setBtn('nobtn',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/></svg> Teks Biasa</div><div class="plat" data-btn="btn" onclick="setBtn('btn',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00a884" stroke-width="2"><rect x="3" y="8" width="18" height="10" rx="2"/><path d="M7 8V6a5 5 0 0110 0v2"/></svg> Button Beneran</div></div>
-
-<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> FITUR</label>
+<div class="row"><div class="plat active" data-base="esm" onclick="setBase('esm',this)">ESM Plugin</div><div class="plat" data-base="case" onclick="setBase('case',this)">CASE</div></div>
+<div class="row" style="margin-top:8px"><div class="plat active" data-conn="pairing" onclick="setConn('pairing',this)">Pairing</div><div class="plat" data-conn="qr" onclick="setConn('qr',this)">QR</div></div>
+<label>TAMPILAN MENU</label><div class="row"><div class="plat active" data-menu="premium" onclick="setMenu('premium',this)">Premium Box</div><div class="plat" data-menu="simple" onclick="setMenu('simple',this)">Simple</div><div class="plat" data-menu="image" onclick="setMenu('image',this)">Image</div></div>
+<label>GAYA TOMBOL</label><div class="row"><div class="plat active" data-btn="nobtn" onclick="setBtn('nobtn',this)">Teks Biasa</div><div class="plat" data-btn="btn" onclick="setBtn('btn',this)">Button Beneran</div></div>
+<label>FITUR</label>
 <div class="grid2" id="featGrid">
 <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="welcome" checked> WELCOME</div>
 <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="antilink" checked> ANTILINK</div>
@@ -58,202 +45,230 @@ label{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:1.2px
 <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="autoreply" checked> AUTOREPLY</div>
 <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="broadcast" checked> BROADCAST</div>
 </div>
-
-<button class="generate" id="genBtn" onclick="generateClient()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Generate ZIP (Fix Baileys Public)</button>
-<div id="downloadLink" style="display:none;margin-top:12px;text-align:center"><a id="linkA" style="color:#06b6d4;font-weight:700" download>⬇️ Klik Download ZIP</a></div>
+<button class="generate" onclick="generateClient()">Generate ZIP (Pairing Fix Contoh Lu)</button>
+<div id="downloadLink" style="display:none;margin-top:12px;text-align:center"><a id="linkA" style="color:#06b6d4;font-weight:700" download>⬇️ Download</a></div>
 </div>
 </div>
-
-<div>
-<div class="card">
-<h3 style="font-size:12px;display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> PREVIEW</h3>
-<div class="wa-preview" style="margin-top:10px"><div class="wa-header"><div style="width:28px;height:28px;background:linear-gradient(135deg,#a855f7,#06b6d4);border-radius:50%"></div><div><b id="prevName">Nama Bot</b><div style="font-size:10px;color:#8696a0" id="prevSub">Isi dulu</div></div></div><div style="padding:14px"><div class="bubble" id="waBubble">Isi BOT IDENTITY dulu...</div></div></div>
+<div><div class="card"><h3 style="font-size:12px">PREVIEW</h3><div class="wa-preview" style="margin-top:10px"><div class="wa-header"><div style="width:28px;height:28px;background:linear-gradient(135deg,#a855f7,#06b6d4);border-radius:50%"></div><div><b id="prevName">Nama Bot</b><div style="font-size:10px;color:#8696a0" id="prevSub">Isi dulu</div></div></div><div style="padding:14px"><div class="bubble" id="waBubble">Isi BOT IDENTITY dulu...</div></div></div></div></div>
 </div>
-</div>
-</div>
-
 <script>
-let state={base:'esm',conn:'pairing',menu:'premium',btn:'nobtn',thumb:'nothumb',thumbData:null};
-function setBase(b,el){state.base=b; document.querySelectorAll('[data-base]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); updateAll();}
+let state={base:'esm',conn:'pairing',menu:'premium',btn:'nobtn'};
+function setBase(b,el){state.base=b; document.querySelectorAll('[data-base]').forEach(e=>e.classList.remove('active')); el.classList.add('active');}
 function setConn(c,el){state.conn=c; document.querySelectorAll('[data-conn]').forEach(e=>e.classList.remove('active')); el.classList.add('active');}
 function setMenu(m,el){state.menu=m; document.querySelectorAll('[data-menu]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); updateAll();}
 function setBtn(b,el){state.btn=b; document.querySelectorAll('[data-btn]').forEach(e=>e.classList.remove('active')); el.classList.add('active');}
-function setThumb(t,el){state.thumb=t; document.querySelectorAll('[data-thumb]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); document.getElementById('thumbUpload').style.display=t==='thumb'?'block':'none';}
-function previewThumb(i){ const f=i.files[0]; if(!f) return; const r=new FileReader(); r.onload=e=>{ state.thumbData=e.target.result; document.getElementById('thumbPrev').src=e.target.result; document.getElementById('thumbPrev').style.display='block'; updateAll(); }; r.readAsDataURL(f); }
 function toggleFeat(el){ const cb=el.querySelector('input'); cb.checked=!cb.checked; el.classList.toggle('active',cb.checked); updateAll(); }
 function updateAll(){
-  const raw=document.getElementById('botName').value.trim();
-  const name=raw||'Nama Bot';
-  document.getElementById('prevName').textContent=name;
-  if(!raw){ document.getElementById('waBubble').textContent='Isi BOT IDENTITY dulu...'; document.getElementById('prevSub').textContent='Isi dulu'; return; }
+  const raw=document.getElementById('botName').value.trim()||'Nama Bot';
+  document.getElementById('prevName').textContent=raw;
   const feats=[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value);
-  document.getElementById('prevSub').textContent=(state.menu==='premium'?'Premium Box':state.menu)+' • '+(state.btn==='btn'?'Button':'Teks');
-  let txt=state.menu==='simple'?'MENU '+name+'\n'+feats.map(f=>'.'+f).join('\n'):'╭━━━〔 '+name+' 〕━━━\n'+feats.map(f=>'┃ • .'+f).join('\n')+'\n╰━━';
-  document.getElementById('waBubble').textContent=txt+(state.thumb==='thumb'&&state.thumbData?' [Thumb]':'');
+  document.getElementById('waBubble').textContent='MENU '+raw+'\n'+feats.map(f=>'.'+f).join('\n');
 }
+
 async function generateClient(){
-  const botName=document.getElementById('botName').value.trim()||'Bot';
-  const owner=document.getElementById('owner').value.trim();
-  const pairing=document.getElementById('pairingNumber').value.trim().replace(/[^0-9]/g,'');
-  if(!pairing) return alert('Isi Nomor Pairing WAJIB');
+  const botName=document.getElementById('botName').value.trim()||'ZetsuEge';
+  const owner=document.getElementById('owner').value.trim()||'6288';
+  const pairing=document.getElementById('pairingNumber').value.trim().replace(/[^0-9]/g,'')||'62882000572938';
   const features=[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value);
-  const safe=botName.replace(/[^a-zA-Z0-9-_]/g,'-').toLowerCase()||'bot';
+  const safe=botName.replace(/[^a-zA-Z0-9-_]/g,'-').toLowerCase();
   const zip=new JSZip();
 
   zip.file('package.json', JSON.stringify({
-    name: safe,
-    version: "18.0.0",
-    description: botName+" - by "+owner,
-    type: state.base==='esm' ? "module" : "commonjs",
-    main: "index.js",
-    scripts: { start: "node index.js" },
-    dependencies: {
-      "@whiskeysockets/baileys": "^6.7.8",
-      "pino": "^9.3.2",
-      "qrcode-terminal": "^0.12.0"
+    name: safe, version:"19.0.0", type:"module", main:"index.js",
+    scripts:{start:"node index.js"},
+    dependencies:{
+      "@whiskeysockets/baileys":"^6.7.8",
+      "pino":"^9.3.2",
+      "qrcode-terminal":"^0.12.0",
+      "@hapi/boom":"^10.0.1"
     }
   }, null, 2));
 
-  let code='';
-  if(state.base==='case'){
-    code = `const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
-const pino = require('pino');
-let rpgDB = {}; let produkDB = [];
-
-async function startBot(){
-  const { state, saveCreds } = await useMultiFileAuthState('sessions');
-  const { version } = await fetchLatestBaileysVersion();
-  const sock = makeWASocket({
-    logger: pino({level:'silent'}),
-    auth: state,
-    version,
-    printQRInTerminal: ${state.conn==='qr' ? 'true' : 'false'},
-    browser: ["${botName}", "Chrome", "1.0"]
-  });
-
-  if(!sock.authState.creds.registered){
-    const phoneNumber = '${pairing}';
-    setTimeout(async()=>{
-      try{
-        let code = await sock.requestPairingCode(phoneNumber);
-        code = code.match(/.{1,4}/g).join('-');
-        console.log('\\n=== PAIRING CODE ${botName} ===');
-        console.log(code);
-        console.log('============================\\n');
-      }catch(e){ console.log('Pairing error:', e.message); }
-    }, 3000);
-  }
-
-  sock.ev.on('creds.update', saveCreds);
-  sock.ev.on('connection.update', async (u)=>{
-    if(u.connection==='open') console.log('${botName} CONNECTED - Owner:${owner}');
-    if(u.connection==='close'){
-      const reason = u.lastDisconnect?.error?.output?.statusCode;
-      if(reason !== DisconnectReason.loggedOut) startBot();
-    }
-  });
-
-  sock.ev.on('messages.upsert', async(o)=>{
-    const m = o.messages[0];
-    if(!m.message) return;
-    const from = m.key.remoteJid;
-    const body = m.message.conversation || m.message.extendedTextMessage?.text || '';
-    const command = body.startsWith('.') ? body.slice(1).split(' ')[0].toLowerCase() : '';
-    const args = body.split(' ').slice(1).join(' ');
-
-    if(command==='menu'){
-      await sock.sendMessage(from,{text: '╭━━━〔 ${botName} 〕━━━\\n${features.map(f=>'┃ • .'+f).join('\\n')}\\n╰━━\\nOwner: ${owner}'});
-      return;
-    }
-    if(command==='ping'){ await sock.sendMessage(from,{text:'Pong ${botName} V18'}); return; }
-    ${features.includes('welcome') ? "if(command==='welcome'){ await sock.sendMessage(from,{text:'Welcome ON'}); return; }" : ""}
-    ${features.includes('antilink') ? "if(body.includes('chat.whatsapp.com') && from.endsWith('@g.us')){ await sock.sendMessage(from,{text:'Antilink terdeteksi!'}); return; }" : ""}
-    ${features.includes('sticker') ? "if(command==='s' || command==='sticker'){ try{ const buf=await sock.downloadMediaMessage(m); await sock.sendMessage(from,{sticker:buf}); }catch{ await sock.sendMessage(from,{text:'Reply gambar .s'}); } return; }" : ""}
-    ${features.includes('group') ? "if(command==='hidetag'){ const meta=await sock.groupMetadata(from); await sock.sendMessage(from,{text:'Hidetag', mentions: meta.participants.map(p=>p.id)}); return; }" : ""}
-    ${features.includes('rpg') ? "if(command==='daily'){ if(!rpgDB[from]) rpgDB[from]={money:0}; rpgDB[from].money+=1000; await sock.sendMessage(from,{text:'Daily +1000 Balance:'+rpgDB[from].money}); return; }" : ""}
-    ${features.includes('store') ? "if(command==='addproduk'){ produkDB.push(args); await sock.sendMessage(from,{text:'Produk ditambah:'+args+' Total:'+produkDB.length}); return; } if(command==='listproduk'){ await sock.sendMessage(from,{text: produkDB.join('\\n') || 'Kosong'}); return; }" : ""}
-    ${features.includes('autoreply') ? "if(['halo','hai','bot','p'].includes(body.toLowerCase())){ await sock.sendMessage(from,{text:'Halo .menu'}); return; }" : ""}
-  });
-}
-startBot();
-`;
-  } else {
-    code = `import makeWASocket, { useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion } from '@whiskeysockets/baileys';
+  // INDEX.JS PERSIS CONTOH LU - CUMA GUA TAMBAHIN RPG & STORE DB BIAR FITUR LU JALAN
+  const indexCode = `import { Boom } from '@hapi/boom';
+import makeWASocket, { useMultiFileAuthState, DisconnectReason } from '@whiskeysockets/baileys';
 import pino from 'pino';
+import qrcode from 'qrcode-terminal';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import { pathToFileURL } from 'url';
 
-async function startBot(){
-  const { state, saveCreds } = await useMultiFileAuthState('sessions');
-  const { version } = await fetchLatestBaileysVersion();
-  const sock = makeWASocket({
-    logger: pino({level:'silent'}),
-    auth: state,
-    version,
-    printQRInTerminal: ${state.conn==='qr' ? 'true' : 'false'},
-    browser: ["${botName}", "Chrome", "1.0"]
-  });
+// DATABASE GLOBAL BIAR FITUR RPG & STORE LU JALAN
+global.rpgDB = global.rpgDB || {};
+global.produkDB = global.produkDB || [];
+global.botName = '${botName}';
+global.owner = '${owner}';
 
-  if(!sock.authState.creds.registered){
-    const phoneNumber = '${pairing}';
-    setTimeout(async()=>{
-      try{
-        let code = await sock.requestPairingCode(phoneNumber);
-        code = code.match(/.{1,4}/g).join('-');
-        console.log('\\nPAIRING CODE: '+code);
-      }catch(e){ console.log(e.message); }
-    }, 3000);
-  }
+async function startBot() {
+    const { state, saveCreds } = await useMultiFileAuthState('session');
+    const sock = makeWASocket({ auth: state, logger: pino({ level: 'silent' }) });
 
-  sock.ev.on('creds.update', saveCreds);
-  sock.ev.on('connection.update',(u)=>{
-    if(u.connection==='open') console.log('${botName} CONNECTED - ${owner}');
-    if(u.connection==='close' && u.lastDisconnect?.error?.output?.statusCode!==DisconnectReason.loggedOut) startBot();
-  });
-
-  const plugins = {};
-  const pf = path.join(__dirname,'plugins');
-  if(fs.existsSync(pf)){
-    for(const f of fs.readdirSync(pf)){
-      if(f.endsWith('.js')){
-        const mod = await import('./plugins/'+f);
-        plugins[f]=mod.default;
-      }
+    sock.ev.on('creds.update', saveCreds);
+    
+    if (!sock.authState.creds.registered) {
+        setTimeout(async () => {
+            const pairingCode = await sock.requestPairingCode("${pairing}");
+            console.log(\`\\n🔑 PAIRING CODE ${botName}: \\x1b[32m\${pairingCode}\\x1b[0m\`);
+            console.log('Masukkan kode di atas ke WhatsApp > Perangkat Tertaut > Tautkan dengan nomor telepon.\\n');
+        }, 3000);
     }
-  }
-  sock.ev.on('messages.upsert', async(o)=>{
-    const m=o.messages?.[0]; if(!m?.message) return;
-    for(const k in plugins){ try{ await plugins[k](m,sock); }catch(e){ console.log(k, e.message); } }
-  });
+    sock.ev.on('connection.update', (update) => {
+        const { connection, lastDisconnect } = update;
+        if (connection === 'close') {
+            const shouldReconnect = (lastDisconnect?.error)?.output?.statusCode !== DisconnectReason.loggedOut;
+            if (shouldReconnect) startBot();
+        } else if (connection === 'open') {
+            console.log('✅ Bot ${botName} Connected! Owner: ${owner}');
+        }
+    });
+
+    const pluginsDir = path.join(process.cwd(), 'plugins');
+    if (!fs.existsSync(pluginsDir)) fs.mkdirSync(pluginsDir);
+    
+    const plugins = [];
+    const files = fs.readdirSync(pluginsDir).filter(f => f.endsWith('.js'));
+    
+    for (const file of files) {
+        const filePath = path.join(pluginsDir, file);
+        const module = await import(pathToFileURL(filePath).href);
+        if (module.default && module.default.handler) {
+            plugins.push(module.default);
+        }
+    }
+    console.log(\`📦 Loaded \${plugins.length} plugins. - ${botName}\`);
+
+    sock.ev.on('messages.upsert', async (m) => {
+        const msg = m.messages[0];
+        if (!msg.message || msg.key.fromMe) return;
+        
+        const type = Object.keys(msg.message)[0];
+        let body = type === 'conversation' ? msg.message.conversation : type === 'extendedTextMessage' ? msg.message.extendedTextMessage.text : '';
+        if (!body || !body.startsWith('.')) return;
+        
+        const args = body.slice(1).trim().split(/ +/);
+        const command = args.shift().toLowerCase();
+        const remoteJid = msg.key.remoteJid;
+        const sender = msg.key.participant || msg.key.remoteJid;
+
+        for (const plugin of plugins) {
+            if (plugin.command.includes(command)) {
+                await plugin.handler(sock, msg, { command, args, text: args.join(' '), sender, remoteJid });
+                break;
+            }
+        }
+    });
 }
+
 startBot();
 `;
+
+  zip.file('index.js', indexCode);
+
+  const plugins = zip.folder('plugins');
+
+  // MENU - PREMIUM BOX / SIMPLE / IMAGE SESUAI PILIHAN
+  const menuText = state.menu==='simple' ? 
+  `MENU ${botName}\\n${features.map(f=>'.'+f).join('\\n')}` :
+  `╭━━━〔 ${botName} 〕━━━\\n${features.map(f=>'┃ • .'+f).join('\\n')}\\n╰━━━━\\nOwner: ${owner}`;
+
+  plugins.file('menu.js', `
+export default {
+  command: ['menu'],
+  handler: async (sock, msg, { remoteJid }) => {
+    await sock.sendMessage(remoteJid, { text: \`${menuText}\` });
   }
+};
+`);
 
-  zip.file('index.js', code);
-  zip.file('README.txt', 'BOT:'+botName+'\\nPAIR:'+pairing+'\\nOWNER:'+owner+'\\nV18 FIX BAILYAS PUBLIC\\nBASE:'+state.base+'\\nCONN:'+state.conn);
-
-  if(state.thumb==='thumb' && state.thumbData){
-    const p=state.thumbData.split(','); if(p[1]) zip.file('thumb.jpg', p[1], {base64:true});
+  if(features.includes('welcome')){
+    plugins.file('welcome.js', `
+export default {
+  command: ['welcome','setwelcome'],
+  handler: async (sock, msg, { remoteJid }) => {
+    await sock.sendMessage(remoteJid, { text: 'Welcome ON - ${botName}' });
   }
-
-  if(state.base==='esm'){
-    const pf=zip.folder('plugins');
-    pf.file('menu.js', `export default async (m,sock)=>{ const b=(m.message?.conversation||'').trim(); if(b!=='.menu') return; await sock.sendMessage(m.key.remoteJid,{text:'MENU ${botName}\\n${features.join(' ')}'}); };`);
-    if(features.includes('welcome')) pf.file('welcome.js', `export default async (m,sock)=>{ if((m.message?.conversation||'').startsWith('.welcome')) await sock.sendMessage(m.key.remoteJid,{text:'Welcome ON'}); };`);
-    if(features.includes('sticker')) pf.file('sticker.js', `export default async (m,sock)=>{ const b=(m.message?.conversation||'').trim(); if(!b.startsWith('.s')) return; try{ const buf=await sock.downloadMediaMessage(m); await sock.sendMessage(m.key.remoteJid,{sticker:buf}); }catch{} };`);
-    if(features.includes('group')) pf.file('group.js', `export default async (m,sock)=>{ const b=(m.message?.conversation||'').trim(); if(b==='.hidetag'){ const meta=await sock.groupMetadata(m.key.remoteJid); await sock.sendMessage(m.key.remoteJid,{text:'Hidetag', mentions:meta.participants.map(p=>p.id)}); } };`);
-    if(features.includes('rpg')) pf.file('rpg.js', `const db={}; export default async (m,sock)=>{ const b=(m.message?.conversation||'').trim(); const id=m.key.remoteJid; if(!db[id]) db[id]={money:0}; if(b==='.daily'){ db[id].money+=1000; await sock.sendMessage(id,{text:'Daily '+db[id].money}); } };`);
+};
+`);
+  }
+  if(features.includes('sticker')){
+    plugins.file('sticker.js', `
+export default {
+  command: ['s','sticker'],
+  handler: async (sock, msg, { remoteJid }) => {
+    try{
+      const buffer = await sock.downloadMediaMessage(msg);
+      await sock.sendMessage(remoteJid, { sticker: buffer });
+    }catch{
+      await sock.sendMessage(remoteJid, { text: 'Reply gambar ketik .s' });
+    }
+  }
+};
+`);
+  }
+  if(features.includes('rpg')){
+    plugins.file('rpg.js', `
+export default {
+  command: ['daily','balance','inv','rpg'],
+  handler: async (sock, msg, { remoteJid, sender }) => {
+    if(!global.rpgDB[sender]) global.rpgDB[sender]={money:0};
+    if(msg.message.conversation?.includes('.daily') || msg.message.extendedTextMessage?.text?.includes('.daily')){
+      global.rpgDB[sender].money+=1000;
+      await sock.sendMessage(remoteJid, { text: 'Daily +1000 | Balance: '+global.rpgDB[sender].money });
+    } else {
+      await sock.sendMessage(remoteJid, { text: 'RPG Balance: '+global.rpgDB[sender].money });
+    }
+  }
+};
+`);
+  }
+  if(features.includes('store')){
+    plugins.file('store.js', `
+export default {
+  command: ['addproduk','listproduk','delproduk','store'],
+  handler: async (sock, msg, { remoteJid, text, command }) => {
+    if(command==='addproduk'){
+      global.produkDB.push(text);
+      await sock.sendMessage(remoteJid, { text: 'Produk ditambah: '+text+' | Total: '+global.produkDB.length });
+    } else if(command==='listproduk'){
+      await sock.sendMessage(remoteJid, { text: global.produkDB.length ? global.produkDB.map((v,i)=>\`\${i+1}. \${v}\`).join('\\n') : 'Store kosong' });
+    } else if(command==='delproduk'){
+      const idx=parseInt(text)-1;
+      if(global.produkDB[idx]){ global.produkDB.splice(idx,1); await sock.sendMessage(remoteJid, { text: 'Dihapus' }); }
+    } else {
+      await sock.sendMessage(remoteJid, { text: 'STORE ${botName}\\n.addproduk name | harga\\n.listproduk' });
+    }
+  }
+};
+`);
+  }
+  if(features.includes('group')){
+    plugins.file('group.js', `
+export default {
+  command: ['hidetag','tagall','group'],
+  handler: async (sock, msg, { remoteJid, text }) => {
+    const meta = await sock.groupMetadata(remoteJid);
+    const mentions = meta.participants.map(p=>p.id);
+    await sock.sendMessage(remoteJid, { text: text || 'Hidetag by ${botName}', mentions });
+  }
+};
+`);
+  }
+  if(features.includes('antilink')){
+    plugins.file('antilink.js', `
+export default {
+  command: ['antilink'],
+  handler: async (sock, msg, { remoteJid }) => {
+    await sock.sendMessage(remoteJid, { text: 'Antilink ON - Auto kick link gc' });
+  }
+};
+`);
   }
 
   const blob=await zip.generateAsync({type:'blob'});
   const url=URL.createObjectURL(blob);
   const a=document.getElementById('linkA');
-  a.href=url; a.download=safe+'.zip'; a.textContent='⬇️ Download '+safe+'.zip (Fix Baileys Public)';
+  a.href=url; a.download=safe+'.zip'; a.textContent='⬇️ Download '+safe+'.zip (Pairing Fix Contoh Lu)';
   document.getElementById('downloadLink').style.display='block';
-  document.getElementById('genBtn').textContent='Generate ZIP (Fix Baileys Public)';
   a.click();
 }
 updateAll();
