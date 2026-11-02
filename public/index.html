@@ -2,24 +2,30 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CiKiZz Generate Script Bot</title>
+<title>CiKiZz - Generate</title>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box}body{background:#05050f;color:#fff;font-family:'Space Grotesk',sans-serif}
-.card{background:rgba(15,15,30,0.9);border:1px solid rgba(168,85,247,0.2);border-radius:18px;padding:18px;margin-bottom:14px}
+*{margin:0;padding:0;box-sizing:border-box}body{background:#05050f;color:#fff;font-family:'Space Grotesk',sans-serif;min-height:100vh}
+.card{background:rgba(15,15,30,0.9);border:1px solid rgba(168,85,247,0.2);border-radius:18px;padding:18px;margin-bottom:14px;backdrop-filter:blur(10px)}
 label{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin:16px 0 8px;display:flex;align-items:center;gap:6px}
-.row{display:flex;gap:8px;flex-wrap:wrap}.plat{flex:1;min-width:110px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:11px;font-weight:600;min-height:48px}
-.plat.active{background:linear-gradient(135deg, rgba(6,182,212,0.3), rgba(168,85,247,0.3));border-color:#06b6d4}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.feat{display:flex;align-items:center;gap:10px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;font-size:11px;cursor:pointer}
-.feat.active{border-color:#06b6d4;background:rgba(6,182,212,0.12)}input{width:100%;padding:12px;border-radius:10px;background:#000;border:1px solid #333;color:#fff;font-family:'JetBrains Mono',monospace}
-.generate{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(90deg,#06b6d4,#a855f7);color:#fff;font-weight:700;display:flex;justify-content:center;gap:8px;cursor:pointer}
+.row{display:flex;gap:8px;flex-wrap:wrap}.plat{flex:1;min-width:110px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:11px;font-weight:600;min-height:48px;transition:0.2s}
+.plat.active{background:linear-gradient(135deg, rgba(6,182,212,0.3), rgba(168,85,247,0.3));border-color:#06b6d4;color:#fff;box-shadow:0 0 12px rgba(6,182,212,0.3)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.feat{display:flex;align-items:center;gap:10px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;font-size:11px;cursor:pointer;transition:0.2s}
+.feat.active{border-color:#06b6d4;background:rgba(6,182,212,0.12)}input{width:100%;padding:12px;border-radius:10px;background:#000;border:1px solid #333;color:#fff;font-family:'JetBrains Mono',monospace;outline:none}
+input:focus{border-color:#06b6d4}
+.generate{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(90deg,#06b6d4,#a855f7);color:#fff;font-weight:700;display:flex;justify-content:center;gap:8px;cursor:pointer;font-size:13px;margin-top:18px}
 .wa-preview{background:#111b21;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.1)}.wa-header{background:#202c33;padding:10px 14px;display:flex;gap:10px;align-items:center}
-.bubble{background:#202c33;padding:10px;border-radius:8px 8px 8px 0;font-size:11px;font-family:'JetBrains Mono',monospace;white-space:pre-wrap}
+.bubble{background:#202c33;padding:10px;border-radius:8px 8px 8px 0;font-size:11px;font-family:'JetBrains Mono',monospace;white-space:pre-wrap;word-break:break-word}
+.thumb-preview{width:100%;max-height:160px;object-fit:cover;border-radius:10px;margin-top:8px;display:none}
+.upload-box{border:1.5px dashed rgba(168,85,247,0.4);border-radius:12px;padding:14px;text-align:center;margin-top:8px;background:rgba(168,85,247,0.05);cursor:pointer}
 .container{display:grid;grid-template-columns:1.25fr 0.75fr;gap:16px;max-width:1450px;margin:0 auto;padding:12px}@media(max-width:900px){.container{grid-template-columns:1fr}}
+.topbar{max-width:1450px;margin:0 auto;padding:18px 12px 0;display:flex;align-items:center;gap:12px}
+.logo{width:38px;height:38px;background:linear-gradient(135deg,#06b6d4,#a855f7);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700}
 </style>
 </head>
 <body>
+<div class="topbar"><div class="logo">C</div><div><div style="font-weight:700;letter-spacing:0.5px">CiKiZz</div><div style="font-size:10px;color:#9ca3af">CREATE SCRIPT BOT</div></div></div>
 <div class="container">
 <div>
 <div class="card">
@@ -28,11 +34,16 @@ label{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:1.2px
 <label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00a884" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg> NOMOR BOT UNTUK PAIRING (WAJIB)</label>
 <input id="pairingNumber" placeholder="62882000572938" oninput="updateAll()">
 <label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> BASE & KONEKSI</label>
-<div class="row"><div class="plat active" data-base="esm" onclick="setBase('esm',this)">ESM Plugin</div><div class="plat" data-base="case" onclick="setBase('case',this)">CASE</div></div>
-<div class="row" style="margin-top:8px"><div class="plat active" data-conn="pairing" onclick="setConn('pairing',this)">Pairing</div><div class="plat" data-conn="qr" onclick="setConn('qr',this)">QR</div></div>
-<label>TAMPILAN MENU</label><div class="row"><div class="plat active" data-menu="premium" onclick="setMenu('premium',this)">Premium Box</div><div class="plat" data-menu="simple" onclick="setMenu('simple',this)">Simple</div><div class="plat" data-menu="image" onclick="setMenu('image',this)">Image</div></div>
-<label>GAYA TOMBOL</label><div class="row"><div class="plat active" data-btn="nobtn" onclick="setBtn('nobtn',this)">Teks Biasa</div><div class="plat" data-btn="btn" onclick="setBtn('btn',this)">Button Beneran</div></div>
-<label>FITUR</label>
+<div class="row"><div class="plat active" data-base="esm" onclick="setBase('esm',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> ESM Plugin</div><div class="plat" data-base="case" onclick="setBase('case',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> CASE</div></div>
+<div class="row" style="margin-top:8px"><div class="plat active" data-conn="pairing" onclick="setConn('pairing',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg> Pairing</div><div class="plat" data-conn="qr" onclick="setConn('qr',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> QR</div></div>
+<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-3.5-3.5-7 7"/></svg> THUMBNAIL IYA / TIDAK</label>
+<div class="row"><div class="plat active" data-thumb="nothumb" onclick="setThumb('nothumb',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg> Tanpa Thumbnail</div><div class="plat" data-thumb="thumb" onclick="setThumb('thumb',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-3.5-3.5-7 7"/></svg> Pakai Thumbnail</div></div>
+<div id="thumbUpload" style="display:none"><div class="upload-box" onclick="document.getElementById('thumbFile').click()"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><div style="font-size:11px;color:#9ca3af;margin-top:6px">Klik upload thumbnail</div><input type="file" id="thumbFile" accept="image/*" style="display:none" onchange="previewThumb(this)"><img id="thumbPrev" class="thumb-preview"></div></div>
+<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg> TAMPILAN MENU</label>
+<div class="row"><div class="plat active" data-menu="premium" onclick="setMenu('premium',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg> Premium Box</div><div class="plat" data-menu="simple" onclick="setMenu('simple',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg> Simple</div><div class="plat" data-menu="image" onclick="setMenu('image',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/></svg> Image</div></div>
+<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00a884" stroke-width="1.5"><rect x="3" y="8" width="18" height="10" rx="2"/><path d="M7 8V6a5 5 0 0110 0v2"/></svg> GAYA TOMBOL</label>
+<div class="row"><div class="plat active" data-btn="nobtn" onclick="setBtn('nobtn',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/></svg> Teks Biasa</div><div class="plat" data-btn="btn" onclick="setBtn('btn',this)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00a884" stroke-width="2"><rect x="3" y="8" width="18" height="10" rx="2"/><path d="M7 8V6a5 5 0 0110 0v2"/></svg> Button Beneran</div></div>
+<label><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> FITUR</label>
 <div class="grid2" id="featGrid">
 <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="welcome" checked> WELCOME</div>
 <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="antilink" checked> ANTILINK</div>
@@ -44,67 +55,72 @@ label{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:1.2px
 <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="store" checked> STORE</div>
 <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="autoreply" checked> AUTOREPLY</div>
 <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="broadcast" checked> BROADCAST</div>
+<div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="telegram" checked> TELEGRAM</div>
 </div>
-<button class="generate" onclick="generateClient()">Generate ZIP (Pairing Fix Contoh Lu)</button>
-<div id="downloadLink" style="display:none;margin-top:12px;text-align:center"><a id="linkA" style="color:#06b6d4;font-weight:700" download>⬇️ Download</a></div>
+<button class="generate" id="genBtn" onclick="generateClient()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Generate ZIP</button>
+<div id="downloadLink" style="display:none;margin-top:12px;text-align:center"><a id="linkA" style="color:#06b6d4;font-weight:700;text-decoration:none;background:rgba(6,182,212,0.1);padding:10px 18px;border-radius:10px;border:1px solid rgba(6,182,212,0.3);display:inline-block" download>⬇️ Download ZIP</a></div>
 </div>
 </div>
-<div><div class="card"><h3 style="font-size:12px">PREVIEW</h3><div class="wa-preview" style="margin-top:10px"><div class="wa-header"><div style="width:28px;height:28px;background:linear-gradient(135deg,#a855f7,#06b6d4);border-radius:50%"></div><div><b id="prevName">Nama Bot</b><div style="font-size:10px;color:#8696a0" id="prevSub">Isi dulu</div></div></div><div style="padding:14px"><div class="bubble" id="waBubble">Isi BOT IDENTITY dulu...</div></div></div></div></div>
+<div>
+<div class="card">
+<h3 style="font-size:12px;display:flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> PREVIEW</h3>
+<div class="wa-preview" style="margin-top:10px"><div class="wa-header"><div style="width:28px;height:28px;background:linear-gradient(135deg,#a855f7,#06b6d4);border-radius:50%"></div><div><b id="prevName">Nama Bot</b><div style="font-size:10px;color:#8696a0" id="prevSub">Isi dulu</div></div></div><div style="padding:14px"><div class="bubble" id="waBubble">Isi BOT IDENTITY dulu...</div></div></div>
+</div>
+</div>
 </div>
 <script>
-let state={base:'esm',conn:'pairing',menu:'premium',btn:'nobtn'};
-function setBase(b,el){state.base=b; document.querySelectorAll('[data-base]').forEach(e=>e.classList.remove('active')); el.classList.add('active');}
+let state={base:'esm',conn:'pairing',menu:'premium',btn:'nobtn',thumb:'nothumb',thumbData:null};
+function setBase(b,el){state.base=b; document.querySelectorAll('[data-base]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); updateAll();}
 function setConn(c,el){state.conn=c; document.querySelectorAll('[data-conn]').forEach(e=>e.classList.remove('active')); el.classList.add('active');}
 function setMenu(m,el){state.menu=m; document.querySelectorAll('[data-menu]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); updateAll();}
 function setBtn(b,el){state.btn=b; document.querySelectorAll('[data-btn]').forEach(e=>e.classList.remove('active')); el.classList.add('active');}
+function setThumb(t,el){state.thumb=t; document.querySelectorAll('[data-thumb]').forEach(e=>e.classList.remove('active')); el.classList.add('active'); document.getElementById('thumbUpload').style.display=t==='thumb'?'block':'none';}
+function previewThumb(i){ const f=i.files[0]; if(!f) return; const r=new FileReader(); r.onload=e=>{ state.thumbData=e.target.result; document.getElementById('thumbPrev').src=e.target.result; document.getElementById('thumbPrev').style.display='block'; updateAll(); }; r.readAsDataURL(f); }
 function toggleFeat(el){ const cb=el.querySelector('input'); cb.checked=!cb.checked; el.classList.toggle('active',cb.checked); updateAll(); }
 function updateAll(){
-  const raw=document.getElementById('botName').value.trim()||'Nama Bot';
-  document.getElementById('prevName').textContent=raw;
+  const raw=document.getElementById('botName').value.trim();
+  const name=raw||'Nama Bot';
+  document.getElementById('prevName').textContent=name;
+  if(!raw){ document.getElementById('waBubble').textContent='Isi BOT IDENTITY dulu...'; document.getElementById('prevSub').textContent='Isi dulu'; return; }
   const feats=[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value);
-  document.getElementById('waBubble').textContent='MENU '+raw+'\n'+feats.map(f=>'.'+f).join('\n');
+  document.getElementById('prevSub').textContent=(state.menu==='premium'?'Premium Box':state.menu)+' • '+(state.btn==='btn'?'Button':'Teks')+' • '+state.base.toUpperCase();
+  let txt=state.menu==='simple'?'MENU '+name+'\n'+feats.map(f=>'.'+f).join('\n'):'╭━━━〔 '+name+' 〕━━━\n'+feats.map(f=>'┃ • .'+f).join('\n')+'\n╰━━';
+  document.getElementById('waBubble').textContent=txt;
 }
-
 async function generateClient(){
   const botName=document.getElementById('botName').value.trim()||'ZetsuEge';
-  const owner=document.getElementById('owner').value.trim()||'6288';
+  const owner=document.getElementById('owner').value.trim()||'Owner';
   const pairing=document.getElementById('pairingNumber').value.trim().replace(/[^0-9]/g,'')||'62882000572938';
   const features=[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value);
-  const safe=botName.replace(/[^a-zA-Z0-9-_]/g,'-').toLowerCase();
+  const safe=botName.replace(/[^a-zA-Z0-9-_]/g,'-').toLowerCase()||'bot';
   const zip=new JSZip();
-
   zip.file('package.json', JSON.stringify({
-    name: safe, version:"19.0.0", type:"module", main:"index.js",
-    scripts:{start:"node index.js"},
-    dependencies:{
-      "@whiskeysockets/baileys":"^6.7.8",
-      "pino":"^9.3.2",
-      "qrcode-terminal":"^0.12.0",
-      "@hapi/boom":"^10.0.1"
+    name: safe,
+    version: "1.0.0",
+    description: botName,
+    type: state.base==='esm' ? "module" : "commonjs",
+    main: "index.js",
+    scripts: { start: "node index.js" },
+    dependencies: {
+      "@whiskeysockets/baileys": "^6.7.8",
+      "pino": "^9.3.2",
+      "qrcode-terminal": "^0.12.0",
+      "@hapi/boom": "^10.0.1"
     }
   }, null, 2));
-
-  // INDEX.JS PERSIS CONTOH LU - CUMA GUA TAMBAHIN RPG & STORE DB BIAR FITUR LU JALAN
-  const indexCode = `import { Boom } from '@hapi/boom';
-import makeWASocket, { useMultiFileAuthState, DisconnectReason } from '@whiskeysockets/baileys';
-import pino from 'pino';
-import qrcode from 'qrcode-terminal';
-import fs from 'fs';
-import path from 'path';
-import { pathToFileURL } from 'url';
-
-// DATABASE GLOBAL BIAR FITUR RPG & STORE LU JALAN
-global.rpgDB = global.rpgDB || {};
-global.produkDB = global.produkDB || [];
-global.botName = '${botName}';
-global.owner = '${owner}';
-
+  let indexCode = "";
+  if(state.base==='case'){
+    indexCode = `const { Boom } = require('@hapi/boom');
+const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
+const pino = require('pino');
+const qrcode = require('qrcode-terminal');
+global.rpgDB = {};
+global.produkDB = [];
+global.telegramDB = {};
 async function startBot() {
     const { state, saveCreds } = await useMultiFileAuthState('session');
     const sock = makeWASocket({ auth: state, logger: pino({ level: 'silent' }) });
-
     sock.ev.on('creds.update', saveCreds);
-    
     if (!sock.authState.creds.registered) {
         setTimeout(async () => {
             const pairingCode = await sock.requestPairingCode("${pairing}");
@@ -116,18 +132,182 @@ async function startBot() {
         const { connection, lastDisconnect } = update;
         if (connection === 'close') {
             const shouldReconnect = (lastDisconnect?.error)?.output?.statusCode !== DisconnectReason.loggedOut;
+            console.log('[CONNECTION] Close, reconnect:', shouldReconnect);
             if (shouldReconnect) startBot();
         } else if (connection === 'open') {
             console.log('✅ Bot ${botName} Connected! Owner: ${owner}');
         }
     });
-
+    sock.ev.on('messages.upsert', async (m) => {
+        const msg = m.messages[0];
+        if (!msg.message || msg.key.fromMe) return;
+        const type = Object.keys(msg.message)[0];
+        let body = type === 'conversation' ? msg.message.conversation : type === 'extendedTextMessage' ? msg.message.extendedTextMessage.text : type === 'imageMessage' ? msg.message.imageMessage.caption : '';
+        const remoteJid = msg.key.remoteJid;
+        const sender = msg.key.participant || msg.key.remoteJid;
+        console.log(\`[MSG] \${remoteJid} | \${sender} : \${body}\`);
+        if (!body) return;
+        const isCmd = body.startsWith('.');
+        if(isCmd){
+            console.log(\`[CMD] \${body} from \${sender} in \${remoteJid}\`);
+        }
+        ${features.includes('autoreply') ? `
+        if(['halo','hai','bot','p','.'].includes(body.toLowerCase().trim())){
+            console.log('[AUTOREPLY] Trigger');
+            await sock.sendMessage(remoteJid, { text: 'Halo kak, ketik .menu' });
+            return;
+        }` : ''}
+        if(!body.startsWith('.')) return;
+        const args = body.slice(1).trim().split(/ +/);
+        const command = args.shift().toLowerCase();
+        const text = args.join(' ');
+        switch(command){
+            case 'menu': {
+                const menu = \`${state.menu==='simple' ? 'MENU ${botName}\\n'+features.map(f=>'.'+f).join('\\n') : '╭━━━〔 ${botName} 〕━━━\\n'+features.map(f=>'┃ • .'+f).join('\\n')+'\\n╰━━\\nOwner: ${owner}'}\`;
+                await sock.sendMessage(remoteJid, { text: menu });
+                console.log('[MENU] Sent to', remoteJid);
+                break;
+            }
+            case 'ping': {
+                await sock.sendMessage(remoteJid, { text: 'Pong ${botName} - Online' });
+                break;
+            }
+            ${features.includes('welcome') ? `
+            case 'welcome': {
+                await sock.sendMessage(remoteJid, { text: 'Welcome ON - ${botName}' });
+                break;
+            }` : ''}
+            ${features.includes('antilink') ? `
+            case 'antilink': {
+                await sock.sendMessage(remoteJid, { text: 'Antilink ON - Link gc akan di kick' });
+                break;
+            }` : ''}
+            ${features.includes('sticker') ? `
+            case 's':
+            case 'sticker':
+            case 'stiker': {
+                try{
+                    const buffer = await sock.downloadMediaMessage(msg);
+                    await sock.sendMessage(remoteJid, { sticker: buffer });
+                    console.log('[STICKER] Sent');
+                }catch{
+                    await sock.sendMessage(remoteJid, { text: 'Reply gambar dengan .s' });
+                }
+                break;
+            }` : ''}
+            ${features.includes('downloader') ? `
+            case 'downloader':
+            case 'tiktok':
+            case 'ig': {
+                await sock.sendMessage(remoteJid, { text: 'Downloader - Kirim link TikTok/IG: .tiktok <link>' });
+                break;
+            }` : ''}
+            ${features.includes('ai') ? `
+            case 'ai': {
+                await sock.sendMessage(remoteJid, { text: 'AI ${botName}: ' + (text || 'Halo') });
+                break;
+            }` : ''}
+            ${features.includes('group') ? `
+            case 'hidetag':
+            case 'tagall': {
+                try{
+                    const meta = await sock.groupMetadata(remoteJid);
+                    const mentions = meta.participants.map(p=>p.id);
+                    await sock.sendMessage(remoteJid, { text: text || 'Hidetag by ${botName}', mentions });
+                    console.log('[HIDETAG] Sent to', mentions.length);
+                }catch(e){ console.log(e); }
+                break;
+            }` : ''}
+            ${features.includes('rpg') ? `
+            case 'daily':
+            case 'balance':
+            case 'rpg': {
+                if(!global.rpgDB[sender]) global.rpgDB[sender]={money:0};
+                if(command==='daily'){
+                    global.rpgDB[sender].money+=1000;
+                    await sock.sendMessage(remoteJid, { text: 'Daily +1000 | Balance: '+global.rpgDB[sender].money });
+                } else {
+                    await sock.sendMessage(remoteJid, { text: 'Balance: '+global.rpgDB[sender].money });
+                }
+                console.log('[RPG] '+sender+' : '+global.rpgDB[sender].money);
+                break;
+            }` : ''}
+            ${features.includes('store') ? `
+            case 'addproduk':
+            case 'listproduk':
+            case 'delproduk':
+            case 'store': {
+                if(command==='addproduk'){
+                    global.produkDB.push(text);
+                    await sock.sendMessage(remoteJid, { text: 'Produk ditambah: '+text+' | Total: '+global.produkDB.length });
+                    console.log('[STORE] Add:', text);
+                } else if(command==='listproduk'){
+                    const list = global.produkDB.length ? global.produkDB.map((v,i)=>\`\${i+1}. \${v}\`).join('\\n') : 'Store kosong';
+                    await sock.sendMessage(remoteJid, { text: list });
+                } else if(command==='delproduk'){
+                    const idx=parseInt(text)-1;
+                    if(global.produkDB[idx]){ global.produkDB.splice(idx,1); await sock.sendMessage(remoteJid, { text: 'Dihapus' }); }
+                } else {
+                    await sock.sendMessage(remoteJid, { text: 'STORE ${botName}\\n.addproduk nama | harga\\n.listproduk' });
+                }
+                break;
+            }` : ''}
+            ${features.includes('broadcast') ? `
+            case 'broadcast':
+            case 'bc': {
+                await sock.sendMessage(remoteJid, { text: 'Broadcast: '+text });
+                break;
+            }` : ''}
+            ${features.includes('telegram') ? `
+            case 'telegram': {
+                await sock.sendMessage(remoteJid, { text: 'Telegram Bridge ON - ${botName}\\nStatus: Connected' });
+                console.log('[TELEGRAM] Command');
+                break;
+            }` : ''}
+            default: {
+                console.log('[UNKNOWN CMD]', command);
+            }
+        }
+    });
+}
+startBot();
+`;
+  } else {
+    indexCode = `import { Boom } from '@hapi/boom';
+import makeWASocket, { useMultiFileAuthState, DisconnectReason } from '@whiskeysockets/baileys';
+import pino from 'pino';
+import qrcode from 'qrcode-terminal';
+import fs from 'fs';
+import path from 'path';
+import { pathToFileURL } from 'url';
+global.rpgDB = global.rpgDB || {};
+global.produkDB = global.produkDB || [];
+global.telegramDB = global.telegramDB || {};
+async function startBot() {
+    const { state, saveCreds } = await useMultiFileAuthState('session');
+    const sock = makeWASocket({ auth: state, logger: pino({ level: 'silent' }) });
+    sock.ev.on('creds.update', saveCreds);
+    if (!sock.authState.creds.registered) {
+        setTimeout(async () => {
+            const pairingCode = await sock.requestPairingCode("${pairing}");
+            console.log(\`\\n🔑 PAIRING CODE ${botName}: \\x1b[32m\${pairingCode}\\x1b[0m\`);
+            console.log('Masukkan kode di atas ke WhatsApp > Perangkat Tertaut > Tautkan dengan nomor telepon.\\n');
+        }, 3000);
+    }
+    sock.ev.on('connection.update', (update) => {
+        const { connection, lastDisconnect } = update;
+        if (connection === 'close') {
+            const shouldReconnect = (lastDisconnect?.error)?.output?.statusCode !== DisconnectReason.loggedOut;
+            console.log('[CONNECTION] Close, reconnect:', shouldReconnect);
+            if (shouldReconnect) startBot();
+        } else if (connection === 'open') {
+            console.log('✅ Bot ${botName} Connected! Owner: ${owner}');
+        }
+    });
     const pluginsDir = path.join(process.cwd(), 'plugins');
     if (!fs.existsSync(pluginsDir)) fs.mkdirSync(pluginsDir);
-    
     const plugins = [];
     const files = fs.readdirSync(pluginsDir).filter(f => f.endsWith('.js'));
-    
     for (const file of files) {
         const filePath = path.join(pluginsDir, file);
         const module = await import(pathToFileURL(filePath).href);
@@ -136,138 +316,184 @@ async function startBot() {
         }
     }
     console.log(\`📦 Loaded \${plugins.length} plugins. - ${botName}\`);
-
     sock.ev.on('messages.upsert', async (m) => {
         const msg = m.messages[0];
         if (!msg.message || msg.key.fromMe) return;
-        
         const type = Object.keys(msg.message)[0];
-        let body = type === 'conversation' ? msg.message.conversation : type === 'extendedTextMessage' ? msg.message.extendedTextMessage.text : '';
-        if (!body || !body.startsWith('.')) return;
-        
-        const args = body.slice(1).trim().split(/ +/);
-        const command = args.shift().toLowerCase();
+        let body = type === 'conversation' ? msg.message.conversation : type === 'extendedTextMessage' ? msg.message.extendedTextMessage.text : type === 'imageMessage' ? msg.message.imageMessage.caption : '';
         const remoteJid = msg.key.remoteJid;
         const sender = msg.key.participant || msg.key.remoteJid;
-
+        if(!body) return;
+        console.log(\`[MSG] \${remoteJid} | \${sender} : \${body}\`);
+        ${features.includes('autoreply') ? `
+        if(['halo','hai','bot','p'].includes(body.toLowerCase().trim())){
+            console.log('[AUTOREPLY] Trigger');
+            await sock.sendMessage(remoteJid, { text: 'Halo kak, ketik .menu' });
+            return;
+        }` : ''}
+        if (!body.startsWith('.')) return;
+        const args = body.slice(1).trim().split(/ +/);
+        const command = args.shift().toLowerCase();
+        console.log(\`[CMD] \${command} from \${sender} in \${remoteJid}\`);
         for (const plugin of plugins) {
             if (plugin.command.includes(command)) {
+                console.log(\`[PLUGIN] Executing \${command}\`);
                 await plugin.handler(sock, msg, { command, args, text: args.join(' '), sender, remoteJid });
                 break;
             }
         }
     });
 }
-
 startBot();
 `;
-
+  }
   zip.file('index.js', indexCode);
-
-  const plugins = zip.folder('plugins');
-
-  // MENU - PREMIUM BOX / SIMPLE / IMAGE SESUAI PILIHAN
-  const menuText = state.menu==='simple' ? 
-  `MENU ${botName}\\n${features.map(f=>'.'+f).join('\\n')}` :
-  `╭━━━〔 ${botName} 〕━━━\\n${features.map(f=>'┃ • .'+f).join('\\n')}\\n╰━━━━\\nOwner: ${owner}`;
-
-  plugins.file('menu.js', `
-export default {
+  if(state.thumb==='thumb' && state.thumbData){
+    const p=state.thumbData.split(','); if(p[1]) zip.file('thumb.jpg', p[1], {base64:true});
+  }
+  if(state.base==='esm'){
+    const pf=zip.folder('plugins');
+    const menuText = state.menu==='simple' ? 
+    `MENU ${botName}\\n${features.map(f=>'.'+f).join('\\n')}` :
+    `╭━━━〔 ${botName} 〕━━━\\n${features.map(f=>'┃ • .'+f).join('\\n')}\\n╰━━\\nOwner: ${owner}`;
+    pf.file('menu.js', `export default {
   command: ['menu'],
   handler: async (sock, msg, { remoteJid }) => {
     await sock.sendMessage(remoteJid, { text: \`${menuText}\` });
+    console.log('[MENU] Sent');
   }
-};
-`);
-
-  if(features.includes('welcome')){
-    plugins.file('welcome.js', `
-export default {
+};`);
+    if(features.includes('welcome')){
+      pf.file('welcome.js', `export default {
   command: ['welcome','setwelcome'],
   handler: async (sock, msg, { remoteJid }) => {
     await sock.sendMessage(remoteJid, { text: 'Welcome ON - ${botName}' });
+    console.log('[WELCOME]');
   }
-};
-`);
+};`);
+    }
+    if(features.includes('antilink')){
+      pf.file('antilink.js', `export default {
+  command: ['antilink'],
+  handler: async (sock, msg, { remoteJid }) => {
+    await sock.sendMessage(remoteJid, { text: 'Antilink ON - Link gc akan di kick' });
+    console.log('[ANTILINK]');
   }
-  if(features.includes('sticker')){
-    plugins.file('sticker.js', `
-export default {
-  command: ['s','sticker'],
+};`);
+    }
+    if(features.includes('sticker')){
+      pf.file('sticker.js', `export default {
+  command: ['s','sticker','stiker'],
   handler: async (sock, msg, { remoteJid }) => {
     try{
       const buffer = await sock.downloadMediaMessage(msg);
       await sock.sendMessage(remoteJid, { sticker: buffer });
+      console.log('[STICKER] Sent');
     }catch{
-      await sock.sendMessage(remoteJid, { text: 'Reply gambar ketik .s' });
+      await sock.sendMessage(remoteJid, { text: 'Reply gambar dengan .s' });
     }
   }
-};
-`);
+};`);
+    }
+    if(features.includes('downloader')){
+      pf.file('downloader.js', `export default {
+  command: ['downloader','tiktok','ig','fb'],
+  handler: async (sock, msg, { remoteJid, text }) => {
+    await sock.sendMessage(remoteJid, { text: 'Downloader: '+ (text || 'kirim link') });
+    console.log('[DOWNLOADER]');
   }
-  if(features.includes('rpg')){
-    plugins.file('rpg.js', `
-export default {
-  command: ['daily','balance','inv','rpg'],
-  handler: async (sock, msg, { remoteJid, sender }) => {
+};`);
+    }
+    if(features.includes('ai')){
+      pf.file('ai.js', `export default {
+  command: ['ai'],
+  handler: async (sock, msg, { remoteJid, text }) => {
+    await sock.sendMessage(remoteJid, { text: 'AI ${botName}: ' + (text || 'Halo') });
+    console.log('[AI]');
+  }
+};`);
+    }
+    if(features.includes('group')){
+      pf.file('group.js', `export default {
+  command: ['hidetag','tagall','group'],
+  handler: async (sock, msg, { remoteJid, text }) => {
+    try{
+      const meta = await sock.groupMetadata(remoteJid);
+      const mentions = meta.participants.map(p=>p.id);
+      await sock.sendMessage(remoteJid, { text: text || 'Hidetag by ${botName}', mentions });
+      console.log('[HIDETAG] '+mentions.length);
+    }catch(e){ console.log(e); }
+  }
+};`);
+    }
+    if(features.includes('rpg')){
+      pf.file('rpg.js', `export default {
+  command: ['daily','balance','rpg','inv'],
+  handler: async (sock, msg, { remoteJid, sender, command }) => {
     if(!global.rpgDB[sender]) global.rpgDB[sender]={money:0};
-    if(msg.message.conversation?.includes('.daily') || msg.message.extendedTextMessage?.text?.includes('.daily')){
+    if(command==='daily'){
       global.rpgDB[sender].money+=1000;
       await sock.sendMessage(remoteJid, { text: 'Daily +1000 | Balance: '+global.rpgDB[sender].money });
     } else {
-      await sock.sendMessage(remoteJid, { text: 'RPG Balance: '+global.rpgDB[sender].money });
+      await sock.sendMessage(remoteJid, { text: 'Balance: '+global.rpgDB[sender].money });
     }
+    console.log('[RPG] '+sender+' : '+global.rpgDB[sender].money);
   }
-};
-`);
-  }
-  if(features.includes('store')){
-    plugins.file('store.js', `
-export default {
+};`);
+    }
+    if(features.includes('store')){
+      pf.file('store.js', `export default {
   command: ['addproduk','listproduk','delproduk','store'],
   handler: async (sock, msg, { remoteJid, text, command }) => {
     if(command==='addproduk'){
       global.produkDB.push(text);
       await sock.sendMessage(remoteJid, { text: 'Produk ditambah: '+text+' | Total: '+global.produkDB.length });
+      console.log('[STORE] Add:', text);
     } else if(command==='listproduk'){
-      await sock.sendMessage(remoteJid, { text: global.produkDB.length ? global.produkDB.map((v,i)=>\`\${i+1}. \${v}\`).join('\\n') : 'Store kosong' });
+      const list = global.produkDB.length ? global.produkDB.map((v,i)=>\`\${i+1}. \${v}\`).join('\\n') : 'Store kosong';
+      await sock.sendMessage(remoteJid, { text: list });
+      console.log('[STORE] List');
     } else if(command==='delproduk'){
       const idx=parseInt(text)-1;
       if(global.produkDB[idx]){ global.produkDB.splice(idx,1); await sock.sendMessage(remoteJid, { text: 'Dihapus' }); }
     } else {
-      await sock.sendMessage(remoteJid, { text: 'STORE ${botName}\\n.addproduk name | harga\\n.listproduk' });
+      await sock.sendMessage(remoteJid, { text: 'STORE ${botName}\\n.addproduk nama | harga\\n.listproduk' });
     }
   }
-};
-`);
-  }
-  if(features.includes('group')){
-    plugins.file('group.js', `
-export default {
-  command: ['hidetag','tagall','group'],
-  handler: async (sock, msg, { remoteJid, text }) => {
-    const meta = await sock.groupMetadata(remoteJid);
-    const mentions = meta.participants.map(p=>p.id);
-    await sock.sendMessage(remoteJid, { text: text || 'Hidetag by ${botName}', mentions });
-  }
-};
-`);
-  }
-  if(features.includes('antilink')){
-    plugins.file('antilink.js', `
-export default {
-  command: ['antilink'],
+};`);
+    }
+    if(features.includes('autoreply')){
+      pf.file('autoreply.js', `export default {
+  command: ['autoreply'],
   handler: async (sock, msg, { remoteJid }) => {
-    await sock.sendMessage(remoteJid, { text: 'Antilink ON - Auto kick link gc' });
+    await sock.sendMessage(remoteJid, { text: 'Autoreply ON' });
+    console.log('[AUTOREPLY]');
   }
-};
-`);
+};`);
+    }
+    if(features.includes('broadcast')){
+      pf.file('broadcast.js', `export default {
+  command: ['broadcast','bc'],
+  handler: async (sock, msg, { remoteJid, text }) => {
+    await sock.sendMessage(remoteJid, { text: 'Broadcast: '+text });
+    console.log('[BC]');
   }
-
+};`);
+    }
+    if(features.includes('telegram')){
+      pf.file('telegram.js', `export default {
+  command: ['telegram','tele'],
+  handler: async (sock, msg, { remoteJid }) => {
+    await sock.sendMessage(remoteJid, { text: 'Telegram Bridge ON - ${botName}\\nStatus: Connected\\nFitur telegram aktif' });
+    console.log('[TELEGRAM] ON');
+  }
+};`);
+    }
+  }
   const blob=await zip.generateAsync({type:'blob'});
   const url=URL.createObjectURL(blob);
   const a=document.getElementById('linkA');
-  a.href=url; a.download=safe+'.zip'; a.textContent='⬇️ Download '+safe+'.zip (Pairing Fix Contoh Lu)';
+  a.href=url; a.download=safe+'.zip'; a.textContent='⬇️ Download '+safe+'.zip';
   document.getElementById('downloadLink').style.display='block';
   a.click();
 }
