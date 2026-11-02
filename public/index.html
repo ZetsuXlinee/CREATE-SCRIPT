@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CiKiZz Generate Script Bot</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:#050510;color:#fff;font-family:'Space Grotesk',sans-serif;min-height:100vh;
+    background-image: 
+      radial-gradient(circle at 20% 30%, rgba(147,51,234,0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(6,182,212,0.15) 0%, transparent 50%),
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+  }
+  .navbar{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;margin:16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(20px);border-radius:16px;}
+  .logo{font-weight:700;font-size:22px;display:flex;align-items:center;gap:10px}.logo span{color:#a855f7} .logo b{color:#06b6d4}
+  .container{display:grid;grid-template-columns:1.2fr 0.8fr;gap:20px;max-width:1300px;margin:20px auto;padding:0 20px;}
+  @media(max-width:900px){.container{grid-template-columns:1fr}}
+  .card{background:rgba(15,15,30,0.85);border:1px solid rgba(168,85,247,0.3);border-radius:20px;padding:28px;backdrop-filter:blur(20px);box-shadow:0 0 40px rgba(168,85,247,0.15), inset 0 1px 0 rgba(255,255,255,0.1);position:relative;overflow:hidden;}
+  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg, transparent, #a855f7, #06b6d4, transparent);}
+  h2{font-size:26px;margin-bottom:8px;display:flex;gap:10px;align-items:center}
+  .sub{color:#9ca3af;font-size:14px;margin-bottom:24px;line-height:1.5}
+  label{font-size:11px;color:#d1d5db;margin-bottom:8px;display:block;text-transform:uppercase;letter-spacing:1.2px;font-weight:700}
+  .platforms{display:flex;gap:12px;margin-bottom:20px}
+  .plat{flex:1;padding:14px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;display:flex;align-items:center;gap:10px;transition:0.2s;font-size:14px;font-weight:600}
+  .plat.active{background:linear-gradient(135deg, rgba(6,182,212,0.2), rgba(168,85,247,0.2));border-color:#06b6d4;box-shadow:0 0 20px rgba(6,182,212,0.3);}
+  input, select{width:100%;padding:14px 16px;border-radius:12px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'JetBrains Mono',monospace;font-size:14px;outline:none;margin-bottom:18px;}
+  input:focus, select:focus{border-color:#a855f7;box-shadow:0 0 0 3px rgba(168,85,247,0.2)}
+  .features{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+  .feat{display:flex;align-items:center;gap:10px;padding:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;font-size:13px;cursor:pointer;transition:0.2s;}
+  .feat:hover{border-color:rgba(168,85,247,0.5)} .feat input{width:auto;margin:0;accent-color:#a855f7}
+  .generate{width:100%;padding:18px;border:none;border-radius:14px;background:linear-gradient(90deg, #06b6d4, #a855f7);color:#fff;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 0 30px rgba(168,85,247,0.5);transition:0.2s;}
+  .generate:hover{transform:translateY(-2px);box-shadow:0 0 50px rgba(168,85,247,0.7)} .generate:disabled{opacity:0.5;cursor:not-allowed}
+  .noted{margin-top:20px;background:rgba(6,182,212,0.08);border:1px dashed #06b6d4;border-radius:12px;padding:16px}
+  .noted h4{font-size:13px;color:#06b6d4;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+  .noted code{display:block;background:#000;padding:12px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#fff;line-height:1.7;border:1px solid rgba(255,255,255,0.1)}
+  .code{background:#000;border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:16px;font-size:12px;line-height:1.6;min-height:260px;overflow:auto;color:#9ca3af;white-space:pre-wrap;font-family:'JetBrains Mono',monospace}
+  .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px}
+  .stat{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;text-align:center;}
+  .stat h3{font-size:22px;color:#06b6d4}
+  .toast{position:fixed;bottom:20px;right:20px;background:#111;border:1px solid #a855f7;padding:14px 18px;border-radius:12px;transform:translateY(100px);opacity:0;transition:0.3s;z-index:999}
+  .toast.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <div class="logo">⬢ <span>CiKiZz</span> <b>Generate Script</b></div>
+  <div style="font-size:12px;color:#9ca3af">PRO v2.1.0 • Pterodactyl Ready • Auto ZIP</div>
+</div>
+
+<div class="container">
+  <div class="card">
+    <h2>✨ Generate Your Bot Script</h2>
+    <p class="sub">Build Telegram & WhatsApp bots in seconds. Isi form → Generate → Download ZIP → Upload ke Pterodactyl → <b style="color:#06b6d4">npm install</b> → Start.</p>
+
+    <label>Target Platform</label>
+    <div class="platforms">
+      <div class="plat active" data-type="telegram">📨 Telegram</div>
+      <div class="plat" data-type="whatsapp">💬 WhatsApp</div>
+    </div>
+
+    <label>Bot Name</label>
+    <input id="botName" placeholder="e.g. KizzuStore-Bot">
+
+    <label>Bot Token <span style="text-transform:none;color:#6b7280">(Telegram only)</span></label>
+    <input id="token" placeholder="123456:ABC-DEF... kosongkan jika belum ada">
+
+    <label>Language / Runtime</label>
+    <select><option>Node.js 20 (Pterodactyl Ready)</option></select>
+
+    <label>Features</label>
+    <div class="features">
+      <label class="feat"><input type="checkbox" value="autoreply" checked> Autoreply</label>
+      <label class="feat"><input type="checkbox" value="command" checked> Command Handler</label>
+      <label class="feat"><input type="checkbox" value="broadcast" checked> Broadcast</label>
+      <label class="feat"><input type="checkbox" value="logging"> Logging</label>
+    </div>
+
+    <button class="generate" id="genBtn">⚡ Generate Script & Download ZIP</button>
+
+    <!-- NOTED PENTING -->
+    <div class="noted">
+      <h4>📌 NOTED WAJIB DI PTERODACTYL:</h4>
+      <code>
+        <span style="color:#6b7280"># 1. Setelah extract ZIP, buka Console Ptero:</span><br>
+        npm install<br><br>
+        <span style="color:#6b7280"># 2. Tunggu sampai selesai (1-2 menit)</span><br>
+        <span style="color:#6b7280"># Ini akan install:</span><br>
+        <span id="installList">- grammy<br>- dotenv</span><br><br>
+        <span style="color:#6b7280"># 3. Lalu start bot:</span><br>
+        npm start
+      </code>
+      <p style="font-size:11px;color:#9ca3af;margin-top:10px">⚠️ Jika error <span style="color:#ef4444">Cannot find module</span> = belum <b style="color:#fff">npm install</b><br>Telegram: isi BOT_TOKEN di file .env atau bot.js sebelum start.</p>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px">
+        <h3 style="font-size:16px">Live Script Preview</h3>
+        <span style="font-size:11px;background:rgba(255,255,255,0.1);padding:4px 8px;border-radius:6px">bot.js</span>
+      </div>
+      <div class="code" id="codePreview">// loading...</div>
+      <div class="stats">
+        <div class="stat"><h3 id="s1">0</h3><p style="font-size:11px;color:#9ca3af">Generated</p></div>
+        <div class="stat"><h3>100%</h3><p style="font-size:11px;color:#9ca3af">Ptero Ready</p></div>
+        <div class="stat"><h3>1 CMD</h3><p style="font-size:11px;color:#9ca3af">npm install</p></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;padding:20px">
+      <h3 style="font-size:13px;margin-bottom:10px;color:#06b6d4">📦 ISI FILE ZIP YANG DI-DOWNLOAD:</h3>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#9ca3af;line-height:1.8">
+        My-Bot.zip<br>
+        ├── bot.js <span style="color:#6b7280">- script utama</span><br>
+        ├── package.json <span style="color:#6b7280">- list npm install</span><br>
+        ├── .env.example <span style="color:#6b7280">- contoh token</span><br>
+        ├── README.txt <span style="color:#06b6d4">- CARA INSTALL LENGKAP</span><br>
+        └── CARA-INSTALL.txt
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">✅ ZIP berhasil! Cek folder download kamu.</div>
+
+<script>
+let selectedType = 'telegram';
+document.querySelectorAll('.plat').forEach(el => {
+  el.onclick = () => {
+    document.querySelectorAll('.plat').forEach(p=>p.classList.remove('active'));
+    el.classList.add('active');
+    selectedType = el.dataset.type;
+    document.getElementById('token').style.display = selectedType==='telegram' ? 'block' : 'none';
+    document.getElementById('installList').innerHTML = selectedType==='telegram' ? '- grammy<br>- dotenv' : '- @whiskeysockets/baileys<br>- pino<br>- dotenv';
+    updatePreview();
+  }
+});
+
+function updatePreview(){
+  const name = document.getElementById('botName').value || 'MyBot';
+  const feats = [...document.querySelectorAll('.feat input:checked')].map(i=>i.value);
+  let code = `// ${name} - ${selectedType}
+const { Bot } = require('grammy');
+const bot = new Bot(process.env.BOT_TOKEN);
+
+bot.command('start', ctx => {
+  ctx.reply('Halo dari ${name}!');
+});
+${feats.includes('autoreply') ? "\n// Autoreply\nbot.on('message:text', ctx => {\n  // logic autoreply\n});" : ''}
+${feats.includes('broadcast') ? "\n// Broadcast\nbot.command('bc', ctx => {\n  // broadcast logic\n});" : ''}
+
+bot.start();
+console.log('${name} running!');`;
+  document.getElementById('codePreview').textContent = code;
+}
+document.getElementById('botName').addEventListener('input', updatePreview);
+document.querySelectorAll('.feat input').forEach(i=>i.addEventListener('change', updatePreview));
+
+document.getElementById('genBtn').onclick = async () => {
+  const botName = document.getElementById('botName').value.trim();
+  const token = document.getElementById('token').value.trim();
+  const features = [...document.querySelectorAll('.feat input:checked')].map(i=>i.value);
+  
+  if(!botName) return alert('Isi nama bot dulu bos!');
+  if(selectedType==='telegram' && !token) if(!confirm('Token kosong, lanjut dengan placeholder? Nanti isi manual di Ptero.')) return;
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true; btn.textContent = '⏳ Generating ZIP...';
+
+  try {
+    const res = await fetch('/api/generate', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ botName, token, type: selectedType, features })
+    });
+    if(!res.ok) throw new Error(await res.text());
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = botName.replace(/\s+/g,'-') + '.zip'; a.click();
+    URL.revokeObjectURL(url);
+    document.getElementById('s1').textContent = parseInt(document.getElementById('s1').textContent)+1;
+    const toast = document.getElementById('toast');
+    toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),3000);
+  } catch(e){
+    alert('Gagal generate: ' + e.message);
+  } finally {
+    btn.disabled = false; btn.textContent = '⚡ Generate Script & Download ZIP';
+  }
+};
+updatePreview();
+</script>
+</body>
+</html>
