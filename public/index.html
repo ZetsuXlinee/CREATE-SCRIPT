@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CiKiZz - Generate Script Bot</title>
+<title>CiKiZz Generate Script Bot</title>
 <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -59,7 +59,7 @@ label{font-size:10px;color:#9ca3af;text-transform:uppercase;letter-spacing:1.2px
 <div class="feat active" onclick="toggleFeat(this)"><input type="checkbox" value="broadcast" checked> BROADCAST</div>
 </div>
 
-<button class="generate" id="genBtn" onclick="generateClient()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Generate ZIP (Link Stabil - No API)</button>
+<button class="generate" id="genBtn" onclick="generateClient()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Generate ZIP (Fix Baileys Public)</button>
 <div id="downloadLink" style="display:none;margin-top:12px;text-align:center"><a id="linkA" style="color:#06b6d4;font-weight:700" download>⬇️ Klik Download ZIP</a></div>
 </div>
 </div>
@@ -91,30 +91,169 @@ function updateAll(){
   let txt=state.menu==='simple'?'MENU '+name+'\n'+feats.map(f=>'.'+f).join('\n'):'╭━━━〔 '+name+' 〕━━━\n'+feats.map(f=>'┃ • .'+f).join('\n')+'\n╰━━';
   document.getElementById('waBubble').textContent=txt+(state.thumb==='thumb'&&state.thumbData?' [Thumb]':'');
 }
-
 async function generateClient(){
   const botName=document.getElementById('botName').value.trim()||'Bot';
   const owner=document.getElementById('owner').value.trim();
   const pairing=document.getElementById('pairingNumber').value.trim().replace(/[^0-9]/g,'');
   if(!pairing) return alert('Isi Nomor Pairing WAJIB');
   const features=[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value);
-  const safe=botName.replace(/[^a-zA-Z0-9-_]/g,'-');
+  const safe=botName.replace(/[^a-zA-Z0-9-_]/g,'-').toLowerCase()||'bot';
   const zip=new JSZip();
-  const feat=features.join(' ');
-  let code=state.base==='case'
-  ? '// '+botName+' CASE V16 FULL SVG+BUTTON+LINK\nconst { makeWASocket, useMultiFileAuthState, DisconnectReason } = require(\'noxleyss\');\nconst pino=require(\'pino\');\nlet rpgDB={}; let produkDB=[];\nasync function startBot(){\n  const { state, saveCreds } = await useMultiFileAuthState(\'sessions\');\n  const sock=makeWASocket({logger:pino({level:\'silent\'}), auth:state, printQRInTerminal:'+(state.conn==='qr')+'});\n  if(!sock.authState.creds.registered){ setTimeout(async()=>{ try{ let c=await sock.requestPairingCode(\''+pairing+'\'); console.log(\'PAIRING:\'+c.match(/.{1,4}/g).join(\'-\')); }catch(e){} },4000); }\n  sock.ev.on(\'creds.update\',saveCreds);\n  sock.ev.on(\'connection.update\',(u)=>{ if(u.connection===\'open\') console.log(\''+botName+' CONNECTED\'); });\n  sock.ev.on(\'messages.upsert\',async(o)=>{ const m=o.messages[0]; if(!m.message) return; const from=m.key.remoteJid; const body=m.message.conversation||\'\'; const cmd=body.startsWith(\'.\')?body.slice(1).split(\' \')[0]:\'\';\n    if(cmd===\'menu\') await sock.sendMessage(from,{text:\'MENU '+botName+' '+feat+'\'});\n  });\n}\nstartBot();'
-  : '// '+botName+' ESM V16 FULL\nimport { makeWASocket, useMultiFileAuthState } from \'noxleyss\';\nimport pino from \'pino\';\nimport fs from \'fs\';\nimport path from \'path\';\nimport { fileURLToPath } from \'url\';\nconst __dirname=path.dirname(fileURLToPath(import.meta.url));\nasync function startBot(){ const { state, saveCreds } = await useMultiFileAuthState(\'sessions\'); const sock=makeWASocket({logger:pino({level:\'silent\'}), auth:state, printQRInTerminal:'+(state.conn==='qr')+'}); if(!sock.authState.creds.registered){ setTimeout(async()=>{ try{ let c=await sock.requestPairingCode(\''+pairing+'\'); console.log(c.match(/.{1,4}/g).join(\'-\')); }catch{} },4000); } sock.ev.on(\'creds.update\',saveCreds); console.log(\''+botName+' ready\'); }\nstartBot();';
+
+  zip.file('package.json', JSON.stringify({
+    name: safe,
+    version: "18.0.0",
+    description: botName+" - by "+owner,
+    type: state.base==='esm' ? "module" : "commonjs",
+    main: "index.js",
+    scripts: { start: "node index.js" },
+    dependencies: {
+      "@whiskeysockets/baileys": "^6.7.8",
+      "pino": "^9.3.2",
+      "qrcode-terminal": "^0.12.0"
+    }
+  }, null, 2));
+
+  let code='';
+  if(state.base==='case'){
+    code = `const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion } = require('@whiskeysockets/baileys');
+const pino = require('pino');
+let rpgDB = {}; let produkDB = [];
+
+async function startBot(){
+  const { state, saveCreds } = await useMultiFileAuthState('sessions');
+  const { version } = await fetchLatestBaileysVersion();
+  const sock = makeWASocket({
+    logger: pino({level:'silent'}),
+    auth: state,
+    version,
+    printQRInTerminal: ${state.conn==='qr' ? 'true' : 'false'},
+    browser: ["${botName}", "Chrome", "1.0"]
+  });
+
+  if(!sock.authState.creds.registered){
+    const phoneNumber = '${pairing}';
+    setTimeout(async()=>{
+      try{
+        let code = await sock.requestPairingCode(phoneNumber);
+        code = code.match(/.{1,4}/g).join('-');
+        console.log('\\n=== PAIRING CODE ${botName} ===');
+        console.log(code);
+        console.log('============================\\n');
+      }catch(e){ console.log('Pairing error:', e.message); }
+    }, 3000);
+  }
+
+  sock.ev.on('creds.update', saveCreds);
+  sock.ev.on('connection.update', async (u)=>{
+    if(u.connection==='open') console.log('${botName} CONNECTED - Owner:${owner}');
+    if(u.connection==='close'){
+      const reason = u.lastDisconnect?.error?.output?.statusCode;
+      if(reason !== DisconnectReason.loggedOut) startBot();
+    }
+  });
+
+  sock.ev.on('messages.upsert', async(o)=>{
+    const m = o.messages[0];
+    if(!m.message) return;
+    const from = m.key.remoteJid;
+    const body = m.message.conversation || m.message.extendedTextMessage?.text || '';
+    const command = body.startsWith('.') ? body.slice(1).split(' ')[0].toLowerCase() : '';
+    const args = body.split(' ').slice(1).join(' ');
+
+    if(command==='menu'){
+      await sock.sendMessage(from,{text: '╭━━━〔 ${botName} 〕━━━\\n${features.map(f=>'┃ • .'+f).join('\\n')}\\n╰━━\\nOwner: ${owner}'});
+      return;
+    }
+    if(command==='ping'){ await sock.sendMessage(from,{text:'Pong ${botName} V18'}); return; }
+    ${features.includes('welcome') ? "if(command==='welcome'){ await sock.sendMessage(from,{text:'Welcome ON'}); return; }" : ""}
+    ${features.includes('antilink') ? "if(body.includes('chat.whatsapp.com') && from.endsWith('@g.us')){ await sock.sendMessage(from,{text:'Antilink terdeteksi!'}); return; }" : ""}
+    ${features.includes('sticker') ? "if(command==='s' || command==='sticker'){ try{ const buf=await sock.downloadMediaMessage(m); await sock.sendMessage(from,{sticker:buf}); }catch{ await sock.sendMessage(from,{text:'Reply gambar .s'}); } return; }" : ""}
+    ${features.includes('group') ? "if(command==='hidetag'){ const meta=await sock.groupMetadata(from); await sock.sendMessage(from,{text:'Hidetag', mentions: meta.participants.map(p=>p.id)}); return; }" : ""}
+    ${features.includes('rpg') ? "if(command==='daily'){ if(!rpgDB[from]) rpgDB[from]={money:0}; rpgDB[from].money+=1000; await sock.sendMessage(from,{text:'Daily +1000 Balance:'+rpgDB[from].money}); return; }" : ""}
+    ${features.includes('store') ? "if(command==='addproduk'){ produkDB.push(args); await sock.sendMessage(from,{text:'Produk ditambah:'+args+' Total:'+produkDB.length}); return; } if(command==='listproduk'){ await sock.sendMessage(from,{text: produkDB.join('\\n') || 'Kosong'}); return; }" : ""}
+    ${features.includes('autoreply') ? "if(['halo','hai','bot','p'].includes(body.toLowerCase())){ await sock.sendMessage(from,{text:'Halo .menu'}); return; }" : ""}
+  });
+}
+startBot();
+`;
+  } else {
+    code = `import makeWASocket, { useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion } from '@whiskeysockets/baileys';
+import pino from 'pino';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+async function startBot(){
+  const { state, saveCreds } = await useMultiFileAuthState('sessions');
+  const { version } = await fetchLatestBaileysVersion();
+  const sock = makeWASocket({
+    logger: pino({level:'silent'}),
+    auth: state,
+    version,
+    printQRInTerminal: ${state.conn==='qr' ? 'true' : 'false'},
+    browser: ["${botName}", "Chrome", "1.0"]
+  });
+
+  if(!sock.authState.creds.registered){
+    const phoneNumber = '${pairing}';
+    setTimeout(async()=>{
+      try{
+        let code = await sock.requestPairingCode(phoneNumber);
+        code = code.match(/.{1,4}/g).join('-');
+        console.log('\\nPAIRING CODE: '+code);
+      }catch(e){ console.log(e.message); }
+    }, 3000);
+  }
+
+  sock.ev.on('creds.update', saveCreds);
+  sock.ev.on('connection.update',(u)=>{
+    if(u.connection==='open') console.log('${botName} CONNECTED - ${owner}');
+    if(u.connection==='close' && u.lastDisconnect?.error?.output?.statusCode!==DisconnectReason.loggedOut) startBot();
+  });
+
+  const plugins = {};
+  const pf = path.join(__dirname,'plugins');
+  if(fs.existsSync(pf)){
+    for(const f of fs.readdirSync(pf)){
+      if(f.endsWith('.js')){
+        const mod = await import('./plugins/'+f);
+        plugins[f]=mod.default;
+      }
+    }
+  }
+  sock.ev.on('messages.upsert', async(o)=>{
+    const m=o.messages?.[0]; if(!m?.message) return;
+    for(const k in plugins){ try{ await plugins[k](m,sock); }catch(e){ console.log(k, e.message); } }
+  });
+}
+startBot();
+`;
+  }
 
   zip.file('index.js', code);
-  zip.file('package.json', JSON.stringify({name:safe.toLowerCase(), version:'16.0.0', type: state.base==='esm'?'module':'commonjs', main:'index.js', dependencies:{noxleyss:'^1.2.1', pino:'^9.3.2'}}, null, 2));
-  if(state.thumb==='thumb' && state.thumbData){ const p=state.thumbData.split(','); if(p[1]) zip.file('thumb.jpg', p[1], {base64:true}); }
-  if(state.base==='esm'){ const pf=zip.folder('plugins'); pf.file('menu.js','export default async (m,sock)=>{ if((m.message?.conversation||\'\').trim()===\'.menu\') await sock.sendMessage(m.key.remoteJid,{text:\'MENU '+botName+' '+feat+'\'}); };'); features.forEach(f=>{ if(f!=='menu') pf.file(f+'.js','export default async (m,sock)=>{ const b=m.message?.conversation||\'\'; if(b.startsWith(\'.'+f+'\')) await sock.sendMessage(m.key.remoteJid,{text:\''+f+' OK\'}); };'); }); }
-  
+  zip.file('README.txt', 'BOT:'+botName+'\\nPAIR:'+pairing+'\\nOWNER:'+owner+'\\nV18 FIX BAILYAS PUBLIC\\nBASE:'+state.base+'\\nCONN:'+state.conn);
+
+  if(state.thumb==='thumb' && state.thumbData){
+    const p=state.thumbData.split(','); if(p[1]) zip.file('thumb.jpg', p[1], {base64:true});
+  }
+
+  if(state.base==='esm'){
+    const pf=zip.folder('plugins');
+    pf.file('menu.js', `export default async (m,sock)=>{ const b=(m.message?.conversation||'').trim(); if(b!=='.menu') return; await sock.sendMessage(m.key.remoteJid,{text:'MENU ${botName}\\n${features.join(' ')}'}); };`);
+    if(features.includes('welcome')) pf.file('welcome.js', `export default async (m,sock)=>{ if((m.message?.conversation||'').startsWith('.welcome')) await sock.sendMessage(m.key.remoteJid,{text:'Welcome ON'}); };`);
+    if(features.includes('sticker')) pf.file('sticker.js', `export default async (m,sock)=>{ const b=(m.message?.conversation||'').trim(); if(!b.startsWith('.s')) return; try{ const buf=await sock.downloadMediaMessage(m); await sock.sendMessage(m.key.remoteJid,{sticker:buf}); }catch{} };`);
+    if(features.includes('group')) pf.file('group.js', `export default async (m,sock)=>{ const b=(m.message?.conversation||'').trim(); if(b==='.hidetag'){ const meta=await sock.groupMetadata(m.key.remoteJid); await sock.sendMessage(m.key.remoteJid,{text:'Hidetag', mentions:meta.participants.map(p=>p.id)}); } };`);
+    if(features.includes('rpg')) pf.file('rpg.js', `const db={}; export default async (m,sock)=>{ const b=(m.message?.conversation||'').trim(); const id=m.key.remoteJid; if(!db[id]) db[id]={money:0}; if(b==='.daily'){ db[id].money+=1000; await sock.sendMessage(id,{text:'Daily '+db[id].money}); } };`);
+  }
+
   const blob=await zip.generateAsync({type:'blob'});
   const url=URL.createObjectURL(blob);
   const a=document.getElementById('linkA');
-  a.href=url; a.download=safe+'.zip'; a.textContent='⬇️ Download '+safe+'.zip - Klik Disini (Stabil Link)';
+  a.href=url; a.download=safe+'.zip'; a.textContent='⬇️ Download '+safe+'.zip (Fix Baileys Public)';
   document.getElementById('downloadLink').style.display='block';
+  document.getElementById('genBtn').textContent='Generate ZIP (Fix Baileys Public)';
   a.click();
 }
 updateAll();
