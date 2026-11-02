@@ -1,12 +1,13 @@
 {
   "name": "cikizz-generate-script",
-  "version": "4.0.0",
-  "description": "CiKiZz PRO MAX - Bot Generator WhatsApp & Telegram - Fix Pairing & Mobile",
+  "version": "13.0.0",
+  "description": "CiKiZz PRO MAX - Fix Pairing 1 Menit + Full Fitur + SVG",
+  "type": "module",
   "main": "api/generate.js",
   "dependencies": {
     "jszip": "^3.10.1"
   },
   "engines": {
-    "node": "22.x"
+    "node": "20.x"
   }
 }
