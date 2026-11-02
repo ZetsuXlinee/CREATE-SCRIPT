@@ -2,6 +2,7 @@
   "name": "cikizz-generate-script",
   "version": "13.0.0",
   "type": "module",
-  "dependencies": { "jszip": "^3.10.1" },
-  "engines": { "node": "20.x" }
+  "dependencies": {
+    "jszip": "^3.10.1"
+  }
 }
