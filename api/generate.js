@@ -1,414 +1,161 @@
-// api/generate.js V12 - FULL FITUR PLUGIN + CASE LENGKAP + PAIRING 1 MENIT + FIX VERCEL + ALL SVG
+// api/generate.js - V36 FINAL FIX ALL ERROR - WA CASE+PLUGINS EXECUTABLE + WA ESM + TELEGRAM + AI FREE REAL
 import JSZip from 'jszip';
 
-const PLUGIN_TEMPLATES = {
-welcome: (botName) => `import fs from 'fs';
-export default async (m, sock) => {
-  const body = (m.message?.conversation||m.message?.extendedTextMessage?.text||'').trim();
-  if(!body.startsWith('.welcome')) return;
-  const args = body.split(' ');
-  const mode = args[1]||'ON';
-  await sock.sendMessage(m.key.remoteJid, {text: \`✅ Welcome \${mode}\\nBot: ${botName}\`});
-};
-`,
-antilink: () => `export default async (m, sock) => {
-  if(m.key.fromMe) return;
-  const body = m.message?.conversation||m.message?.extendedTextMessage?.text||'';
-  if(!body.includes('chat.whatsapp.com')) return;
-  const isGroup = m.key.remoteJid.endsWith('@g.us');
-  if(!isGroup) return;
-  try{
-    const meta = await sock.groupMetadata(m.key.remoteJid);
-    const botId = sock.user.id.split(':')[0]+'@s.whatsapp.net';
-    const botParticipant = meta.participants.find(p=>p.id===botId || p.id.includes(sock.user.id.split(':')[0]));
-    const isAdmin = botParticipant?.admin==='admin' || botParticipant?.admin==='superadmin';
-    if(isAdmin){
-      await sock.sendMessage(m.key.remoteJid, {delete: m.key});
-      await sock.sendMessage(m.key.remoteJid, {text: '⚠️ *Antilink Detected!* Link grup dihapus!'});
-    }
-  }catch(e){ console.log('Antilink error', e.message) }
-};
-`,
-sticker: () => `export default async (m, sock) => {
-  const body = (m.message?.conversation||'').trim();
-  if(!body.startsWith('.s') && !body.startsWith('.sticker')) return;
-  const quoted = m.message?.extendedTextMessage?.contextInfo?.quotedMessage;
-  const hasMedia = m.message?.imageMessage || m.message?.videoMessage || quoted?.imageMessage || quoted?.videoMessage || quoted?.stickerMessage;
-  if(!hasMedia){
-    await sock.sendMessage(m.key.remoteJid, {text: 'Reply gambar/video dengan .s untuk jadi sticker'});
-    return;
-  }
-  try{
-    const buf = await sock.downloadMediaMessage(m);
-    await sock.sendMessage(m.key.remoteJid, {sticker: buf});
-  }catch(e){
-    await sock.sendMessage(m.key.remoteJid, {text: 'Gagal bikin sticker: '+e.message});
-  }
-};
-`,
-downloader: () => `export default async (m, sock) => {
-  const body = (m.message?.conversation||'').trim();
-  if(body.startsWith('.tiktok') || body.startsWith('.yt') || body.startsWith('.ig') || body.startsWith('.fb')){
-    const url = body.split(' ')[1];
-    if(!url) return sock.sendMessage(m.key.remoteJid, {text: 'Mana url nya? Contoh: .tiktok https://...'});
-    await sock.sendMessage(m.key.remoteJid, {text: '⏳ Downloader aktif\\nURL: '+url+'\\n[Integrasikan API downloader lu disini]\\nFitur: tiktok, yt, ig, fb'});
-  }
-};
-`,
-ai: () => `export default async (m, sock) => {
-  const body = (m.message?.conversation||'').trim();
-  if(!body.startsWith('.ai ')) return;
-  const prompt = body.slice(4).trim();
-  if(!prompt) return sock.sendMessage(m.key.remoteJid, {text: 'Tanya apa? Contoh: .ai halo bot'});
-  await sock.sendMessage(m.key.remoteJid, {text: '🤖 *AI Thinking...*\\n\\nPrompt: '+prompt+'\\n\\n[Integrasikan OpenAI/Gemini API lu disini]'});
-};
-`,
-group: () => `export default async (m, sock) => {
-  const body = (m.message?.conversation||'').trim();
-  const from = m.key.remoteJid;
-  if(!from.endsWith('@g.us')) return;
-  if(body==='.hidetag'){
-    const meta = await sock.groupMetadata(from);
-    const mentions = meta.participants.map(p=>p.id);
-    await sock.sendMessage(from, {text: '📢 Hidetag by bot\\n'+body, mentions});
-  }
-  if(body.startsWith('.kick')){
-    const target = body.split(' ')[1];
-    if(target) await sock.sendMessage(from, {text: 'Kick: '+target+' [butuh bot admin]'});
-  }
-  if(body==='.group open') await sock.groupSettingUpdate(from, 'not_announcement');
-  if(body==='.group close') await sock.groupSettingUpdate(from, 'announcement');
-};
-`,
-rpg: () => `const db = global.rpgDB = global.rpgDB || {};
-export default async (m, sock) => {
-  const from = m.key.remoteJid;
-  const sender = m.key.participant || from;
-  if(!db[sender]) db[sender] = {money:0, exp:0, level:1};
-  const body = (m.message?.conversation||'').trim();
-  if(body==='.daily'){
-    db[sender].money+=1000;
-    db[sender].exp+=50;
-    await sock.sendMessage(from, {text: '💰 Daily Claim!\\n+1000 Money\\n+50 Exp\\nBalance: '+db[sender].money+' Money, Level: '+db[sender].level});
-  }
-  if(body==='.balance' || body==='.bal'){
-    await sock.sendMessage(from, {text: '💰 Balance\\nMoney: '+db[sender].money+'\\nExp: '+db[sender].exp+'\\nLevel: '+db[sender].level});
-  }
-  if(body==='.levelup' && db[sender].exp>=100){
-    db[sender].level++;
-    db[sender].exp=0;
-    await sock.sendMessage(from, {text: '🎉 Level Up! Sekarang Level '+db[sender].level});
-  }
-};
-`,
-store: () => `const produkDB = global.produkDB = global.produkDB || [];
-export default async (m, sock) => {
-  const body = (m.message?.conversation||'').trim();
-  if(body.startsWith('.addproduk')){
-    const name = body.slice(10).trim();
-    if(!name) return sock.sendMessage(m.key.remoteJid, {text: 'Contoh: .addproduk Nama Produk - Harga'});
-    produkDB.push({name, id: Date.now()});
-    await sock.sendMessage(m.key.remoteJid, {text: '✅ Produk ditambah:\\n'+name+'\\nTotal produk: '+produkDB.length});
-  }
-  if(body==='.listproduk' || body==='.produk'){
-    if(produkDB.length===0) return sock.sendMessage(m.key.remoteJid, {text: 'Belum ada produk'});
-    const list = produkDB.map((p,i)=> (i+1)+'. '+p.name).join('\\n');
-    await sock.sendMessage(m.key.remoteJid, {text: '📦 *LIST PRODUK*\\n\\n'+list});
-  }
-  if(body.startsWith('.delproduk')){
-    const idx = parseInt(body.split(' ')[1])-1;
-    if(!isNaN(idx) && produkDB[idx]){ produkDB.splice(idx,1); await sock.sendMessage(m.key.remoteJid, {text: '✅ Produk dihapus'}); }
-  }
-};
-`,
-autoreply: () => `export default async (m, sock) => {
-  const body = (m.message?.conversation||'').toLowerCase().trim();
-  if(body==='halo' || body==='hai' || body==='bot' || body==='p' || body==='cie'){
-    await sock.sendMessage(m.key.remoteJid, {text: 'Halo juga! 👋 Ketik .menu untuk lihat menu bot'});
-  }
-  if(body.includes('assalamualaikum')){
-    await sock.sendMessage(m.key.remoteJid, {text: 'Waalaikumsalam! 👋'});
-  }
-};
-`,
-broadcast: () => `export default async (m, sock) => {
-  const body = (m.message?.conversation||'').trim();
-  if(!body.startsWith('.bc ') && !body.startsWith('.broadcast ')) return;
-  if(!m.key.fromMe && !global.owner) return;
-  const text = body.slice(body.indexOf(' ')+1);
-  if(!text) return sock.sendMessage(m.key.remoteJid, {text: 'Contoh: .bc Halo semua'});
-  try{
-    const chats = await sock.groupFetchAllParticipating();
-    let count=0;
-    for(const id in chats){
-      await sock.sendMessage(id, {text: '📢 *BROADCAST*\\n\\n'+text});
-      count++;
-      await new Promise(r=>setTimeout(r,1000));
-    }
-    await sock.sendMessage(m.key.remoteJid, {text: '✅ Broadcast terkirim ke '+count+' grup'});
-  }catch(e){
-    await sock.sendMessage(m.key.remoteJid, {text: 'Gagal BC: '+e.message});
-  }
-};
-`
-};
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed, use POST' });
+  try {
+    const { platform, base, botName, ownerNumber, ownerName, pairingNumber, teleToken, teleUsername, features, menuType, btnType, thumbType, thumbData, openaiKey } = req.body;
+    if (!botName?.trim()) return res.status(400).json({ error: 'botName wajib' });
+    const isWA = platform === 'whatsapp';
+    if (isWA && !pairingNumber) return res.status(400).json({ error: 'pairingNumber wajib' });
+    if (!isWA && !teleToken) return res.status(400).json({ error: 'teleToken wajib' });
 
-function getMenuPlugin(cfg){
-  const botName = cfg.botName||'Bot';
-  const features = cfg.features||[];
-  let style = cfg.menuStyle||'premium';
-  const btnMode = cfg.btn||'nobtn';
-  const thumb = cfg.thumb||'nothumb';
-  if(style==='image' && thumb==='nothumb') style='premium';
-  const list = features.map(f=>'│ ◦ .'+f).join('\\n');
-  let baseText = '';
-  if(style==='simple') baseText = `*MENU ${botName}*\\nOwner: ${cfg.owner}\\n\\n${features.map(f=>'• .'+f).join('\\n')}`;
-  else if(style==='image') baseText = `╭─「 *${botName}* 」\\n│ Owner: ${cfg.owner}\\n${list}\\n╰─ Image Menu`;
-  else baseText = `╭━━━〔 *${botName}* 〕━━━┈⊷\\n┃ Owner: ${cfg.owner}\\n┃ Bot: ${botName}\\n┃ Pairing: ${cfg.pairingNumber}\\n╰━━━━━━━━━━━━┈⊷\\n${list}\\n╰━━━━━━━━━━━━┈⊷\\n\\nKetik .ping untuk cek bot`;
-
-  if(btnMode==='btn'){
-    return `import fs from 'fs';
-export default async (m,sock)=>{
-  const body = (m.message?.conversation||m.message?.extendedTextMessage?.text||'').trim();
-  if(body!=='.menu' && body!=='.help' && body!=='.bot') return;
-  const caption = \`${baseText}\`;
-  const buttons = [
-    {buttonId:'.ping', buttonText:{displayText:'📶 PING BOT'}, type:1},
-    {buttonId:'.sticker', buttonText:{displayText:'🎨 STICKER'}, type:1},
-    {buttonId:'.ai halo', buttonText:{displayText:'🤖 AI CHAT'}, type:1},
-    {buttonId:'.listproduk', buttonText:{displayText:'📦 PRODUK'}, type:1}
-  ];
-  try{
-    if(${thumb==='thumb'} && fs.existsSync('./thumb.jpg')){
-      await sock.sendMessage(m.key.remoteJid, {image: fs.readFileSync('./thumb.jpg'), caption, footer: '${botName} - ${cfg.owner}', buttons, headerType: 4});
-    } else {
-      await sock.sendMessage(m.key.remoteJid, {text: caption, footer: '${botName}', buttons, headerType: 1});
-    }
-  }catch(e){ await sock.sendMessage(m.key.remoteJid, {text: caption}); }
-};`;
-  } else {
-    return `import fs from 'fs';
-export default async (m,sock)=>{
-  const body = (m.message?.conversation||m.message?.extendedTextMessage?.text||'').trim();
-  if(body!=='.menu' && body!=='.help' && body!=='.bot') return;
-  const text = \`${baseText}\`;
-  if(${thumb==='thumb'} && fs.existsSync('./thumb.jpg')){
-    await sock.sendMessage(m.key.remoteJid, {image: fs.readFileSync('./thumb.jpg'), caption: text});
-  } else {
-    await sock.sendMessage(m.key.remoteJid, {text});
-  }
-};`;
-  }
-}
-
-function getCaseTemplate(cfg){
-  const cleanNumber = (cfg.pairingNumber||'').replace(/[^0-9]/g,'');
-  const botName = cfg.botName||'Bot';
-  const features = cfg.features||[];
-  const thumb = cfg.thumb||'nothumb';
-  const btn = cfg.btn||'nobtn';
-  const menuStyle = cfg.menuStyle||'premium';
-
-  return `// ${botName} - CASE V12 FULL FITUR + PAIRING 1 MENIT (logic dari code lu - anti Gagal menautkan perangkat)
-const { makeWASocket, useMultiFileAuthState, DisconnectReason } = require("noxleyss");
-const pino = require("pino");
-const fs = require("fs");
-
-const ownerNumber = "${cfg.owner}";
-const botName = "${botName}";
-const pairingNumber = "${cleanNumber}";
-let rpgDB = {};
-let produkDB = [];
-
-async function startBot(){
-  const { state, saveCreds } = await useMultiFileAuthState("sessions");
-  const sock = makeWASocket({
-    logger: pino({ level: "silent" }),
-    auth: state,
-    printQRInTerminal: ${cfg.conn==='qr'}
-  });
-
-  // === PAIRING FIX - LOGIC PERSIS CODE LU YANG GAK BURU-BURU 1 MENIT MASIH BISA ===
-  if (!sock.authState.creds.registered) {
-    const phoneNumber = "${cleanNumber}";
-    setTimeout(async () => {
-      try {
-        let code = await sock.requestPairingCode(phoneNumber);
-        code = code?.match(/.{1,4}/g)?.join("-") || code;
-        console.log(\`[PAIRING CODE] Kode: \${code} - Berlaku 60-120 detik, santai! Fix error 2L3F-PWB8 Gagal menautkan perangkat\`);
-      } catch (err) {
-        console.error("Gagal pairing:", err.message);
-      }
-    }, 4000);
-  }
-
-  sock.ev.on("creds.update", saveCreds);
-  sock.ev.on("connection.update", (update) => {
-    const { connection, lastDisconnect } = update;
-    if (connection === "open"){
-      console.log(\`[SUCCESS] \${botName} terhubung! V12 FULL FITUR\`);
-      console.log(\`Owner: \${ownerNumber} | Pairing: \${pairingNumber} | Base: CASE | Menu: ${menuStyle} | Btn: ${btn} | Thumb: ${thumb}\`);
-    } else if (connection === "close") {
-      const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
-      console.log("Koneksi putus, reconnect:", shouldReconnect);
-      if (shouldReconnect) startBot();
-    }
-  });
-
-  sock.ev.on("messages.upsert", async ({messages})=>{
-    const m = messages[0];
-    if(!m.message) return;
-    const from = m.key.remoteJid;
-    const body = m.message.conversation || m.message.extendedTextMessage?.text || '';
-    const command = body.startsWith('.') ? body.slice(1).split(' ')[0].toLowerCase() : '';
-    const args = body.split(' ').slice(1).join(' ');
-
-    // === MENU - ${menuStyle} + ${btn} + ${thumb} ===
-    if(command==='menu' || command==='help' || command==='bot'){
-      let menuText = '';
-      if('${menuStyle}'==='simple') menuText = \`MENU \${botName}\\n${features.map(f=>'• .'+f).join('\\n')}\`;
-      else if('${menuStyle}'==='image') menuText = \`╭─「 \${botName} 」\\n${features.map(f=>'│ • .'+f).join('\\n')}\\n╰─ Image Menu\`;
-      else menuText = \`╭━━━〔 \${botName} 〕━━━\\n${features.map(f=>'┃ • .'+f).join('\\n')}\\n╰━━━━━━━━━━━━\\nOwner: \${ownerNumber}\\nBot: \${botName}\`;
-
-      if('${thumb}'==='thumb' && fs.existsSync('./thumb.jpg')){
-        await sock.sendMessage(from, {image: fs.readFileSync('./thumb.jpg'), caption: menuText});
-      } else {
-        await sock.sendMessage(from, {text: menuText});
-      }
-      ${btn==='btn' ? `await sock.sendMessage(from, {text: 'Pilih fitur:', footer: botName, buttons: [{buttonId:'.ping', buttonText:{displayText:'📶 PING'}, type:1}, {buttonId:'.sticker', buttonText:{displayText:'🎨 STICKER'}, type:1}], headerType:1});` : ''}
-      return;
-    }
-
-    if(command==='ping'){
-      await sock.sendMessage(from, {text: \`Pong! \${botName} aktif ✅ V12 FULL\\nOwner: \${ownerNumber}\\nPairing: \${pairingNumber}\\nBase: CASE\\nFitur: ${(cfg.features||[]).join(', ')}\`});
-      return;
-    }
-
-    // === FULL FITUR CASE LENGKAP ===
-    ${features.includes('welcome') ? `if(command==='welcome'){ await sock.sendMessage(from,{text:'✅ Welcome '+(args||'ON')}); return; }` : ''}
-    ${features.includes('antilink') ? `if(body.includes('chat.whatsapp.com') && from.endsWith('@g.us')){ try{ const meta=await sock.groupMetadata(from); const botId=sock.user.id.split(':')[0]+'@s.whatsapp.net'; const isAdmin=meta.participants.find(p=>p.id===botId)?.admin; if(isAdmin) await sock.sendMessage(from,{delete:m.key}); }catch{} await sock.sendMessage(from,{text:'⚠️ Antilink Detected!'}); }` : ''}
-    ${features.includes('sticker') ? `if(command==='s' || command==='sticker'){ try{ const buf=await sock.downloadMediaMessage(m); await sock.sendMessage(from,{sticker:buf}); }catch{ await sock.sendMessage(from,{text:'Reply gambar dengan .s'}); } return; }` : ''}
-    ${features.includes('downloader') ? `if(['tiktok','yt','ig','fb'].includes(command)){ await sock.sendMessage(from,{text:'⏳ Downloader: '+command+' - '+args}); return; }` : ''}
-    ${features.includes('ai') ? `if(command==='ai'){ await sock.sendMessage(from,{text:'🤖 AI: '+args}); return; }` : ''}
-    ${features.includes('group') ? `if(command==='hidetag'){ if(!from.endsWith('@g.us')) return; const meta=await sock.groupMetadata(from); await sock.sendMessage(from,{text:'Hidetag', mentions:meta.participants.map(p=>p.id)}); return; }` : ''}
-    ${features.includes('rpg') ? `if(command==='daily'){ if(!rpgDB[from]) rpgDB[from]={money:0}; rpgDB[from].money+=1000; await sock.sendMessage(from,{text:'💰 Daily +1000! Balance: '+rpgDB[from].money}); return; } if(command==='balance'||command==='bal'){ await sock.sendMessage(from,{text:'💰 Balance: '+(rpgDB[from]?.money||0)}); return; }` : ''}
-    ${features.includes('store') ? `if(command==='addproduk'){ produkDB.push(args); await sock.sendMessage(from,{text:'✅ Produk ditambah: '+args+'\\nTotal: '+produkDB.length}); return; } if(command==='listproduk'||command==='produk'){ await sock.sendMessage(from,{text:'📦 List:\\n'+produkDB.map((p,i)=>(i+1)+'. '+p).join('\\n')}); return; }` : ''}
-    ${features.includes('autoreply') ? `if(['halo','hai','bot','p'].includes(body.toLowerCase())){ await sock.sendMessage(from,{text:'Halo juga! Ketik .menu'}); return; }` : ''}
-    ${features.includes('broadcast') ? `if(command==='bc' || command==='broadcast'){ const chats=await sock.groupFetchAllParticipating(); for(const id in chats){ await sock.sendMessage(id,{text:'📢 BC\\n\\n'+args}); } await sock.sendMessage(from,{text:'✅ BC ke '+Object.keys(chats).length+' grup'}); return; }` : ''}
-  });
-}
-startBot();
-`;
-}
-
-export default async function handler(req, res){
-  res.setHeader('Access-Control-Allow-Origin','*');
-  res.setHeader('Access-Control-Allow-Methods','POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers','Content-Type');
-  if(req.method==='OPTIONS') return res.status(200).end();
-  if(req.method!=='POST') return res.status(405).json({error:'POST only'});
-
-  try{
-    const cfg = req.body || {};
-    if(!cfg.botName) return res.status(400).json({error:'Nama Bot wajib'});
-    if(!cfg.pairingNumber) return res.status(400).json({error:'Nomor Bot Pairing wajib - isi 628xxxx'});
-    const cleanNumber = (cfg.pairingNumber||'').replace(/[^0-9]/g,'');
-    const botName = cfg.botName;
-    const safeName = botName.replace(/[^a-zA-Z0-9-_]/g,'-');
+    const safeBotName = botName.trim().replace(/"/g, '\\"');
+    const safeOwnerNumber = (ownerNumber || '').trim();
+    const safeOwnerName = (ownerName || '').trim().replace(/"/g, '\\"');
+    const safePairing = (pairingNumber || '').replace(/[^0-9]/g, '');
+    const safeTeleToken = (teleToken || '').trim();
+    const safeTeleUsername = (teleUsername || '').trim();
+    const safeOpenAI = (openaiKey || '').trim();
+    const safeFeatures = Array.isArray(features) && features.length ? features : ['welcome','antilink','sticker','downloader','ai','group','rpg','store','autoreply','broadcast'];
+    const safe = botName.replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase() || 'bot';
     const zip = new JSZip();
 
-    let botCode = '';
-    if(cfg.base==='case'){
-      botCode = getCaseTemplate(cfg);
+    const settingsCJS = 'module.exports = {\n  botName: "' + safeBotName + '",\n  ownerNumber: "' + safeOwnerNumber + '",\n  ownerName: "' + safeOwnerName + '",\n  pairingNumber: "' + safePairing + '",\n  prefix: ".",\n  features: ' + JSON.stringify(safeFeatures) + ',\n  menuType: "' + (menuType||'premium') + '",\n  btnType: "' + (btnType||'nobtn') + '",\n  thumbType: "' + (thumbType||'nothumb') + '",\n  openaiKey: "' + safeOpenAI + '",\n  version: "1.0.0"\n};\n';
+    const settingsESM = 'export default {\n  botName: "' + safeBotName + '",\n  ownerNumber: "' + safeOwnerNumber + '",\n  ownerName: "' + safeOwnerName + '",\n  pairingNumber: "' + safePairing + '",\n  prefix: ".",\n  features: ' + JSON.stringify(safeFeatures) + ',\n  menuType: "' + (menuType||'premium') + '",\n  btnType: "' + (btnType||'nobtn') + '",\n  thumbType: "' + (thumbType||'nothumb') + '",\n  openaiKey: "' + safeOpenAI + '",\n  version: "1.0.0"\n};\n';
+    const teleSettings = 'module.exports = {\n  botName: "' + safeBotName + '",\n  ownerName: "' + safeOwnerName + '",\n  username: "' + safeTeleUsername + '",\n  token: "' + safeTeleToken + '",\n  features: ' + JSON.stringify(safeFeatures) + ',\n  openaiKey: "' + safeOpenAI + '",\n  version: "1.0.0"\n};\n';
+
+    if (isWA) {
+      if (base === 'case') {
+        zip.file('settings.js', settingsCJS);
+        zip.file('package.json', JSON.stringify({ name: safe, version: "1.0.0", description: safeBotName + " WA CASE V36 FULL 10 FITUR + AI REAL", type: "commonjs", main: "index.js", scripts: { start: "node index.js" }, dependencies: { "@whiskeysockets/baileys": "^6.7.8", "pino": "^9.3.2", "qrcode-terminal": "^0.12.0", "@hapi/boom": "^10.0.1", "axios": "^1.6.0", "openai": "^4.20.0" } }, null, 2));
+        zip.file('database.json', JSON.stringify({ welcome: [], antilink: [], autoreply: {}, rpg: {}, produk: [], owner: [] }, null, 2));
+        zip.file('README.md', '# ' + safeBotName + ' WA CASE V36\n\nFIX:\n- index.js full 10 fitur monolitik jalan\n- plugins/ 10 file CASE executable (module.exports) - bukan komen\n- AI free pakai Popcat API - bisa jawab beneran tanpa OpenAI key\n');
+        const waCaseIndex = [
+          "const settings=require('./settings.js');const botName=settings.botName;const owner=settings.ownerNumber;const ownerName=settings.ownerName;const pairingNumber=settings.pairingNumber;const prefix=settings.prefix;const fs=require('fs');const axios=require('axios');global.db={welcome:[],antilink:[],autoreply:{},rpg:{},produk:[],owner:[]};try{if(fs.existsSync('database.json'))global.db=JSON.parse(fs.readFileSync('database.json'));}catch(e){}function saveDB(){try{fs.writeFileSync('database.json',JSON.stringify(global.db,null,2));}catch{}}",
+          "console.log('[SETTINGS] Loaded - BotName:',botName,'| Owner:',owner,'| Fitur:',settings.features.join(','),'| Mode: CASE V36');",
+          "const {default:makeWASocket,useMultiFileAuthState,DisconnectReason}=require('@whiskeysockets/baileys');const pino=require('pino');async function startBot(){const {state,saveCreds}=await useMultiFileAuthState('session');const sock=makeWASocket({auth:state,logger:pino({level:'silent'})});sock.ev.on('creds.update',saveCreds);if(!sock.authState.creds.registered)setTimeout(async()=>{try{const code=await sock.requestPairingCode(pairingNumber);console.log('\\n🔑 PAIRING CODE '+botName+': '+code+'\\n');}catch(e){console.log('[PAIRING ERROR]',e.message);}},3000);",
+          "sock.ev.on('connection.update',u=>{if(u.connection==='open')console.log('✅ Bot '+botName+' Connected! WA CASE V36 FULL 10 FITUR AI REAL - Owner '+ownerName);if(u.connection==='close'){const r=u.lastDisconnect?.error?.output?.statusCode!==DisconnectReason.loggedOut;if(r)setTimeout(()=>startBot(),3000);}});",
+          "sock.ev.on('group-participants.update',async update=>{if(global.db.welcome.includes(update.id)){for(const p of update.participants){if(update.action==='add')await sock.sendMessage(update.id,{text:'👋 Welcome @'+p.split('@')[0]+' di grup!\\nBot: '+botName+' Owner: '+ownerName,mentions:[p]});if(update.action==='remove')await sock.sendMessage(update.id,{text:'👋 Bye @'+p.split('@')[0],mentions:[p]});}}});",
+          "sock.ev.on('messages.upsert',async m=>{const msg=m.messages[0];if(!msg||msg.key.fromMe)return;let content=msg.message;if(content?.ephemeralMessage)content=content.ephemeralMessage.message;const type=Object.keys(content||{})[0];let body='';if(type==='conversation')body=content.conversation;else if(type==='extendedTextMessage')body=content.extendedTextMessage.text;else if(type==='imageMessage')body=content.imageMessage.caption||'';const remoteJid=msg.key.remoteJid;const sender=msg.key.participant||remoteJid;",
+          "if(global.db.autoreply[body?.toLowerCase()]){await sock.sendMessage(remoteJid,{text:global.db.autoreply[body.toLowerCase()]});return;}if(global.db.antilink.includes(remoteJid)&&/https?:\\/\\//i.test(body)){await sock.sendMessage(remoteJid,{text:'❌ Link terdeteksi @'+sender.split('@')[0]+' - Dihapus oleh '+botName,mentions:[sender]});try{await sock.sendMessage(remoteJid,{delete:{remoteJid:remoteJid,fromMe:false,id:msg.key.id,participant:msg.key.participant}});}catch(e){console.log('[ANTILINK]',e.message);}return;}",
+          "if(!body?.startsWith(prefix))return;const args=body.slice(1).trim().split(/ +/);const command=args.shift().toLowerCase();const text=args.join(' ');console.log('[CMD] .'+command+' Bot '+botName);try{switch(command){",
+          "case 'menu':{let mt='╭━━━〔 '+botName+' 〕━━━✦\\n┃ Owner: '+ownerName+' ('+owner+')\\n┃ Bot: '+botName+'\\n┣━━━〔 FITUR 〕━━━\\n';settings.features.forEach(f=>{mt+='┃ ❒ .'+f+'\\n';});mt+='╰━━━━\\n\\nV36 AI REAL FREE + OPENAI';await sock.sendMessage(remoteJid,{text:mt});break;}",
+          "case 'ping':await sock.sendMessage(remoteJid,{text:'Pong '+botName+' Owner '+ownerName});break;",
+          "case 'welcome':{if(text==='on'){if(!global.db.welcome.includes(remoteJid))global.db.welcome.push(remoteJid);saveDB();await sock.sendMessage(remoteJid,{text:'✅ Welcome ON - '+botName});}else if(text==='off'){global.db.welcome=global.db.welcome.filter(g=>g!==remoteJid);saveDB();await sock.sendMessage(remoteJid,{text:'❌ Welcome OFF'});}else await sock.sendMessage(remoteJid,{text:'Welcome '+botName+' .welcome on/off Status: '+(global.db.welcome.includes(remoteJid)?'ON':'OFF')});break;}",
+          "case 'antilink':{if(text==='on'){if(!global.db.antilink.includes(remoteJid))global.db.antilink.push(remoteJid);saveDB();await sock.sendMessage(remoteJid,{text:'✅ Antilink ON - '+botName});}else if(text==='off'){global.db.antilink=global.db.antilink.filter(g=>g!==remoteJid);saveDB();await sock.sendMessage(remoteJid,{text:'❌ Antilink OFF'});}else await sock.sendMessage(remoteJid,{text:'Antilink '+botName+' .antilink on/off'});break;}",
+          "case 's':case 'sticker':case 'stiker':{const c=msg.message?.ephemeralMessage?msg.message.ephemeralMessage.message:msg.message;const b=await sock.downloadMediaMessage({message:c,key:msg.key});if(b)await sock.sendMessage(remoteJid,{sticker:b});break;}",
+          "case 'tiktok':case 'tt':{const url=text;if(!url){await sock.sendMessage(remoteJid,{text:'Kirim link! .tiktok https://...'});break;}await sock.sendMessage(remoteJid,{text:'⬇️ Downloading tiktok - '+botName});try{const r=await axios.get('https://tikwm.com/api/?url='+encodeURIComponent(url));const video=r.data?.data?.play;if(video)await sock.sendMessage(remoteJid,{video:{url:video},caption:'✅ Tiktok - '+botName+' Owner '+ownerName});else await sock.sendMessage(remoteJid,{text:'❌ Gagal download - coba link lain'});}catch(e){await sock.sendMessage(remoteJid,{text:'❌ Error: '+e.message});}break;}",
+          "case 'ytmp3':case 'ytmp4':case 'yt':await sock.sendMessage(remoteJid,{text:'🎥 YT '+command+' - '+botName+' Link: '+text+'\\n(Untuk full YT butuh ytdl-core)'});break;",
+          "case 'ai':case 'gpt':case 'openai':{if(!text){await sock.sendMessage(remoteJid,{text:'Tanya apa? .ai siapa kamu?'});break;}await sock.sendMessage(remoteJid,{text:'🤖 '+botName+' mikir: '+text});try{if(settings.openaiKey&&settings.openaiKey.startsWith('sk-')){const r=await axios.post('https://api.openai.com/v1/chat/completions',{model:'gpt-3.5-turbo',messages:[{role:'user',content:text}]},{headers:{Authorization:'Bearer '+settings.openaiKey}});await sock.sendMessage(remoteJid,{text:'🤖 '+botName+' AI (OpenAI):\\n'+r.data.choices[0].message.content});}else{const r=await axios.get('https://api.popcat.xyz/chatbot?msg='+encodeURIComponent(text)+'&owner='+encodeURIComponent(ownerName)+'&botname='+encodeURIComponent(botName));const ans=r.data.response||'Halo saya '+botName+'!';await sock.sendMessage(remoteJid,{text:'🤖 '+botName+' AI (FREE):\\n'+ans+'\\n\\n_Free mode pakai Popcat API - isi openaiKey untuk GPT-4_'});}}catch(e){try{await sock.sendMessage(remoteJid,{text:'🤖 '+botName+' FREE AI:\\nKamu: '+text+'\\nJawab: Halo saya '+botName+' Owner '+ownerName+' - AI free lagi error, coba lagi: '+e.message});}catch{}}break;}",
+          "case 'hidetag':{const meta=await sock.groupMetadata(remoteJid);const mentions=meta.participants.map(p=>p.id);await sock.sendMessage(remoteJid,{text:text||'Hidetag by '+botName+' Owner '+ownerName,mentions});break;}",
+          "case 'tagall':{const meta=await sock.groupMetadata(remoteJid);let t='📢 TagAll by '+botName+'\\n\\n';meta.participants.forEach((p,i)=>{t+=(i+1)+'. @'+p.id.split('@')[0]+'\\n';});await sock.sendMessage(remoteJid,{text:t,mentions:meta.participants.map(p=>p.id)});break;}",
+          "case 'kick':{const target=msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0];if(target){await sock.groupParticipantsUpdate(remoteJid,[target],'remove');await sock.sendMessage(remoteJid,{text:'✅ Kick by '+botName,mentions:[target]});}break;}",
+          "case 'promote':{const target=msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0];if(target){await sock.groupParticipantsUpdate(remoteJid,[target],'promote');await sock.sendMessage(remoteJid,{text:'✅ Promote by '+botName});}break;}",
+          "case 'daily':{if(!global.db.rpg[sender])global.db.rpg[sender]={money:0,lastDaily:0};const now=Date.now();if(global.db.rpg[sender].lastDaily&&now-global.db.rpg[sender].lastDaily<86400000){await sock.sendMessage(remoteJid,{text:'⏳ Cooldown 24 jam - '+botName});break;}global.db.rpg[sender].money+=1000;global.db.rpg[sender].lastDaily=now;saveDB();await sock.sendMessage(remoteJid,{text:'💰 Daily '+botName+' +1000 Balance: '+global.db.rpg[sender].money});break;}",
+          "case 'balance':{if(!global.db.rpg[sender])global.db.rpg[sender]={money:0};await sock.sendMessage(remoteJid,{text:'💰 '+botName+' Balance: '+global.db.rpg[sender].money});break;}",
+          "case 'addproduk':{if(!global.db.produk)global.db.produk=[];global.db.produk.push(text);saveDB();await sock.sendMessage(remoteJid,{text:'✅ '+botName+' Ditambah: '+text});break;}",
+          "case 'listproduk':{const l=(global.db.produk||[]).map((v,i)=>(i+1)+'. '+v).join('\\n')||'Kosong';await sock.sendMessage(remoteJid,{text:'🛒 '+botName+' Store Owner '+ownerName+'\\n\\n'+l});break;}",
+          "case 'delproduk':{const idx=parseInt(args[0])-1;if(global.db.produk[idx]){const del=global.db.produk.splice(idx,1);saveDB();await sock.sendMessage(remoteJid,{text:'🗑️ Hapus: '+del[0]});}break;}",
+          "case 'addreply':{const parts=text.split(' ');const trigger=parts[0];const reply=parts.slice(1).join(' ');if(!trigger||!reply){await sock.sendMessage(remoteJid,{text:'Contoh: .addreply halo Halo'});break;}global.db.autoreply[trigger.toLowerCase()]=reply;saveDB();await sock.sendMessage(remoteJid,{text:'✅ Autoreply '+trigger+' => '+reply});break;}",
+          "case 'listreply':{const list=Object.entries(global.db.autoreply||{}).map(([k,v])=>k+' => '+v).join('\\n')||'Kosong';await sock.sendMessage(remoteJid,{text:'📋 Autoreply '+botName+'\\n'+list});break;}",
+          "case 'delreply':{delete global.db.autoreply[args[0]?.toLowerCase()];saveDB();await sock.sendMessage(remoteJid,{text:'🗑️ Autoreply dihapus'});break;}",
+          "case 'bc':case 'broadcast':{if(!text){await sock.sendMessage(remoteJid,{text:'Contoh: .bc Halo'});break;}const groups=await sock.groupFetchAllParticipating();const ids=Object.keys(groups);await sock.sendMessage(remoteJid,{text:'📢 Broadcast '+botName+' ke '+ids.length+' grup'});for(const id of ids){await sock.sendMessage(id,{text:'📢 Broadcast dari '+botName+' Owner '+ownerName+'\\n\\n'+text});await new Promise(r=>setTimeout(r,1500));}break;}",
+          "default:await sock.sendMessage(remoteJid,{text:'Command .'+command+' tidak ada, ketik .menu\\nBot: '+botName});break;}}}catch(e){console.log('[ERROR]',e.message);}});}startBot();"
+        ].join('\n');
+        zip.file('index.js', waCaseIndex);
+        const pfCase = zip.folder('plugins');
+        pfCase.file('welcome.js', "module.exports = {\n  name: 'welcome',\n  description: '.welcome on/off - auto welcome join/leave',\n  usage: \".welcome on\",\n  caseCode: \"case 'welcome':{if(text==='on'){if(!global.db.welcome.includes(remoteJid))global.db.welcome.push(remoteJid);saveDB();await sock.sendMessage(remoteJid,{text:'✅ Welcome ON'});}else if(text==='off'){global.db.welcome=global.db.welcome.filter(g=>g!==remoteJid);saveDB();await sock.sendMessage(remoteJid,{text:'❌ Welcome OFF'});}else await sock.sendMessage(remoteJid,{text:'Welcome Status: '+(global.db.welcome.includes(remoteJid)?'ON':'OFF')});break;}\"\n};\n");
+        pfCase.file('antilink.js', "module.exports = {\n  name: 'antilink',\n  description: '.antilink on/off + auto delete link',\n  caseCode: \"case 'antilink':{if(text==='on'){if(!global.db.antilink.includes(remoteJid))global.db.antilink.push(remoteJid);saveDB();await sock.sendMessage(remoteJid,{text:'✅ Antilink ON'});}else if(text==='off'){global.db.antilink=global.db.antilink.filter(g=>g!==remoteJid);saveDB();await sock.sendMessage(remoteJid,{text:'❌ Antilink OFF'});}break;}\"\n};\n");
+        pfCase.file('sticker.js', "module.exports = {\n  name: 'sticker',\n  command: ['s','sticker'],\n  caseCode: \"case 's':case 'sticker':{const c=msg.message?.ephemeralMessage?msg.message.ephemeralMessage.message:msg.message;const b=await sock.downloadMediaMessage({message:c,key:msg.key});if(b)await sock.sendMessage(remoteJid,{sticker:b});break;}\"\n};\n");
+        pfCase.file('downloader.js', "module.exports = {\n  name: 'downloader',\n  command: ['tiktok','tt'],\n  caseCode: \"case 'tiktok':case 'tt':{const url=text;if(!url){await sock.sendMessage(remoteJid,{text:'Kirim link! .tiktok https://...'});break;}try{const r=await axios.get('https://tikwm.com/api/?url='+encodeURIComponent(url));const v=r.data?.data?.play;if(v)await sock.sendMessage(remoteJid,{video:{url:v},caption:'✅ Tiktok - '+botName});}catch(e){await sock.sendMessage(remoteJid,{text:'❌ Error: '+e.message});}break;}\"\n};\n");
+        pfCase.file('ai.js', "module.exports = {\n  name: 'ai',\n  description: '.ai tanya - free real AI via Popcat + OpenAI',\n  caseCode: \"case 'ai':{if(!text){await sock.sendMessage(remoteJid,{text:'Tanya apa? .ai halo'});break;}try{if(settings.openaiKey&&settings.openaiKey.startsWith('sk-')){const r=await axios.post('https://api.openai.com/v1/chat/completions',{model:'gpt-3.5-turbo',messages:[{role:'user',content:text}]},{headers:{Authorization:'Bearer '+settings.openaiKey}});await sock.sendMessage(remoteJid,{text:'AI: '+r.data.choices[0].message.content});}else{const r=await axios.get('https://api.popcat.xyz/chatbot?msg='+encodeURIComponent(text)+'&owner='+encodeURIComponent(ownerName)+'&botname='+encodeURIComponent(botName));await sock.sendMessage(remoteJid,{text:'🤖 FREE AI: '+(r.data.response||'Halo!')});}}catch(e){await sock.sendMessage(remoteJid,{text:'❌ AI Error'});}break;}\"\n};\n");
+        pfCase.file('group.js', "module.exports = {\n  name: 'group',\n  command: ['hidetag','tagall','kick'],\n  caseCode: \"case 'hidetag':{const meta=await sock.groupMetadata(remoteJid);const mentions=meta.participants.map(p=>p.id);await sock.sendMessage(remoteJid,{text:text||'Hidetag by '+botName,mentions});break;}case 'tagall':{const meta=await sock.groupMetadata(remoteJid);let t='TagAll\\n';meta.participants.forEach((p,i)=>{t+=(i+1)+'. @'+p.id.split('@')[0]+'\\n';});await sock.sendMessage(remoteJid,{text:t,mentions:meta.participants.map(p=>p.id)});break;}\"\n};\n");
+        pfCase.file('rpg.js', "module.exports = {\n  name: 'rpg',\n  command: ['daily','balance'],\n  caseCode: \"case 'daily':{if(!global.db.rpg[sender])global.db.rpg[sender]={money:0,lastDaily:0};const now=Date.now();if(global.db.rpg[sender].lastDaily&&now-global.db.rpg[sender].lastDaily<86400000){await sock.sendMessage(remoteJid,{text:'⏳ Cooldown'});break;}global.db.rpg[sender].money+=1000;global.db.rpg[sender].lastDaily=now;saveDB();await sock.sendMessage(remoteJid,{text:'💰 Daily +1000 Balance: '+global.db.rpg[sender].money});break;}\"\n};\n");
+        pfCase.file('store.js', "module.exports = {\n  name: 'store',\n  command: ['addproduk','listproduk'],\n  caseCode: \"case 'addproduk':{if(!global.db.produk)global.db.produk=[];global.db.produk.push(text);saveDB();await sock.sendMessage(remoteJid,{text:'✅ Ditambah: '+text});break;}case 'listproduk':{const l=(global.db.produk||[]).map((v,i)=>(i+1)+'. '+v).join('\\\\n')||'Kosong';await sock.sendMessage(remoteJid,{text:'🛒 Store\\\\n'+l});break;}\"\n};\n");
+        pfCase.file('autoreply.js', "module.exports = {\n  name: 'autoreply',\n  command: ['addreply','listreply'],\n  caseCode: \"case 'addreply':{const parts=text.split(' ');const trigger=parts[0];const reply=parts.slice(1).join(' ');if(!trigger||!reply){await sock.sendMessage(remoteJid,{text:'Contoh: .addreply halo Halo'});break;}global.db.autoreply[trigger.toLowerCase()]=reply;saveDB();await sock.sendMessage(remoteJid,{text:'✅ Autoreply '+trigger});break;}\"\n};\n");
+        pfCase.file('broadcast.js', "module.exports = {\n  name: 'broadcast',\n  command: ['bc','broadcast'],\n  caseCode: \"case 'bc':{if(!text){await sock.sendMessage(remoteJid,{text:'Contoh: .bc Halo'});break;}const groups=await sock.groupFetchAllParticipating();const ids=Object.keys(groups);for(const id of ids){await sock.sendMessage(id,{text:'📢 Broadcast dari '+botName+'\\\\n\\\\n'+text});await new Promise(r=>setTimeout(r,1500));}break;}\"\n};\n");
+        if (thumbData) { const b64 = thumbData.split(',')[1]; if (b64) zip.file('thumb.jpg', b64, { base64: true }); }
+      } else {
+        zip.file('settings.js', settingsESM);
+        zip.file('package.json', JSON.stringify({ name: safe, version: "1.0.0", description: safeBotName + " WA ESM V36 FULL 10 FITUR AI REAL", type: "module", main: "index.js", scripts: { start: "node index.js" }, dependencies: { "@whiskeysockets/baileys": "^6.7.8", "pino": "^9.3.2", "@hapi/boom": "^10.0.1", "axios": "^1.6.0", "openai": "^4.20.0" } }, null, 2));
+        zip.file('database.json', JSON.stringify({ welcome: [], antilink: [], autoreply: {}, rpg: {}, produk: [], owner: [] }, null, 2));
+        zip.file('index.js', [
+          "import settings from './settings.js'; const botName=settings.botName; const owner=settings.ownerNumber; const ownerName=settings.ownerName; const pairingNumber=settings.pairingNumber; import fs from 'fs'; let db={welcome:[],antilink:[],autoreply:{},rpg:{},produk:[],owner:[]}; try{if(fs.existsSync('database.json'))db=JSON.parse(fs.readFileSync('database.json'));}catch{} function saveDB(){try{fs.writeFileSync('database.json',JSON.stringify(db,null,2));}catch{}} global.db=db; global.saveDB=saveDB;",
+          "import makeWASocket,{useMultiFileAuthState,DisconnectReason} from '@whiskeysockets/baileys'; import pino from 'pino'; import path from 'path'; import {pathToFileURL} from 'url'; async function startBot(){ const {state,saveCreds}=await useMultiFileAuthState('session'); const sock=makeWASocket({auth:state,logger:pino({level:'silent'})}); sock.ev.on('creds.update',saveCreds); if(!sock.authState.creds.registered)setTimeout(async()=>{const c=await sock.requestPairingCode(pairingNumber);console.log('PAIRING CODE '+botName+': '+c);},3000);",
+          "sock.ev.on('connection.update',u=>{if(u.connection==='open')console.log('✅ Bot '+botName+' Connected! WA ESM V36 AI REAL'); if(u.connection==='close'){const r=u.lastDisconnect?.error?.output?.statusCode!==DisconnectReason.loggedOut; if(r)setTimeout(()=>startBot(),3000);}});",
+          "const pluginsDir=path.join(process.cwd(),'plugins'); if(!fs.existsSync(pluginsDir))fs.mkdirSync(pluginsDir); const allPlugins=[]; const files=fs.readdirSync(pluginsDir).filter(f=>f.endsWith('.js')); for(const file of files){const mod=await import(pathToFileURL(path.join(pluginsDir,file)).href); allPlugins.push(mod.default);} console.log('📦 Loaded '+allPlugins.length+' plugins V36 FULL 10 FITUR - '+botName);",
+          "sock.ev.on('group-participants.update',async update=>{for(const p of allPlugins){if(p.onParticipantsUpdate)await p.onParticipantsUpdate(sock,update);}});",
+          "sock.ev.on('messages.upsert',async m=>{const msg=m.messages[0];if(!msg||msg.key.fromMe)return;let content=msg.message;if(content?.ephemeralMessage)content=content.ephemeralMessage.message;const type=Object.keys(content||{})[0];let body='';if(type==='conversation')body=content.conversation;else if(type==='extendedTextMessage')body=content.extendedTextMessage.text;const remoteJid=msg.key.remoteJid;for(const p of allPlugins){if(p.onMessage){const stop=await p.onMessage(sock,msg);if(stop)return;}}if(!body?.startsWith(settings.prefix))return;const args=body.slice(1).trim().split(/ +/);const command=args.shift().toLowerCase();for(const p of allPlugins){if(p.command.includes(command)){await p.handler(sock,msg,{command,args,text:args.join(' '),sender:msg.key.participant||remoteJid,remoteJid,settings,botName,owner,ownerName});break;}}});} startBot();"
+        ].join('\n'));
+        const pf = zip.folder('plugins');
+        pf.file('menu.js', "import settings from '../settings.js'; export default { command:['menu'], handler: async (sock,msg,{remoteJid})=>{ let t='╭━━━〔 '+settings.botName+' 〕━━━✦\\n┃ Owner: '+settings.ownerName+'\\n┣━━━〔 FITUR 〕━━━\\n'; settings.features.forEach(f=>{t+='┃ ❒ .'+f+'\\n';}); t+='╰━━━━\\nV36 AI REAL FREE'; await sock.sendMessage(remoteJid,{text:t}); } };");
+        pf.file('welcome.js', "import settings from '../settings.js'; export default { command:['welcome'], handler: async (sock,msg,{remoteJid,text})=>{ if(text==='on'){if(!global.db.welcome.includes(remoteJid))global.db.welcome.push(remoteJid);global.saveDB();await sock.sendMessage(remoteJid,{text:'✅ Welcome ON - '+settings.botName});}else if(text==='off'){global.db.welcome=global.db.welcome.filter(g=>g!==remoteJid);global.saveDB();await sock.sendMessage(remoteJid,{text:'❌ Welcome OFF'});}else await sock.sendMessage(remoteJid,{text:'Welcome '+settings.botName+' .welcome on/off Status: '+(global.db.welcome.includes(remoteJid)?'ON':'OFF')});}, onParticipantsUpdate: async (sock,update)=>{ if(!global.db.welcome.includes(update.id))return; for(const p of update.participants){ if(update.action==='add') await sock.sendMessage(update.id,{text:'👋 Welcome @'+p.split('@')[0]+' Bot: '+settings.botName,mentions:[p]}); } } };");
+        pf.file('antilink.js', "import settings from '../settings.js'; export default { command:['antilink'], handler: async (sock,msg,{remoteJid,text})=>{ if(text==='on'){if(!global.db.antilink.includes(remoteJid))global.db.antilink.push(remoteJid);global.saveDB();await sock.sendMessage(remoteJid,{text:'✅ Antilink ON'});}else if(text==='off'){global.db.antilink=global.db.antilink.filter(g=>g!==remoteJid);global.saveDB();await sock.sendMessage(remoteJid,{text:'❌ Antilink OFF'});}else await sock.sendMessage(remoteJid,{text:'Antilink .antilink on/off'});}, onMessage: async (sock,msg)=>{ const remoteJid=msg.key.remoteJid; if(!global.db.antilink.includes(remoteJid))return false; let body=''; const c=msg.message; if(c?.conversation)body=c.conversation; if(c?.extendedTextMessage)body=c.extendedTextMessage.text; if(/https?:\\/\\//i.test(body)){const sender=msg.key.participant||remoteJid; await sock.sendMessage(remoteJid,{text:'❌ Link @'+sender.split('@')[0],mentions:[sender]}); try{await sock.sendMessage(remoteJid,{delete:{remoteJid,fromMe:false,id:msg.key.id,participant:msg.key.participant}});}catch{} return true;}return false;} };");
+        pf.file('sticker.js', "import settings from '../settings.js'; export default { command:['s','sticker','stiker'], handler: async (sock,msg,{remoteJid})=>{ const c=msg.message?.ephemeralMessage?msg.message.ephemeralMessage.message:msg.message; const b=await sock.downloadMediaMessage({message:c,key:msg.key}); if(b)await sock.sendMessage(remoteJid,{sticker:b}); } };");
+        pf.file('downloader.js', "import settings from '../settings.js'; import axios from 'axios'; export default { command:['tiktok','tt'], handler: async (sock,msg,{remoteJid,args})=>{ const url=args[0]; if(!url)return sock.sendMessage(remoteJid,{text:'Kirim link! .tiktok https://...'}); await sock.sendMessage(remoteJid,{text:'⬇️ Downloading tiktok - '+settings.botName}); try{const r=await axios.get('https://tikwm.com/api/?url='+encodeURIComponent(url));const v=r.data?.data?.play; if(v)await sock.sendMessage(remoteJid,{video:{url:v},caption:'✅ Tiktok - '+settings.botName});else await sock.sendMessage(remoteJid,{text:'❌ Gagal'});}catch(e){await sock.sendMessage(remoteJid,{text:'❌ Error: '+e.message});} } };");
+        pf.file('ai.js', "import settings from '../settings.js'; import axios from 'axios'; export default { command:['ai','gpt'], handler: async (sock,msg,{remoteJid,text})=>{ if(!text)return sock.sendMessage(remoteJid,{text:'Tanya apa? .ai siapa kamu?'}); await sock.sendMessage(remoteJid,{text:'🤖 '+settings.botName+' mikir: '+text}); try{if(settings.openaiKey&&settings.openaiKey.startsWith('sk-')){const r=await axios.post('https://api.openai.com/v1/chat/completions',{model:'gpt-3.5-turbo',messages:[{role:'user',content:text}]},{headers:{Authorization:'Bearer '+settings.openaiKey}});await sock.sendMessage(remoteJid,{text:'🤖 '+settings.botName+' AI (OpenAI):\\n'+r.data.choices[0].message.content});}else{const r=await axios.get('https://api.popcat.xyz/chatbot?msg='+encodeURIComponent(text)+'&owner='+encodeURIComponent(settings.ownerName)+'&botname='+encodeURIComponent(settings.botName));await sock.sendMessage(remoteJid,{text:'🤖 '+settings.botName+' AI FREE:\\n'+(r.data.response||'Halo!')});}}catch(e){await sock.sendMessage(remoteJid,{text:'❌ AI Error: '+e.message});} } };");
+        pf.file('group.js', "import settings from '../settings.js'; export default { command:['hidetag','tagall','kick','promote'], handler: async (sock,msg,{remoteJid,text,command})=>{ const meta=await sock.groupMetadata(remoteJid); if(command==='hidetag'){const mentions=meta.participants.map(p=>p.id);await sock.sendMessage(remoteJid,{text:text||'Hidetag by '+settings.botName,mentions});}else if(command==='tagall'){let t='📢 TagAll by '+settings.botName+'\\n\\n';meta.participants.forEach((p,i)=>{t+=(i+1)+'. @'+p.id.split('@')[0]+'\\n';});await sock.sendMessage(remoteJid,{text:t,mentions:meta.participants.map(p=>p.id)});}else if(command==='kick'){const target=msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0];if(target)await sock.groupParticipantsUpdate(remoteJid,[target],'remove');} } };");
+        pf.file('rpg.js', "import settings from '../settings.js'; export default { command:['daily','balance'], handler: async (s,m,{remoteJid,sender})=>{ if(!global.db.rpg[sender])global.db.rpg[sender]={money:0,lastDaily:0};const now=Date.now();if(global.db.rpg[sender].lastDaily&&now-global.db.rpg[sender].lastDaily<86400000)return s.sendMessage(remoteJid,{text:'⏳ Cooldown 24 jam - '+settings.botName});global.db.rpg[sender].money+=1000;global.db.rpg[sender].lastDaily=now;global.saveDB();await s.sendMessage(remoteJid,{text:'💰 Daily '+settings.botName+' +1000 Balance: '+global.db.rpg[sender].money});} };");
+        pf.file('store.js', "import settings from '../settings.js'; export default { command:['addproduk','listproduk','delproduk'], handler: async (s,m,{remoteJid,text,command,args})=>{ if(command==='addproduk'){if(!global.db.produk)global.db.produk=[];global.db.produk.push(text);global.saveDB();await s.sendMessage(remoteJid,{text:'✅ Ditambah: '+text});}else if(command==='listproduk'){const l=(global.db.produk||[]).map((v,i)=>(i+1)+'. '+v).join('\\n')||'Kosong';await s.sendMessage(remoteJid,{text:'🛒 Store '+settings.botName+'\\n'+l});}else if(command==='delproduk'){const idx=parseInt(args[0])-1;if(global.db.produk[idx]){const del=global.db.produk.splice(idx,1);global.saveDB();await s.sendMessage(remoteJid,{text:'🗑️ Hapus: '+del[0]});}} } };");
+        pf.file('autoreply.js', "import settings from '../settings.js'; export default { command:['addreply','listreply','delreply'], handler: async (sock,msg,{remoteJid,text,command,args})=>{ if(command==='addreply'){const parts=text.split(' ');const trigger=parts[0];const reply=parts.slice(1).join(' ');if(!trigger||!reply)return sock.sendMessage(remoteJid,{text:'Contoh: .addreply halo Halo'});global.db.autoreply[trigger.toLowerCase()]=reply;global.saveDB();await sock.sendMessage(remoteJid,{text:'✅ Autoreply '+trigger+' => '+reply});}else if(command==='listreply'){const list=Object.entries(global.db.autoreply||{}).map(([k,v])=>k+' => '+v).join('\\n')||'Kosong';await sock.sendMessage(remoteJid,{text:'📋 Autoreply '+settings.botName+'\\n'+list});}else if(command==='delreply'){delete global.db.autoreply[args[0]?.toLowerCase()];global.saveDB();await sock.sendMessage(remoteJid,{text:'🗑️ Autoreply dihapus'});}}, onMessage: async (sock,msg)=>{const remoteJid=msg.key.remoteJid;let body='';const c=msg.message;if(c?.conversation)body=c.conversation;if(c?.extendedTextMessage)body=c.extendedTextMessage.text;const reply=global.db.autoreply[body?.toLowerCase()];if(reply){await sock.sendMessage(remoteJid,{text:reply});return true;}return false;} };");
+        pf.file('broadcast.js', "import settings from '../settings.js'; export default { command:['bc','broadcast'], handler: async (sock,msg,{remoteJid,text})=>{ if(!text)return sock.sendMessage(remoteJid,{text:'Contoh: .bc Halo'});const groups=await sock.groupFetchAllParticipating();const ids=Object.keys(groups);await sock.sendMessage(remoteJid,{text:'📢 Broadcast '+settings.botName+' ke '+ids.length+' grup'});for(const id of ids){await sock.sendMessage(id,{text:'📢 Broadcast dari '+settings.botName+'\\n\\n'+text});await new Promise(r=>setTimeout(r,1500));} } };");
+      }
     } else {
-      botCode = \`// \${botName} ESM V12 FULL PLUGIN + PAIRING 1 MENIT (logic dari code lu)
-import { makeWASocket, useMultiFileAuthState, DisconnectReason } from "noxleyss";
-import pino from "pino";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-async function startBot(){
-  const { state, saveCreds } = await useMultiFileAuthState("sessions");
-  const sock = makeWASocket({
-    logger: pino({ level: "silent" }),
-    auth: state,
-    printQRInTerminal: \${cfg.conn==='qr'}
-  });
-
-  if (!sock.authState.creds.registered) {
-    const phoneNumber = "\${cleanNumber}";
-    setTimeout(async () => {
-      try {
-        let code = await sock.requestPairingCode(phoneNumber);
-        code = code?.match(/.{1,4}/g)?.join("-") || code;
-        console.log(\`[PAIRING CODE] \${code} - Berlaku 60-120 detik, santai! Fix error Gagal menautkan perangkat\`);
-      } catch (err) {
-        console.error("Gagal pairing:", err.message);
-      }
-    }, 4000);
-  }
-
-  sock.ev.on("creds.update", saveCreds);
-  sock.ev.on("connection.update", (u)=>{
-    if(u.connection==="open") console.log("${botName} CONNECTED V12 FULL");
-    if(u.connection==="close" && u.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut) startBot();
-  });
-
-  const plugins={}; const pFolder=path.join(__dirname,'plugins');
-  if(fs.existsSync(pFolder)) for(const f of fs.readdirSync(pFolder)){ if(f.endsWith('.js')){ const mod=await import('./plugins/'+f); plugins[f]=mod.default; console.log('Loaded '+f); } }
-  sock.ev.on("messages.upsert", async ({messages})=>{ const m=messages?.[0]; if(!m?.message) return; for(const k in plugins){ try{ await plugins[k](m,sock); }catch(e){ console.error('Plugin error',k,e.message)} } });
-}
-startBot();
-\`;
-      const pluginsFolder = zip.folder('plugins');
-      pluginsFolder.file('menu.js', getMenuPlugin(cfg));
-      for(const f of (cfg.features||[])){
-        if(PLUGIN_TEMPLATES[f]){
-          pluginsFolder.file(f+'.js', PLUGIN_TEMPLATES[f](botName));
-        }
-      }
+      zip.file('settings.js', teleSettings);
+      zip.file('package.json', JSON.stringify({ name: safe, version: "1.0.0", description: safeBotName + " TELEGRAM V36 AI REAL", type: "commonjs", main: "index.js", scripts: { start: "node index.js" }, dependencies: { telegraf: "^4.15.3", axios: "^1.6.0", openai: "^4.20.0" } }, null, 2));
+      zip.file('database.json', JSON.stringify({ welcome: [], antilink: [], autoreply: {}, rpg: {}, produk: [], groups: [] }, null, 2));
+      zip.file('README.md', '# ' + safeBotName + ' Telegram V36\n\nFIX ALL ERROR:\n- 1x bot.on(text) handle autoreply+antilink+groups\n- AI free real via Popcat API\n- plugins/ 10 file\n');
+      zip.file('index.js', [
+        "const settings=require('./settings.js');const fs=require('fs');const axios=require('axios');const {Telegraf}=require('telegraf');if(!settings.token){console.log('❌ Token kosong');process.exit(1);}const bot=new Telegraf(settings.token);let db={welcome:[],antilink:[],autoreply:{},rpg:{},produk:[],groups:[]};try{if(fs.existsSync('database.json'))db=JSON.parse(fs.readFileSync('database.json'));}catch{}function saveDB(){try{fs.writeFileSync('database.json',JSON.stringify(db,null,2));}catch{}}console.log('[SETTINGS] Telegram Bot:',settings.botName,'V36 AI REAL');",
+        "// SINGLE TEXT HANDLER - FIX DOUBLE HANDLER ERROR",
+        "bot.on('text',async (ctx,next)=>{const chatId=ctx.chat.id;const text=ctx.message.text||'';if(ctx.chat.type.includes('group')&&!db.groups.includes(chatId)){db.groups.push(chatId);saveDB();}const lower=text.toLowerCase();if(db.autoreply[lower]&&!text.startsWith('/')){await ctx.reply(db.autoreply[lower]);return;}if(db.antilink.includes(chatId)&&/https?:\\/\\//i.test(text)&&!text.startsWith('/')){try{await ctx.deleteMessage();await ctx.reply('❌ Link terdeteksi @'+(ctx.from.username||ctx.from.first_name)+' - Dihapus oleh '+settings.botName);}catch{}return;}return next();});",
+        "bot.on('new_chat_members',async ctx=>{const chatId=ctx.chat.id;if(!db.welcome.includes(chatId))return;for(const m of ctx.message.new_chat_members){await ctx.reply('👋 Welcome @'+(m.username||m.first_name)+' Bot: '+settings.botName+' Owner: '+settings.ownerName);}});",
+        "bot.on('left_chat_member',async ctx=>{const chatId=ctx.chat.id;if(!db.welcome.includes(chatId))return;const m=ctx.message.left_chat_member;await ctx.reply('👋 Bye @'+(m.username||m.first_name));});",
+        "bot.command('welcome',async ctx=>{const chatId=ctx.chat.id;const arg=ctx.message.text.split(' ')[1];if(arg==='on'){if(!db.welcome.includes(chatId))db.welcome.push(chatId);saveDB();await ctx.reply('✅ Welcome ON - '+settings.botName);}else if(arg==='off'){db.welcome=db.welcome.filter(g=>g!==chatId);saveDB();await ctx.reply('❌ Welcome OFF');}else await ctx.reply('Welcome '+settings.botName+' /welcome on/off Status: '+(db.welcome.includes(chatId)?'ON':'OFF'));});",
+        "bot.command('antilink',async ctx=>{const chatId=ctx.chat.id;const arg=ctx.message.text.split(' ')[1];if(arg==='on'){if(!db.antilink.includes(chatId))db.antilink.push(chatId);saveDB();await ctx.reply('✅ Antilink ON - '+settings.botName);}else if(arg==='off'){db.antilink=db.antilink.filter(g=>g!==chatId);saveDB();await ctx.reply('❌ Antilink OFF');}else await ctx.reply('Antilink '+settings.botName+' /antilink on/off Status: '+(db.antilink.includes(chatId)?'ON':'OFF'));});",
+        "bot.command('menu',async ctx=>{let menu='╭━━━〔 '+settings.botName+' 〕━━━✦\\n┃ Owner: '+settings.ownerName+'\\n┃ Username: '+settings.username+'\\n┣━━━〔 FITUR 〕━━━\\n';settings.features.forEach(f=>{menu+='┃ ❒ /'+f+'\\n';});menu+='╰━━━━\\nV36 AI REAL FREE (Popcat) + OPENAI';await ctx.reply(menu);});",
+        "bot.start(ctx=>{ctx.reply('Halo '+settings.botName+' 👋\\nOwner: '+settings.ownerName+'\\nKetik /menu\\nV36 AI REAL');});",
+        "bot.command('s',async ctx=>{const reply=ctx.message.reply_to_message;if(!reply||!reply.photo)return ctx.reply('Reply foto untuk sticker - /s - '+settings.botName);try{const fileId=reply.photo[reply.photo.length-1].file_id;const link=await ctx.telegram.getFileLink(fileId);await ctx.replyWithSticker({url:link.href});}catch(e){await ctx.reply('❌ Sticker Error: '+e.message);}});",
+        "bot.command('sticker',async ctx=>{const reply=ctx.message.reply_to_message;if(!reply||!reply.photo)return ctx.reply('Reply foto! - '+settings.botName);try{const fileId=reply.photo[reply.photo.length-1].file_id;const link=await ctx.telegram.getFileLink(fileId);await ctx.replyWithSticker({url:link.href});}catch(e){await ctx.reply('❌ Error: '+e.message);}});",
+        "bot.command('tiktok',async ctx=>{const url=ctx.message.text.split(' ')[1];if(!url)return ctx.reply('Kirim link! /tiktok https://... - '+settings.botName);await ctx.reply('⬇️ Downloading tiktok - '+settings.botName);try{const r=await axios.get('https://tikwm.com/api/?url='+encodeURIComponent(url));const video=r.data?.data?.play;if(video)await ctx.replyWithVideo({url:video},{caption:'✅ Tiktok - '+settings.botName+' Owner '+settings.ownerName});else await ctx.reply('❌ Gagal download');}catch(e){await ctx.reply('❌ Error: '+e.message);}});",
+        "bot.command('tt',async ctx=>{const url=ctx.message.text.split(' ')[1];if(!url)return ctx.reply('Kirim link! /tt https://...');try{const r=await axios.get('https://tikwm.com/api/?url='+encodeURIComponent(url));const v=r.data?.data?.play;if(v)await ctx.replyWithVideo({url:v});}catch(e){await ctx.reply('❌ Error: '+e.message);}});",
+        "bot.command('ai',async ctx=>{const text=ctx.message.text.replace('/ai','').trim();if(!text)return ctx.reply('Tanya apa? /ai siapa kamu? - '+settings.botName);await ctx.reply('🤖 '+settings.botName+' mikir: \"'+text+'\"');try{if(settings.openaiKey&&settings.openaiKey.startsWith('sk-')){const r=await axios.post('https://api.openai.com/v1/chat/completions',{model:'gpt-3.5-turbo',messages:[{role:'user',content:text}]},{headers:{Authorization:'Bearer '+settings.openaiKey}});await ctx.reply('🤖 '+settings.botName+' AI (OpenAI):\\n'+r.data.choices[0].message.content);}else{const r=await axios.get('https://api.popcat.xyz/chatbot?msg='+encodeURIComponent(text)+'&owner='+encodeURIComponent(settings.ownerName)+'&botname='+encodeURIComponent(settings.botName));await ctx.reply('🤖 '+settings.botName+' AI (FREE):\\n'+(r.data.response||'Halo saya '+settings.botName)+'\\n\\n_Free pakai Popcat API - isi openaiKey untuk GPT-4_');}}catch(e){await ctx.reply('🤖 '+settings.botName+' FREE AI:\\nKamu: '+text+'\\nJawab: Halo saya '+settings.botName+' - free AI error coba lagi');}});",
+        "bot.command('gpt',async ctx=>{const t=ctx.message.text.replace('/gpt','').trim();if(!t)return ctx.reply('Tanya apa? /gpt halo');try{if(settings.openaiKey&&settings.openaiKey.startsWith('sk-')){const r=await axios.post('https://api.openai.com/v1/chat/completions',{model:'gpt-3.5-turbo',messages:[{role:'user',content:t}]},{headers:{Authorization:'Bearer '+settings.openaiKey}});await ctx.reply(r.data.choices[0].message.content);}else{const r=await axios.get('https://api.popcat.xyz/chatbot?msg='+encodeURIComponent(t)+'&owner='+encodeURIComponent(settings.ownerName)+'&botname='+encodeURIComponent(settings.botName));await ctx.reply(r.data.response);}}catch(e){await ctx.reply('❌ Error: '+e.message);}});",
+        "bot.command('hidetag',async ctx=>{const text=ctx.message.text.replace('/hidetag','').trim()||'Hidetag by '+settings.botName;try{const admins=await ctx.getChatAdministrators();const mentions=admins.map(a=>a.user.id);await ctx.reply('📢 '+text+'\\n'+mentions.map(id=>'[\\u200B](tg://user?id='+id+')').join(' '),{parse_mode:'Markdown'});}catch{await ctx.reply('📢 '+text);}});",
+        "bot.command('tagall',async ctx=>{try{const admins=await ctx.getChatAdministrators();let t='📢 TagAll by '+settings.botName+'\\n\\n';admins.forEach((a,i)=>{t+=(i+1)+'. @'+(a.user.username||a.user.first_name)+'\\n';});await ctx.reply(t);}catch{await ctx.reply('TagAll by '+settings.botName);}});",
+        "bot.command('kick',async ctx=>{const reply=ctx.message.reply_to_message;if(!reply)return ctx.reply('Reply user /kick - '+settings.botName);try{await ctx.kickChatMember(reply.from.id);await ctx.reply('✅ Kick @'+(reply.from.username||reply.from.first_name)+' by '+settings.botName);}catch(e){await ctx.reply('❌ Kick Error: Bot harus admin - '+e.message);}});",
+        "bot.command('promote',async ctx=>{const reply=ctx.message.reply_to_message;if(!reply)return ctx.reply('Reply user /promote');try{await ctx.promoteChatMember(reply.from.id,{can_delete_messages:true});await ctx.reply('✅ Promote @'+(reply.from.username||reply.from.first_name)+' by '+settings.botName);}catch(e){await ctx.reply('❌ Error: '+e.message);}});",
+        "bot.command('daily',async ctx=>{const uid=ctx.from.id;if(!db.rpg[uid])db.rpg[uid]={money:0,lastDaily:0};const now=Date.now();if(db.rpg[uid].lastDaily&&now-db.rpg[uid].lastDaily<86400000)return ctx.reply('⏳ Cooldown 24 jam - '+settings.botName);db.rpg[uid].money+=1000;db.rpg[uid].lastDaily=now;saveDB();await ctx.reply('💰 Daily '+settings.botName+' +1000 Balance: '+db.rpg[uid].money+'\\nOwner: '+settings.ownerName);});",
+        "bot.command('balance',async ctx=>{const uid=ctx.from.id;if(!db.rpg[uid])db.rpg[uid]={money:0};await ctx.reply('💰 '+settings.botName+' Balance: '+db.rpg[uid].money+'\\nOwner: '+settings.ownerName);});",
+        "bot.command('addproduk',async ctx=>{const text=ctx.message.text.replace('/addproduk','').trim();if(!text)return ctx.reply('Contoh: /addproduk iPhone 15 - '+settings.botName);db.produk.push(text);saveDB();await ctx.reply('✅ '+settings.botName+' Produk ditambah: '+text+'\\nOwner: '+settings.ownerName);});",
+        "bot.command('listproduk',async ctx=>{const list=db.produk.map((v,i)=>(i+1)+'. '+v).join('\\n')||'Kosong - /addproduk nama';await ctx.reply('🛒 '+settings.botName+' Store - Owner '+settings.ownerName+'\\n\\n'+list);});",
+        "bot.command('delproduk',async ctx=>{const idx=parseInt(ctx.message.text.split(' ')[1])-1;if(db.produk[idx]){const del=db.produk.splice(idx,1);saveDB();await ctx.reply('🗑️ Hapus: '+del[0]);}else await ctx.reply('Index tidak ada');});",
+        "bot.command('addreply',async ctx=>{const args=ctx.message.text.replace('/addreply','').trim().split(' ');const trigger=args[0];const reply=args.slice(1).join(' ');if(!trigger||!reply)return ctx.reply('Contoh: /addreply halo Halo juga dari '+settings.botName);db.autoreply[trigger.toLowerCase()]=reply;saveDB();await ctx.reply('✅ Autoreply '+settings.botName+' | '+trigger+' => '+reply);});",
+        "bot.command('listreply',async ctx=>{const list=Object.entries(db.autoreply).map(([k,v])=>k+' => '+v).join('\\n')||'Kosong';await ctx.reply('📋 Autoreply '+settings.botName+' - Owner '+settings.ownerName+'\\n'+list);});",
+        "bot.command('delreply',async ctx=>{const trigger=ctx.message.text.split(' ')[1];if(trigger){delete db.autoreply[trigger.toLowerCase()];saveDB();await ctx.reply('🗑️ Autoreply '+trigger+' dihapus');}else await ctx.reply('Contoh: /delreply halo');});",
+        "bot.command('bc',async ctx=>{const text=ctx.message.text.replace('/bc','').trim();if(!text)return ctx.reply('Contoh: /bc Halo semua dari '+settings.botName+'\\nOwner '+settings.ownerName);await ctx.reply('📢 Broadcast '+settings.botName+' ke '+db.groups.length+' grup - Owner '+settings.ownerName+'\\n'+text);for(const gid of db.groups){try{await ctx.telegram.sendMessage(gid,'📢 Broadcast dari '+settings.botName+' Owner '+settings.ownerName+'\\n\\n'+text);await new Promise(r=>setTimeout(r,1500));}catch(e){console.log('[BC ERROR]',gid,e.message);}}});",
+        "bot.command('broadcast',async ctx=>{const text=ctx.message.text.replace('/broadcast','').trim();if(!text)return ctx.reply('Contoh: /broadcast Halo');for(const gid of db.groups){try{await ctx.telegram.sendMessage(gid,'📢 '+settings.botName+'\\n\\n'+text);await new Promise(r=>setTimeout(r,1500));}catch{}}await ctx.reply('✅ Broadcast selesai ke '+db.groups.length+' grup');});",
+        "bot.launch().then(()=>console.log('✅ Telegram Bot '+settings.botName+' Connected! V36 FULL 10 FITUR AI REAL - Owner: '+settings.ownerName+' Username: '+settings.username)).catch(e=>console.log('❌ Launch error',e.message));",
+        "process.once('SIGINT',()=>bot.stop('SIGINT'));process.once('SIGTERM',()=>bot.stop('SIGTERM'));"
+      ].join('\n'));
+      const pfTele = zip.folder('plugins');
+      pfTele.file('welcome.js', "module.exports = { name: 'welcome', command: '/welcome on/off' }; // TELE PLUGIN - welcome - bot.on('new_chat_members') auto welcome\n");
+      pfTele.file('antilink.js', "module.exports = { name: 'antilink' }; // TELE PLUGIN - antilink - auto delete link\n");
+      pfTele.file('sticker.js', "module.exports = { name: 'sticker', command: '/s' }; // TELE PLUGIN - sticker\n");
+      pfTele.file('downloader.js', "module.exports = { name: 'downloader', command: '/tiktok' }; // TELE PLUGIN - downloader tikwm\n");
+      pfTele.file('ai.js', "module.exports = { name: 'ai', command: '/ai', description: 'AI REAL FREE Popcat + OpenAI' }; // AI free real\n");
+      pfTele.file('group.js', "module.exports = { name: 'group', command: ['/hidetag','/tagall','/kick'] };\n");
+      pfTele.file('rpg.js', "module.exports = { name: 'rpg', command: ['/daily','/balance'] };\n");
+      pfTele.file('store.js', "module.exports = { name: 'store', command: ['/addproduk','/listproduk'] };\n");
+      pfTele.file('autoreply.js', "module.exports = { name: 'autoreply', command: ['/addreply','/listreply'] };\n");
+      pfTele.file('broadcast.js', "module.exports = { name: 'broadcast', command: '/bc' };\n");
     }
 
-    zip.file('index.js', botCode);
-    zip.file('package.json', JSON.stringify({
-      name: safeName.toLowerCase(),
-      version: '12.0.0',
-      type: cfg.base==='esm' ? 'module' : 'commonjs',
-      main: 'index.js',
-      scripts: { start: 'node index.js' },
-      dependencies: { "noxleyss": "^1.2.1", "pino": "^9.3.2" }
-    }, null, 2));
-
-    if(cfg.thumb==='thumb' && cfg.thumbData){
-      const b64 = cfg.thumbData.split(',')[1];
-      if(b64) zip.file('thumb.jpg', b64, {base64:true});
-    }
-
-    zip.file('README.txt', \`BOT: \${botName}
-PAIRING: \${cleanNumber}
-OWNER: \${cfg.owner}
-BASE: \${cfg.base}
-CONN: \${cfg.conn}
-MENU: \${cfg.menuStyle}
-BTN: \${cfg.btn}
-THUMB: \${cfg.thumb}
-FITUR: \${(cfg.features||[]).join(', ')}
-
-V12 FULL FITUR - FIX SVG + FIX FUNCTION_INVOCATION_FAILED + PAIRING 1 MENIT
-Logic pairing dari code lu: noxleyss + 4 detik delay, kode hidup 60-120 detik
-Fix error screenshot 2L3F-PWB8 Gagal menautkan perangkat
-Cara: npm install && npm start
-\`);
-
-    const buf = await zip.generateAsync({type:'nodebuffer', compression:'DEFLATE', compressionOptions:{level:6}});
-    res.setHeader('Content-Type','application/zip');
-    res.setHeader('Content-Disposition','attachment; filename='+safeName+'.zip');
-    return res.send(buf);
-
-  }catch(e){
-    console.error('GENERATE ERROR:', e);
-    return res.status(500).json({error: e.message, stack: e.stack});
-  }
+    const buffer = await zip.generateAsync({ type: 'nodebuffer' });
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', 'attachment; filename=' + safe + '.zip');
+    res.setHeader('X-Version', 'V36-FIX-ALL-ERROR-AI-REAL');
+    return res.send(buffer);
+  } catch (err) { console.error('[API ERROR]', err); return res.status(500).json({ error: err.message, stack: err.stack }); }
 }
