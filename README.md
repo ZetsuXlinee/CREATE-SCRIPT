@@ -2,7 +2,7 @@
 
 ![Banner](https://capsule-render.vercel.app/api?type=waving&height=280&text=CiKiZz%20Create%20Script%20Bot&fontAlign=50&fontAlignY=38&fontSize=48&desc=Auto%20Generate%20WA%20%26%20Telegram%20Bot%20-%20CASE%20%7C%20ESM%20%7C%20TELEGRAF%20-%2011%20File%20Force&descAlign=50&descAlignY=62&descSize=14&color=gradient&customColorList=6,11,20&animation=fadeIn)
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Space+Grotesk&weight=700&size=22&pause=1000&center=true&vCenter=true&width=800&height=60&lines=Create+WhatsApp+Bot+in+10+seconds+⚡;No+Coding+Needed+🚀;CASE+%7C+ESM+%7C+TELEGRAM+-+3+Jalur+Beda+Code;11+Plugins+Force+-+Bukan+0B+lagi+🔥;Made+by+KizzuRyuichi+💜)](https://git.io/typing-svg)
+![Typing](https://readme-typing-svg.demolab.com?font=Space+Grotesk&weight=700&size=22&pause=1000&center=true&vCenter=true&width=800&height=60&lines=Create+WhatsApp+Bot+in+10+seconds+⚡;No+Coding+Needed+🚀;CASE+%7C+ESM+%7C+TELEGRAM+-+3+Jalur+Beda+Code;11+Plugins+Force+-+Bukan+0B+lagi+🔥;Made+by+KizzuRyuichi+💜)
 
 <p>
   <a href="https://cikizz-create-script-bot-eta.vercel.app/"><img src="https://img.shields.io/badge/🔥_LIVE_DEMO-cikizz--create--script--bot--eta.vercel.app-06b6d4?style=for-the-badge&logo=vercel&logoColor=white&labelColor=0a0b14" /></a>
