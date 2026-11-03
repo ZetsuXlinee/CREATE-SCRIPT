@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>CiKiZz -Script Generate</title>
+<title>CiKiZz - Script Generate</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -31,100 +31,41 @@
     color: var(--text-main);
     font-family: var(--font);
     min-height: 100vh;
-    overflow-x: hidden; /* Mencegah scroll samping */
+    overflow-x: hidden;
     background-image: 
       radial-gradient(circle at 15% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 40%),
       radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 40%);
     background-attachment: fixed;
   }
 
-  /* PERBAIKAN: Padding container disesuaikan untuk HP */
-  .container { 
-    max-width: 1300px; 
-    margin: 0 auto; 
-    padding: 20px 16px; /* Dikurangi dari 30px 20px agar tidak sesak */
-    position: relative; 
-    z-index: 1; 
-    width: 100%;
-  }
+  .container { max-width: 1300px; margin: 0 auto; padding: 20px 16px; position: relative; z-index: 1; width: 100%; }
 
   /* ================= HEADER ================= */
-  /* PERBAIKAN: flex-wrap agar status turun ke bawah jika layar sempit */
-  header { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 24px; 
-    flex-wrap: wrap; 
-    gap: 16px; 
-  }
+  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
   .brand { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 200px; }
-  .brand-icon { 
-    width: 50px; height: 50px; background: linear-gradient(135deg, var(--aero-cyan), var(--aero-blue)); 
-    border-radius: 16px; display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3), inset 0 2px 5px rgba(255,255,255,0.4);
-    border: 1px solid rgba(255,255,255,0.3);
-    flex-shrink: 0;
-  }
+  .brand-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--aero-cyan), var(--aero-blue)); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3), inset 0 2px 5px rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.3); flex-shrink: 0; }
   .brand-text h1 { font-size: 24px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1; }
   .brand-text p { font-size: 12px; color: var(--aero-cyan); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
-  
-  .status { 
-    display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; 
-    color: #000; background: linear-gradient(to bottom, #a3e635, #65a30d); 
-    padding: 10px 20px; border-radius: 50px; border: 1px solid #bef264;
-    box-shadow: 0 5px 15px rgba(163, 230, 53, 0.3), inset 0 2px 2px rgba(255,255,255,0.8);
-    flex-shrink: 0;
-  }
+  .status { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; color: #000; background: linear-gradient(to bottom, #a3e635, #65a30d); padding: 10px 20px; border-radius: 50px; border: 1px solid #bef264; box-shadow: 0 5px 15px rgba(163, 230, 53, 0.3), inset 0 2px 2px rgba(255,255,255,0.8); flex-shrink: 0; }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: #000; animation: pulse 2s infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
   /* ================= LAYOUT ================= */
-  /* PERBAIKAN: minmax(0, 1fr) agar grid tidak memaksa melebar */
   .layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 24px; align-items: start; width: 100%; }
   @media (max-width: 1024px) { .layout { grid-template-columns: 1fr; } }
-
   .main { width: 100%; min-width: 0; }
 
   /* ================= GLASS BENTO CARDS ================= */
-  .bento { 
-    background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px; 
-    padding: 20px; /* Sedikit dikurangi untuk HP */
-    margin-bottom: 20px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    box-shadow: var(--glass-shadow), inset 0 0 20px rgba(255,255,255,0.02);
-    position: relative; overflow: hidden; width: 100%;
-  }
-  .bento::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.06), transparent);
-    pointer-events: none; border-radius: 24px 24px 0 0;
-  }
-
+  .bento { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; margin-bottom: 20px; backdrop-filter: blur(20px); box-shadow: var(--glass-shadow), inset 0 0 20px rgba(255,255,255,0.02); position: relative; overflow: hidden; width: 100%; }
+  .bento::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%; background: linear-gradient(to bottom, rgba(255,255,255,0.06), transparent); pointer-events: none; border-radius: 24px 24px 0 0; }
   .sec-title { font-size: 13px; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px; }
-  .sec-title .ic { 
-    width: 32px; height: 32px; background: rgba(255,255,255,0.05); 
-    border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--glass-border);
-    flex-shrink: 0;
-  }
+  .sec-title .ic { width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--glass-border); flex-shrink: 0; }
 
   /* ================= BUTTONS ================= */
   .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; }
-  
-  .btn-opt { 
-    background: linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, rgba(0,0,0,0.1) 100%);
-    border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; 
-    padding: 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; 
-    transition: all 0.2s; position: relative; overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2);
-    width: 100%;
-  }
+  .btn-opt { background: linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, rgba(0,0,0,0.1) 100%); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.2s; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2); width: 100%; }
   .btn-opt:hover { background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.1) 100%); transform: translateY(-2px); }
-  .btn-opt.active { 
-    border-color: var(--aero-cyan); 
-    background: linear-gradient(to bottom, rgba(6, 182, 212, 0.25) 0%, rgba(6, 182, 212, 0.05) 100%);
-    box-shadow: 0 0 20px rgba(6, 182, 212, 0.2), inset 0 2px 5px rgba(255,255,255,0.4);
-  }
+  .btn-opt.active { border-color: var(--aero-cyan); background: linear-gradient(to bottom, rgba(6, 182, 212, 0.25) 0%, rgba(6, 182, 212, 0.05) 100%); box-shadow: 0 0 20px rgba(6, 182, 212, 0.2), inset 0 2px 5px rgba(255,255,255,0.4); }
   .btn-opt .svg-ic { width: 36px; height: 36px; border-radius: 10px; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; flex-shrink: 0; }
   .btn-opt.active .svg-ic { background: linear-gradient(135deg, var(--aero-cyan), var(--aero-blue)); border-color: #fff; box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); }
   .btn-opt .svg-ic svg { width: 20px; height: 20px; stroke: var(--text-muted); transition: 0.2s; }
@@ -140,11 +81,7 @@
   /* ================= INPUTS ================= */
   .input-box { display: flex; flex-direction: column; gap: 6px; width: 100%; }
   .input-box label { font-size: 11px; font-weight: 800; color: #cbd5e1; margin-left: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .input-field { 
-    width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 12px; 
-    padding: 14px; color: #fff; font-family: var(--mono); font-size: 13px; 
-    outline: none; transition: 0.2s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
-  }
+  .input-field { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 12px; padding: 14px; color: #fff; font-family: var(--mono); font-size: 13px; outline: none; transition: 0.2s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
   .input-field:focus { border-color: var(--aero-cyan); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5), 0 0 15px rgba(6, 182, 212, 0.2); background: rgba(0,0,0,0.6); }
   .input-field::placeholder { color: #475569; }
 
@@ -160,12 +97,7 @@
 
   /* ================= FEATURE CHIPS ================= */
   .feat-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
-  .feat-chip { 
-    background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(0,0,0,0.2)); 
-    border: 1px solid var(--glass-border); border-radius: 30px; 
-    padding: 8px 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; 
-    cursor: pointer; transition: 0.2s; user-select: none; box-shadow: inset 0 1px 2px rgba(255,255,255,0.1);
-  }
+  .feat-chip { background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(0,0,0,0.2)); border: 1px solid var(--glass-border); border-radius: 30px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; user-select: none; box-shadow: inset 0 1px 2px rgba(255,255,255,0.1); }
   .feat-chip:hover { background: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(0,0,0,0.2)); }
   .feat-chip.active { border-color: var(--aero-cyan); background: linear-gradient(to bottom, rgba(6, 182, 212, 0.25), rgba(6, 182, 212, 0.05)); box-shadow: 0 0 15px rgba(6, 182, 212, 0.2); }
   .feat-chip .check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--text-muted); display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
@@ -174,11 +106,7 @@
   .feat-chip.active .check svg { display: block; }
 
   /* ================= WARNING BOX ================= */
-  .warn-box { 
-    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(0,0,0,0.4)); 
-    border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 24px; 
-    padding: 20px; margin-bottom: 24px; position: relative; overflow: hidden; width: 100%;
-  }
+  .warn-box { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(0,0,0,0.4)); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 24px; padding: 20px; margin-bottom: 24px; position: relative; overflow: hidden; width: 100%; }
   .warn-box h4 { color: var(--warning); font-size: 14px; font-weight: 900; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
   .warn-box p { font-size: 13px; color: #e2e8f0; margin-bottom: 16px; font-weight: 500; }
   .warn-code { display: flex; justify-content: space-between; align-items: center; background: #000; padding: 12px 16px; border-radius: 12px; font-family: var(--mono); font-size: 13px; color: var(--aero-cyan); margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 5px rgba(0,0,0,0.8); width: 100%; }
@@ -186,107 +114,35 @@
   .btn-copy:hover { transform: translateY(-2px); }
 
   /* ================= GENERATE BUTTON ================= */
-  .btn-gen { 
-    width: 100%; padding: 18px; border: 1px solid #fff; border-radius: 50px; 
-    background: linear-gradient(to bottom, #22d3ee 0%, #0284c7 50%, #0369a1 100%); 
-    color: #fff; font-size: 16px; font-weight: 900; font-family: var(--font); letter-spacing: 1px;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; 
-    box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3), inset 0 4px 10px rgba(255,255,255,0.6), inset 0 -4px 10px rgba(0,0,0,0.3); 
-    transition: all 0.2s; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-  }
+  .btn-gen { width: 100%; padding: 18px; border: 1px solid #fff; border-radius: 50px; background: linear-gradient(to bottom, #22d3ee 0%, #0284c7 50%, #0369a1 100%); color: #fff; font-size: 16px; font-weight: 900; font-family: var(--font); letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3), inset 0 4px 10px rgba(255,255,255,0.6), inset 0 -4px 10px rgba(0,0,0,0.3); transition: all 0.2s; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
   .btn-gen:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(6, 182, 212, 0.5), inset 0 4px 10px rgba(255,255,255,0.8); }
   .btn-gen:active { transform: translateY(2px); box-shadow: 0 5px 15px rgba(6, 182, 212, 0.3); }
   .btn-gen:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 
   /* ================= IPHONE 15 PRO MOCKUP ================= */
   .sidebar { position: sticky; top: 24px; display: flex; flex-direction: column; align-items: center; width: 100%; }
-  
-  /* PERBAIKAN: Gunakan max-width 100% agar tidak overflow di layar kecil */
-  .iphone-frame { 
-    width: 100%; 
-    max-width: 340px; 
-    height: 680px; 
-    background: #000; 
-    border-radius: 50px; 
-    padding: 10px; 
-    box-shadow: 
-      0 0 0 4px #333, 
-      0 0 0 8px #111, 
-      0 20px 50px rgba(0,0,0,0.8),
-      inset 0 0 20px rgba(255,255,255,0.1); 
-    position: relative; 
-    overflow: hidden;
-    display: flex; flex-direction: column;
-    margin: 0 auto;
-  }
-  
-  /* Dynamic Island */
-  .dynamic-island { 
-    position: absolute; top: 20px; left: 50%; transform: translateX(-50%); 
-    width: 100px; height: 28px; background: #000; border-radius: 20px; z-index: 100; 
-    display: flex; justify-content: flex-end; align-items: center; padding-right: 10px;
-  }
+  .iphone-frame { width: 100%; max-width: 340px; height: 680px; background: #000; border-radius: 50px; padding: 10px; box-shadow: 0 0 0 4px #333, 0 0 0 8px #111, 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.1); position: relative; overflow: hidden; display: flex; flex-direction: column; margin: 0 auto; }
+  .dynamic-island { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 100px; height: 28px; background: #000; border-radius: 20px; z-index: 100; display: flex; justify-content: flex-end; align-items: center; padding-right: 10px; }
   .camera-lens { width: 10px; height: 10px; background: #111; border-radius: 50%; border: 1px solid #333; box-shadow: inset 0 0 5px #000; }
-
-  /* iOS Screen inside iPhone */
-  .ios-screen { 
-    background: #0b141a; border-radius: 40px; overflow: hidden; width: 100%; height: 100%; 
-    position: relative; display: flex; flex-direction: column; 
-  }
-
-  /* Status Bar iOS */
-  .ios-status { 
-    height: 48px; padding: 16px 20px 0; display: flex; justify-content: space-between; align-items: center; 
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-    font-size: 13px; font-weight: 600; color: #fff; z-index: 10;
-  }
+  .ios-screen { background: #0b141a; border-radius: 40px; overflow: hidden; width: 100%; height: 100%; position: relative; display: flex; flex-direction: column; }
+  .ios-status { height: 48px; padding: 16px 20px 0; display: flex; justify-content: space-between; align-items: center; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 600; color: #fff; z-index: 10; }
   .ios-icons { display: flex; gap: 4px; align-items: center; }
-
-  /* WA iOS Header */
-  .wa-header { 
-    background: #1f2c34; padding: 6px 10px 10px; display: flex; align-items: center; gap: 6px; 
-    border-bottom: 1px solid rgba(0,0,0,0.5); z-index: 9;
-  }
+  .wa-header { background: #1f2c34; padding: 6px 10px 10px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid rgba(0,0,0,0.5); z-index: 9; }
   .wa-back { color: #00a884; display: flex; align-items: center; gap: 2px; font-size: 14px; cursor: pointer; }
   .wa-av { width: 32px; height: 32px; border-radius: 50%; background: #2a3942; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; color: #fff; margin-left: 2px; }
   .wa-info { flex: 1; text-align: center; }
   .wa-info h4 { font-size: 14px; font-weight: 600; color: #fff; }
   .wa-info p { font-size: 10px; color: #8696a0; }
   .wa-actions { color: #00a884; display: flex; gap: 12px; align-items: center; }
-
-  /* WA iOS Chat Area */
-  .wa-chat { 
-    padding: 12px 10px; flex: 1; overflow-y: auto; 
-    background-color: #0b141a;
-    background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); 
-    background-size: 250px; background-blend-mode: overlay;
-    display: flex; flex-direction: column;
-  }
-  
-  /* iOS Bubble */
-  .bubble { 
-    background: #1f2c34; padding: 10px 12px; border-radius: 16px 16px 16px 4px; 
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-    font-size: 12.5px; color: #e9edef; line-height: 1.4; max-width: 90%; margin-bottom: 4px; 
-    white-space: pre-wrap; word-wrap: break-word; box-shadow: 0 1px 1px rgba(0,0,0,0.2); 
-    align-self: flex-start;
-  }
+  .wa-chat { padding: 12px 10px; flex: 1; overflow-y: auto; background-color: #0b141a; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: 250px; background-blend-mode: overlay; display: flex; flex-direction: column; }
+  .bubble { background: #1f2c34; padding: 10px 12px; border-radius: 16px 16px 16px 4px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12.5px; color: #e9edef; line-height: 1.4; max-width: 90%; margin-bottom: 4px; white-space: pre-wrap; word-wrap: break-word; box-shadow: 0 1px 1px rgba(0,0,0,0.2); align-self: flex-start; }
   .bubble .time { font-size: 9px; color: #8696a0; text-align: right; margin-top: 4px; display: flex; justify-content: flex-end; align-items: center; gap: 2px; }
-  
   .chat-img { padding: 3px; border-radius: 16px 16px 16px 4px; background: #1f2c34; margin-bottom: 4px; display: none; align-self: flex-start; max-width: 90%; }
   .chat-img img { width: 100%; border-radius: 13px; display: block; }
-  
   .chat-btns { display: none; flex-direction: column; gap: 6px; margin-top: 4px; width: 100%; align-self: flex-start; }
   .chat-btn { background: #1f2c34; color: #00a884; padding: 8px; border-radius: 8px; text-align: center; font-size: 12px; font-weight: 500; border: 1px solid rgba(0,168,132,0.3); }
-
-  /* WA iOS Input Bar */
-  .wa-input { 
-    background: #1f2c34; padding: 8px 10px 20px; display: flex; gap: 8px; align-items: center; 
-  }
-  .wa-input-box { 
-    flex: 1; background: #2a3942; border-radius: 18px; padding: 8px 14px; 
-    display: flex; align-items: center; gap: 8px; color: #8696a0; font-size: 14px;
-  }
+  .wa-input { background: #1f2c34; padding: 8px 10px 20px; display: flex; gap: 8px; align-items: center; }
+  .wa-input-box { flex: 1; background: #2a3942; border-radius: 18px; padding: 8px 14px; display: flex; align-items: center; gap: 8px; color: #8696a0; font-size: 14px; }
 
   /* ================= CONSOLE ================= */
   .console-box { background: #000; border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; font-family: var(--mono); font-size: 11px; color: var(--aero-lime); margin-top: 20px; line-height: 1.8; max-height: 150px; overflow-y: auto; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8); width: 100%; max-width: 340px; }
@@ -295,12 +151,7 @@
   /* ================= AERO MODAL ================= */
   .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 999; padding: 20px; opacity: 0; transition: 0.3s; }
   .modal.active { display: flex; opacity: 1; }
-  .modal-card { 
-    background: linear-gradient(to bottom, rgba(30,41,59,0.9), rgba(15,23,42,0.9)); 
-    border: 1px solid var(--glass-border); border-radius: 32px; width: 100%; max-width: 450px; padding: 30px 20px; 
-    text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05); 
-    transform: scale(0.9); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(20px);
-  }
+  .modal-card { background: linear-gradient(to bottom, rgba(30,41,59,0.9), rgba(15,23,42,0.9)); border: 1px solid var(--glass-border); border-radius: 32px; width: 100%; max-width: 450px; padding: 30px 20px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05); transform: scale(0.9); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(20px); }
   .modal.active .modal-card { transform: scale(1); }
   .modal-icon { width: 70px; height: 70px; background: linear-gradient(135deg, #a3e635, #65a30d); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(163, 230, 53, 0.4), inset 0 4px 10px rgba(255,255,255,0.6); border: 1px solid #bef264; }
   .modal-card h2 { font-size: 22px; font-weight: 900; margin-bottom: 10px; }
@@ -327,7 +178,7 @@
       </div>
       <div class="brand-text">
         <h1>CiKiZz</h1>
-        <p>Aero Bento Generator</p>
+        <p>Ultimate Bento Generator</p>
       </div>
     </div>
     <div class="status"><div class="dot"></div> SYSTEM ONLINE</div>
@@ -339,10 +190,7 @@
       
       <!-- 1. PLATFORM -->
       <div class="bento">
-        <div class="sec-title">
-          <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M9 3v18M15 3v18"/></svg></div>
-          Pilih Platform
-        </div>
+        <div class="sec-title"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="4"/></svg></div>Pilih Platform</div>
         <div class="grid-2">
           <div class="btn-opt wa active" data-platform="whatsapp" onclick="setPlatform('whatsapp',this)">
             <div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
@@ -357,10 +205,7 @@
 
       <!-- 2. IDENTITY -->
       <div class="bento">
-        <div class="sec-title">
-          <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-          Bot Identity
-        </div>
+        <div class="sec-title"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>Bot Identity</div>
         <div id="wa-config" class="grid-2">
           <div class="input-box"><label>Nama Bot</label><input id="botName" class="input-field" placeholder="Zetsu Bot" oninput="updatePreview()"></div>
           <div class="input-box"><label>Owner Number</label><input id="owner" class="input-field" placeholder="628xxx" oninput="updatePreview()"></div>
@@ -377,27 +222,22 @@
 
       <!-- 3. BASE CODE & MENU -->
       <div class="bento" id="base-config">
-        <div class="sec-title">
-          <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-          Base Code & Tampilan
-        </div>
+        <div class="sec-title"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>Base Code & Tampilan</div>
         <div class="grid-2">
           <div class="btn-opt active" data-base="esm" onclick="setBase('esm',this)"><div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></div><div><h4>ESM Plugin</h4><p>Modern (import)</p></div></div>
           <div class="btn-opt" data-base="case" onclick="setBase('case',this)"><div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div><h4>CASE</h4><p>Classic (switch)</p></div></div>
         </div>
-        <div class="grid-3" style="margin-top:12px">
-          <div class="btn-opt active" data-menu="premium" onclick="setMenu('premium',this)"><div><h4>Premium</h4><p>Box Menu</p></div></div>
-          <div class="btn-opt" data-menu="simple" onclick="setMenu('simple',this)"><div><h4>Simple</h4><p>Teks Polos</p></div></div>
-          <div class="btn-opt" data-menu="image" onclick="setMenu('image',this)"><div><h4>Image</h4><p>Ada Gambar</p></div></div>
+        <div class="grid-2" style="margin-top:16px">
+          <div class="btn-opt active" data-menu="1" onclick="setMenu('1',this)"><div><h4>Style 1: Premium</h4><p>Interactive</p></div></div>
+          <div class="btn-opt" data-menu="2" onclick="setMenu('2',this)"><div><h4>Style 2: Academy</h4><p>Sekolah</p></div></div>
+          <div class="btn-opt" data-menu="3" onclick="setMenu('3',this)"><div><h4>Style 3: Console</h4><p>Terminal</p></div></div>
+          <div class="btn-opt" data-menu="4" onclick="setMenu('4',this)"><div><h4>Style 4: System</h4><p>Lokasi</p></div></div>
         </div>
       </div>
 
       <!-- 4. BUTTON & THUMBNAIL -->
       <div class="bento">
-        <div class="sec-title">
-          <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-3.5-3.5-7 7"/></svg></div>
-          Tombol & Thumbnail
-        </div>
+        <div class="sec-title"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-3.5-3.5-7 7"/></svg></div>Tombol & Thumbnail</div>
         <div class="grid-2">
           <div class="btn-opt active" data-btn="nobtn" onclick="setBtn('nobtn',this)"><div><h4>Teks Biasa</h4><p>Tanpa tombol</p></div></div>
           <div class="btn-opt" data-btn="btn" onclick="setBtn('btn',this)"><div><h4>Interactive</h4><p>WhatsApp Button</p></div></div>
@@ -416,10 +256,7 @@
 
       <!-- 5. PANEL PTERODACTYL -->
       <div class="bento">
-        <div class="sec-title">
-          <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 7h20M2 17h20"/></svg></div>
-          Panel System
-        </div>
+        <div class="sec-title"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 7h20M2 17h20"/></svg></div>Panel System</div>
         <div class="toggle-row" id="panelToggle" onclick="togglePanel()">
           <div><h4>Aktifkan Fitur Panel</h4><p>Script Create Panel Pterodactyl</p></div>
           <div class="switch"></div>
@@ -434,44 +271,41 @@
 
       <!-- 6. FITUR BOT -->
       <div class="bento">
-        <div class="sec-title">
-          <div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
-          Pilih Fitur Bot (<span id="featCount" style="color:var(--aero-cyan)">0</span>)
-        </div>
-        <div id="featureContainer">
-          <div class="feat-container" style="margin-bottom:16px">
+        <div class="sec-title"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>Pilih Fitur Bot (<span id="featCount" style="color:var(--aero-cyan)">0</span>)</div>
+        
+        <div class="feat-container">
+            <!-- INFORMASI -->
             <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="menu" checked hidden>Menu</div>
             <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ping" checked hidden>Ping</div>
             <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="owner" checked hidden>Owner</div>
             <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="info" checked hidden>Info Bot</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="welcome" checked hidden>Welcome</div>
+            
+            <!-- DOWNLOADER -->
+            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="vidsave" checked hidden>VidSave (TT/IG/YT)</div>
+            
+            <!-- TOOLS -->
+            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="bypass" checked hidden>Bypass Link</div>
+            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="rch" checked hidden>React Ch</div>
+            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="iqc" checked hidden>IQC v2</div>
+            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="web2apk" checked hidden>Web2APK</div>
+            
+            <!-- AI & MAKER -->
+            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="unblur" checked hidden>Unblur AI</div>
+            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="fotolive" checked hidden>Foto Live</div>
+            
+            <!-- ADMIN -->
+            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="welcome" checked hidden>Welcome Baru</div>
             <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="antilink" checked hidden>Antilink</div>
             <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="hidetag" checked hidden>Hidetag</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="sticker" checked hidden>Sticker</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="tiktok" checked hidden>TikTok DL</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ai" checked hidden>AI Chat</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="rpg" checked hidden>RPG</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="store" checked hidden>Store</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="broadcast" checked hidden>Broadcast</div>
-          </div>
         </div>
       </div>
 
       <!-- PERINGATAN INSTALASI -->
       <div class="warn-box">
-        <h4>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          PERINGATAN INSTALASI WAJIB
-        </h4>
+        <h4><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> PERINGATAN INSTALASI WAJIB</h4>
         <p>Setelah meng-extract ZIP, jalankan perintah ini di console Pterodactyl:</p>
-        <div class="warn-code">
-          <span>1. npm install</span>
-          <button class="btn-copy" onclick="copyText('npm install')">COPY</button>
-        </div>
-        <div class="warn-code">
-          <span>2. npm install fflate</span>
-          <button class="btn-copy" onclick="copyText('npm install fflate')">COPY</button>
-        </div>
+        <div class="warn-code"><span>1. npm install</span><button class="btn-copy" onclick="copyText('npm install')">COPY</button></div>
+        <div class="warn-code"><span>2. npm install fflate</span><button class="btn-copy" onclick="copyText('npm install fflate')">COPY</button></div>
       </div>
 
       <button class="btn-gen" id="btnGen" onclick="generateScript()">
@@ -483,16 +317,9 @@
     <!-- KOLOM KANAN (PREVIEW IPHONE) -->
     <div class="sidebar">
       <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-        <!-- IPHONE FRAME MOCKUP -->
         <div class="iphone-frame">
-          <!-- Dynamic Island -->
-          <div class="dynamic-island">
-            <div class="camera-lens"></div>
-          </div>
-
-          <!-- iOS Screen -->
+          <div class="dynamic-island"><div class="camera-lens"></div></div>
           <div class="ios-screen">
-            <!-- Status Bar iOS -->
             <div class="ios-status">
               <span>12:45</span>
               <div class="ios-icons">
@@ -500,35 +327,20 @@
                 <svg width="20" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
               </div>
             </div>
-
-            <!-- WhatsApp Header iOS -->
             <div class="wa-header">
-              <div class="wa-back">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00a884" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-                <span style="font-size: 11px; font-weight: 400; margin-left: 2px;">12</span>
-              </div>
+              <div class="wa-back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00a884" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg><span style="font-size: 11px; font-weight: 400; margin-left: 2px;">12</span></div>
               <div class="wa-av" id="waAv">B</div>
-              <div class="wa-info">
-                <h4 id="waName">Nama Bot</h4>
-                <p id="waSub">online</p>
-              </div>
+              <div class="wa-info"><h4 id="waName">Nama Bot</h4><p id="waSub">online</p></div>
               <div class="wa-actions">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14v-4z"/><rect x="3" y="6" width="12" height="12" rx="2" ry="2"/></svg>
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
               </div>
             </div>
-
-            <!-- WhatsApp Chat iOS -->
             <div class="wa-chat" id="waChat">
               <div class="chat-img" id="chatImgWrap"><img id="chatImg" src=""></div>
-              <div class="bubble" id="chatBubble">
-                Isi identitas bot untuk melihat preview.
-                <div class="time">12:00 <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>
-              </div>
+              <div class="bubble" id="chatBubble">Isi identitas bot untuk melihat preview.<div class="time">12:00 <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div></div>
               <div class="chat-btns" id="chatBtns"></div>
             </div>
-
-            <!-- WhatsApp Input iOS -->
             <div class="wa-input">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8696a0" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
               <div class="wa-input-box">Pesan</div>
@@ -537,11 +349,7 @@
             </div>
           </div>
         </div>
-
-        <!-- CONSOLE -->
-        <div class="console-box" id="consoleBox">
-          <div><span>></span> System ready...</div>
-        </div>
+        <div class="console-box" id="consoleBox"><div><span>></span> System ready...</div></div>
       </div>
     </div>
   </div>
@@ -550,105 +358,31 @@
 <!-- MODAL -->
 <div class="modal" id="modalSuccess">
   <div class="modal-card">
-    <div class="modal-icon">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-    </div>
+    <div class="modal-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
     <h2>SCRIPT BERHASIL!</h2>
     <p>File ZIP kamu sedang di-download. Jangan lupa ikuti langkah di bawah ini.</p>
-    
     <div class="modal-warn">
-      <h4>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Langkah Instalasi:
-      </h4>
+      <h4><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Langkah Instalasi:</h4>
       <code>1. npm install</code>
       <code>2. npm install fflate</code>
       <code>3. npm start</code>
     </div>
-    
     <button class="btn-modal" onclick="closeModal()">MENGERTI & TUTUP</button>
   </div>
 </div>
 
 <script>
-let state = { platform: 'whatsapp', base: 'esm', menu: 'premium', btn: 'nobtn', thumb: 'nothumb', thumbData: null, usePanel: false };
+let state = { platform: 'whatsapp', base: 'esm', menu: '1', btn: 'nobtn', thumb: 'nothumb', thumbData: null, usePanel: false };
 
-function copyText(text) {
-  navigator.clipboard.writeText(text).then(() => { alert('Berhasil dicopy: ' + text); }).catch(() => alert('Gagal copy'));
-}
-
-function setPlatform(val, el) {
-  state.platform = val;
-  document.querySelectorAll('[data-platform]').forEach(e => e.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('wa-config').style.display = val === 'whatsapp' ? 'grid' : 'none';
-  document.getElementById('tele-config').style.display = val === 'telegram' ? 'grid' : 'none';
-  document.getElementById('base-config').style.display = val === 'whatsapp' ? 'block' : 'none';
-  updatePreview();
-}
-
-function setBase(val, el) {
-  state.base = val;
-  document.querySelectorAll('[data-base]').forEach(e => e.classList.remove('active'));
-  el.classList.add('active');
-  updatePreview();
-}
-
-function setMenu(val, el) {
-  state.menu = val;
-  document.querySelectorAll('[data-menu]').forEach(e => e.classList.remove('active'));
-  el.classList.add('active');
-  updatePreview();
-}
-
-function setBtn(val, el) {
-  state.btn = val;
-  document.querySelectorAll('[data-btn]').forEach(e => e.classList.remove('active'));
-  el.classList.add('active');
-  updatePreview();
-}
-
-function setThumb(val, el) {
-  state.thumb = val;
-  document.querySelectorAll('[data-thumb]').forEach(e => e.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('uploadArea').style.display = val === 'thumb' ? 'block' : 'none';
-  updatePreview();
-}
-
-function togglePanel() {
-  state.usePanel = !state.usePanel;
-  const el = document.getElementById('panelToggle');
-  el.classList.toggle('active', state.usePanel);
-  document.getElementById('panelConfig').style.display = state.usePanel ? 'grid' : 'none';
-  
-  if (state.usePanel) document.getElementById('featCount').textContent = parseInt(document.getElementById('featCount').textContent) + 1;
-  else document.getElementById('featCount').textContent = parseInt(document.getElementById('featCount').textContent) - 1;
-  updatePreview();
-}
-
-function handleImage(input) {
-  if (input.files && input.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      state.thumbData = e.target.result;
-      const img = document.getElementById('imgPreview');
-      img.src = e.target.result;
-      img.style.display = 'block';
-      updatePreview();
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
-function toggleFeat(el) {
-  const cb = el.querySelector('input');
-  cb.checked = !cb.checked;
-  el.classList.toggle('active', cb.checked);
-  let baseCount = document.querySelectorAll('#featureContainer input:checked').length;
-  document.getElementById('featCount').textContent = state.usePanel ? baseCount + 1 : baseCount;
-  updatePreview();
-}
+function copyText(text) { navigator.clipboard.writeText(text).then(() => { alert('Berhasil dicopy: ' + text); }).catch(() => alert('Gagal copy')); }
+function setPlatform(val, el) { state.platform = val; document.querySelectorAll('[data-platform]').forEach(e => e.classList.remove('active')); el.classList.add('active'); document.getElementById('wa-config').style.display = val === 'whatsapp' ? 'grid' : 'none'; document.getElementById('tele-config').style.display = val === 'telegram' ? 'grid' : 'none'; document.getElementById('base-config').style.display = val === 'whatsapp' ? 'block' : 'none'; updatePreview(); }
+function setBase(val, el) { state.base = val; document.querySelectorAll('[data-base]').forEach(e => e.classList.remove('active')); el.classList.add('active'); updatePreview(); }
+function setMenu(val, el) { state.menu = val; document.querySelectorAll('[data-menu]').forEach(e => e.classList.remove('active')); el.classList.add('active'); updatePreview(); }
+function setBtn(val, el) { state.btn = val; document.querySelectorAll('[data-btn]').forEach(e => e.classList.remove('active')); el.classList.add('active'); updatePreview(); }
+function setThumb(val, el) { state.thumb = val; document.querySelectorAll('[data-thumb]').forEach(e => e.classList.remove('active')); el.classList.add('active'); document.getElementById('uploadArea').style.display = val === 'thumb' ? 'block' : 'none'; updatePreview(); }
+function togglePanel() { state.usePanel = !state.usePanel; const el = document.getElementById('panelToggle'); el.classList.toggle('active', state.usePanel); document.getElementById('panelConfig').style.display = state.usePanel ? 'grid' : 'none'; if (state.usePanel) document.getElementById('featCount').textContent = parseInt(document.getElementById('featCount').textContent) + 1; else document.getElementById('featCount').textContent = parseInt(document.getElementById('featCount').textContent) - 1; updatePreview(); }
+function handleImage(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = function(e) { state.thumbData = e.target.result; const img = document.getElementById('imgPreview'); img.src = e.target.result; img.style.display = 'block'; updatePreview(); }; reader.readAsDataURL(input.files[0]); } }
+function toggleFeat(el) { const cb = el.querySelector('input'); cb.checked = !cb.checked; el.classList.toggle('active', cb.checked); let baseCount = document.querySelectorAll('#featureContainer input:checked').length; document.getElementById('featCount').textContent = state.usePanel ? baseCount + 1 : baseCount; updatePreview(); }
 
 function updatePreview() {
   const isWA = state.platform === 'whatsapp';
@@ -673,57 +407,41 @@ function updatePreview() {
 
   let text = '';
   if (isWA) {
-    if (state.menu === 'simple') text = `MENU ${name}\n\n${feats.map(f => '❒ .' + f).join('\n')}\n\nOwner: ${ownerName}`;
-    else if (state.menu === 'image') text = `╭━━━〔 ${name} 〕━━━\n${feats.map(f => '┃ ❒ .' + f).join('\n')}\n╰━━━\nOwner: ${ownerName}`;
-    else text = `╭━━━〔 ${name} 〕━━━✦\n┃ Owner: ${ownerName}\n┃ Nomor: ${ownerNum}\n┣━━━〔 ${feats.length} FITUR 〕━━━\n${feats.map(f => '┃ ❒ .' + f).join('\n')}\n╰━━━━━━━━━━━━━━`;
+    if (state.menu === '2') text = `⟪ EDEN ACADEMY ⟫\n═══════════════════════\n✧ Student : ${name}\n✧ Rank    : Beginner\n✧ Level   : 1\n═══════════════════════`;
+    else if (state.menu === '3') text = `[ CiKiZz CORE_ ]\n-----------------------\n> PROFILE\n  User : ${name}\n  Role : Beginner\n-----------------------\n> SYSTEM\n  Status : ONLINE\n-----------------------`;
+    else text = `╭━━━〔 ${name} 〕━━━✦\n┃ Owner: ${ownerName}\n┃ Nomor: ${ownerNum}\n┣━━━〔 ${feats.length} FITUR 〕━━━\n${feats.slice(0, 5).map(f => '┃ ❒ .' + f).join('\n')}\n┃ ...dan lainnya\n╰━━━━━━━━━━━━━━`;
   } else {
     text = `🤖 ${name}\n\n${feats.map(f => '❒ /' + f).join('\n')}\n\nOwner: ${ownerName}\nUsername: ${ownerNum}`;
   }
 
   const time = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}).replace(':','.');
-  document.getElementById('chatBubble').innerHTML = text.replace(/\n/g, '<br>') + 
-    `<div class="time">${time} <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>`;
+  document.getElementById('chatBubble').innerHTML = text.replace(/\n/g, '<br>') + `<div class="time">${time} <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>`;
 
   const imgWrap = document.getElementById('chatImgWrap');
   const imgEl = document.getElementById('chatImg');
-  if (state.thumb === 'thumb') {
-    imgWrap.style.display = 'block';
-    imgEl.src = state.thumbData || 'https://picsum.photos/seed/' + encodeURIComponent(name) + '/400/220';
-  } else if (state.menu === 'image') {
-    imgWrap.style.display = 'block';
-    imgEl.src = 'https://picsum.photos/seed/' + encodeURIComponent(name) + '/400/220';
-  } else {
-    imgWrap.style.display = 'none';
-  }
+  if (state.thumb === 'thumb') { imgWrap.style.display = 'block'; imgEl.src = state.thumbData || 'https://picsum.photos/seed/' + encodeURIComponent(name) + '/400/220'; } 
+  else if (state.menu === 'image') { imgWrap.style.display = 'block'; imgEl.src = 'https://picsum.photos/seed/' + encodeURIComponent(name) + '/400/220'; } 
+  else { imgWrap.style.display = 'none'; }
 
   const btnWrap = document.getElementById('chatBtns');
-  if (state.btn === 'btn') {
-    btnWrap.style.display = 'flex';
-    btnWrap.innerHTML = feats.slice(0, 3).map(f => `<div class="chat-btn">${f.toUpperCase()}</div>`).join('');
-  } else {
-    btnWrap.style.display = 'none';
-  }
+  if (state.btn === 'btn') { btnWrap.style.display = 'flex'; btnWrap.innerHTML = feats.slice(0, 3).map(f => `<div class="chat-btn">${f.toUpperCase()}</div>`).join(''); } 
+  else { btnWrap.style.display = 'none'; }
 
   document.getElementById('consoleBox').innerHTML = `
     <div><span>></span> Starting ${name} - ${baseLabel}</div>
     <div><span>></span> Owner: ${ownerName}</div>
     <div><span>></span> Plugins: ${feats.length} loaded</div>
-    <div><span>></span> Panel: ${state.usePanel ? 'ON' : 'OFF'}</div>
     <div style="color:var(--aero-cyan)">> Ready!</div>
   `;
 }
 
-function closeModal() {
-  document.getElementById('modalSuccess').classList.remove('active');
-}
+function closeModal() { document.getElementById('modalSuccess').classList.remove('active'); }
 
 async function generateScript() {
   const isWA = state.platform === 'whatsapp';
   const botNameInput = document.getElementById(isWA ? 'botName' : 'teleBotName').value.trim();
-  
   if (!botNameInput) return alert('Isi Nama Bot dulu ya!');
   if (isWA && !document.getElementById('owner').value.trim()) return alert('Isi Owner Number dulu!');
-  
   const teleToken = document.getElementById('teleToken')?.value.trim() || '';
   if (!isWA && !teleToken) return alert('Isi Token Telegram dulu!');
 
@@ -743,29 +461,16 @@ async function generateScript() {
     const features = [...document.querySelectorAll('#featureContainer input:checked')].map(i => i.value);
 
     const payload = {
-      botName, ownerNumber, ownerName, pairingNumber: pairing,
-      teleToken, teleUsername, platform: isWA ? 'whatsapp' : 'telegram',
-      base: state.base, menuType: state.menu, btnType: state.btn,
-      thumbType: state.thumb, thumbData: state.thumbData, 
-      features: features, 
-      usePanel: state.usePanel,
-      panelDomain: document.getElementById('panelDomain')?.value.trim() || '',
-      panelPtla: document.getElementById('panelPtla')?.value.trim() || '',
-      panelEgg: document.getElementById('panelEgg')?.value.trim() || '15',
+      botName, ownerNumber, ownerName, pairingNumber: pairing, teleToken, teleUsername, 
+      platform: isWA ? 'whatsapp' : 'telegram', base: state.base, menuType: state.menu, btnType: state.btn,
+      thumbType: state.thumb, thumbData: state.thumbData, features: features, 
+      usePanel: state.usePanel, panelDomain: document.getElementById('panelDomain')?.value.trim() || '',
+      panelPtla: document.getElementById('panelPtla')?.value.trim() || '', panelEgg: document.getElementById('panelEgg')?.value.trim() || '15',
       panelLoc: document.getElementById('panelLoc')?.value.trim() || '1'
     };
     
-    const res = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    
-    if (!res.ok) {
-      let errMsg = 'Server error (' + res.status + ')';
-      try { const errData = await res.json(); errMsg = errData.error || errMsg; } catch(_) {}
-      throw new Error(errMsg);
-    }
+    const res = await fetch('/api/generate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    if (!res.ok) { let errMsg = 'Server error (' + res.status + ')'; try { const errData = await res.json(); errMsg = errData.error || errMsg; } catch(_) {} throw new Error(errMsg); }
     
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
@@ -773,15 +478,9 @@ async function generateScript() {
     a.href = url;
     a.download = safe + '.zip';
     a.click();
-    
     document.getElementById('modalSuccess').classList.add('active');
-    
-  } catch(e) {
-    alert('Gagal generate:\n' + e.message);
-  } finally {
-    btnText.textContent = oldText;
-    btn.disabled = false;
-  }
+  } catch(e) { alert('Gagal generate:\n' + e.message); } 
+  finally { btnText.textContent = oldText; btn.disabled = false; }
 }
 
 updatePreview();
