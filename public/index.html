@@ -8,7 +8,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-  /* ================= CLEAN AERO VARIABLES ================= */
   :root {
     --bg-dark: #020617;
     --aero-cyan: #06b6d4;
@@ -23,19 +22,7 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  
-  body {
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    font-family: var(--font);
-    min-height: 100vh;
-    overflow-x: hidden;
-    background-image: 
-      radial-gradient(circle at 15% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 40%),
-      radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 40%);
-    background-attachment: fixed;
-  }
-
+  body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font); min-height: 100vh; overflow-x: hidden; background-image: radial-gradient(circle at 15% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 40%), radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 40%); background-attachment: fixed; }
   .container { max-width: 1300px; margin: 0 auto; padding: 20px 16px; position: relative; z-index: 1; width: 100%; }
 
   /* HEADER */
@@ -67,8 +54,8 @@
   .btn-opt.active .svg-ic { background: linear-gradient(135deg, var(--aero-cyan), var(--aero-blue)); border-color: #fff; box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); }
   .btn-opt .svg-ic svg { width: 20px; height: 20px; stroke: var(--text-muted); transition: 0.2s; }
   .btn-opt.active .svg-ic svg { stroke: #fff; }
-  .btn-opt h4 { font-size: 14px; font-weight: 800; }
-  .btn-opt p { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+  .btn-opt h4 { font-size: 13px; font-weight: 800; }
+  .btn-opt p { font-size: 11px; color: var(--text-muted); font-weight: 500; line-height: 1.3;}
 
   .btn-opt.wa.active { border-color: #25D366; background: linear-gradient(to bottom, rgba(37,211,102,0.25) 0%, rgba(37,211,102,0.05) 100%); box-shadow: 0 0 20px rgba(37,211,102,0.2); }
   .btn-opt.wa.active .svg-ic { background: linear-gradient(135deg, #25D366, #128C7E); }
@@ -167,7 +154,7 @@
       </div>
       <div class="brand-text">
         <h1>CiKiZz</h1>
-        <p>Buat Script Bot Kalian</p>
+        <p>Buat Script Kalian</p>
       </div>
     </div>
     <div class="status"><div class="dot"></div> SYSTEM ONLINE</div>
@@ -219,19 +206,19 @@
         <div class="grid-2" style="margin-top:16px">
           <div class="btn-opt active" data-menu="1" onclick="setMenu('1',this)">
             <div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
-            <div><h4>Style 1: Premium</h4><p>Dashboard interaktif</p></div>
+            <div><h4>Style 1: Dashboard</h4><p>Box interaktif premium</p></div>
           </div>
           <div class="btn-opt" data-menu="2" onclick="setMenu('2',this)">
             <div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
-            <div><h4>Style 2: Academy</h4><p>Tema sekolah</p></div>
+            <div><h4>Style 2: Eden Academy</h4><p>Tema pelajar elegan</p></div>
           </div>
           <div class="btn-opt" data-menu="3" onclick="setMenu('3',this)">
             <div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
-            <div><h4>Style 3: Console</h4><p>Terminal hacker</p></div>
+            <div><h4>Style 3: Cyber Console</h4><p>Terminal futuristik</p></div>
           </div>
           <div class="btn-opt" data-menu="4" onclick="setMenu('4',this)">
             <div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
-            <div><h4>Style 4: System</h4><p>Info & Lokasi</p></div>
+            <div><h4>Style 4: System Status</h4><p>Info lengkap server</p></div>
           </div>
         </div>
       </div>
@@ -275,7 +262,6 @@
         <div class="sec-title"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>Pilih Fitur Bot (<span id="featCount" style="color:var(--aero-cyan)">0</span>)</div>
         
         <div class="feat-container" id="featureContainer">
-            <!-- Fitur tidak otomatis dicentang (checked) -->
             <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="menu" hidden>Menu</div>
             <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ping" hidden>Ping</div>
             <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="owner" hidden>Owner</div>
@@ -368,6 +354,7 @@
 
 <script>
 let state = { platform: 'whatsapp', base: 'esm', menu: '1', btn: 'nobtn', thumb: 'nothumb', thumbData: null, usePanel: false };
+let typingInterval = null;
 
 // --- AESTHETIC FONTS UNTUK PREVIEW ---
 function fontBold(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D400 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D41A + n - 97); if (n >= 48 && n <= 57) return String.fromCodePoint(0x1D7CE + n - 48); return c; }).join(''); }
@@ -385,10 +372,37 @@ function togglePanel() { state.usePanel = !state.usePanel; const el = document.g
 function handleImage(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = function(e) { state.thumbData = e.target.result; const img = document.getElementById('imgPreview'); img.src = e.target.result; img.style.display = 'block'; updatePreview(); }; reader.readAsDataURL(input.files[0]); } }
 function toggleFeat(el) { const cb = el.querySelector('input'); cb.checked = !cb.checked; el.classList.toggle('active', cb.checked); updateFeatureCount(); updatePreview(); }
 
-// BUG FIX 1: Hitung fitur dengan benar
 function updateFeatureCount() {
     let baseCount = document.querySelectorAll('#featureContainer input:checked').length;
     document.getElementById('featCount').textContent = state.usePanel ? baseCount + 1 : baseCount;
+}
+
+// Logic Loading Bar Realistis
+function animateMenu3(callback, name, feats) {
+    clearInterval(typingInterval);
+    const bubble = document.getElementById('chatBubble');
+    let percent = 0;
+    
+    typingInterval = setInterval(() => {
+        percent += Math.floor(Math.random() * 15) + 5;
+        if (percent >= 100) percent = 100;
+        
+        const filled = Math.floor(percent / 10);
+        const empty = 10 - filled;
+        const bar = '■'.repeat(filled) + '□'.repeat(empty);
+        
+        let loadingTxt = `[ ${fontBold(name.toUpperCase())} CORE_ ]\n-----------------------\n> ${fontBold('BOOTING SYSTEM...')}\n  [${bar}] ${percent}%\n-----------------------`;
+        if(percent < 30) loadingTxt += `\n> Memuat Modul...`;
+        else if(percent < 70) loadingTxt += `\n> Menghubungkan API...`;
+        else loadingTxt += `\n> Menyiapkan Menu...`;
+        
+        bubble.innerHTML = loadingTxt.replace(/\n/g, '<br>');
+        
+        if (percent === 100) {
+            clearInterval(typingInterval);
+            setTimeout(() => callback(), 500); // Delay dikit sebelum menu muncul
+        }
+    }, 150);
 }
 
 function updatePreview() {
@@ -413,23 +427,29 @@ function updatePreview() {
   }
 
   let text = '';
-  // BUG FIX 2: Rendering preview untuk style 1 s/d 4 agar sesuai font aesthetic
   if (isWA) {
     if (state.menu === '1') {
-        text = `╭─── ⟡ ${fontBold(name)} ⟡ ───\n│ Good Morning, ${fontItalic(name)}\n│\n├ ⊛ ${fontSmallCaps('Role')}     : ${fontItalic('Beginner')}\n├ ⊛ ${fontSmallCaps('Level')}    : 0\n├ ⊛ ${fontSmallCaps('Limit')}    : ${fontItalic('Unlimited')}\n│\n├ ⊛ ${fontSmallCaps('Runtime')}  : 1s\n├ ⊛ ${fontSmallCaps('Commands')} : ${feats.length}\n├ ⊛ ${fontSmallCaps('Category')} : 1\n│\n╰── ■■■□□□□□□□ 30%`;
+        text = `╭─── ⟡ ${fontBold(name)} ⟡ ───\n│ Good Morning, ${fontItalic(name)}\n│\n├ ⊛ ${fontSmallCaps('Role')}     : ${fontItalic('Beginner')}\n├ ⊛ ${fontSmallCaps('Level')}    : 0\n├ ⊛ ${fontSmallCaps('Limit')}    : ${fontItalic('Unlimited')}\n│\n├ ⊛ ${fontSmallCaps('Runtime')}  : 2h 14m\n├ ⊛ ${fontSmallCaps('Commands')} : ${feats.length}\n├ ⊛ ${fontSmallCaps('Category')} : ${feats.length > 0 ? 1 : 0}\n│\n╰── ■■■■■■■■■■ 100%`;
     } else if (state.menu === '2') {
-        text = `⟪ ${fontBold('EDEN ACADEMY')} ⟫\n═══════════════════════\n✧ ${fontSmallCaps('Student')}  : ${fontItalic(name)}\n✧ ${fontSmallCaps('Rank')}     : ${fontItalic('Beginner')}\n✧ ${fontSmallCaps('Level')}    : 0\n✧ ${fontSmallCaps('Limit')}    : ${fontItalic('Unlimited')}\n\n✧ ${fontSmallCaps('Runtime')}  : 1s\n✧ ${fontSmallCaps('Commands')} : ${feats.length}\n✧ ${fontSmallCaps('Category')} : 1\n\n  ■■■□□□□□□□ 30%\n═══════════════════════\n⟡ ${fontSmallCaps('Status')} : ${fontItalic('Imperial Scholar')}`;
-    } else if (state.menu === '3') {
-        text = `[ ${fontBold('CiKiZz CORE_')} ]\n-----------------------\n> ${fontBold('PROFILE')}\n  ${fontSmallCaps('User')}      : ${fontItalic(name)}\n  ${fontSmallCaps('Role')}      : ${fontItalic('Beginner')}\n  ${fontSmallCaps('Level')}     : 0\n  ${fontSmallCaps('Limit')}     : ${fontItalic('Unlimited')}\n\n> ${fontBold('SYSTEM')}\n  ${fontSmallCaps('Status')}    : ᴏɴʟɪɴᴇ\n  ${fontSmallCaps('Runtime')}   : 1s\n  ${fontSmallCaps('Platform')}  : linux\n  ${fontSmallCaps('Node')}      : v18.0.0\n\n> ${fontBold('STATISTICS')}\n  ${fontSmallCaps('Commands')}  : ${feats.length}\n  ${fontSmallCaps('Category')}  : 1\n\n  ■■■□□□□□□□ 30%\n-----------------------`;
+        text = `⟪ ${fontBold('EDEN ACADEMY')} ⟫\n═══════════════════════\n✧ ${fontSmallCaps('Student')}  : ${fontItalic(name)}\n✧ ${fontSmallCaps('Rank')}     : ${fontItalic('Beginner')}\n✧ ${fontSmallCaps('Level')}    : 0\n✧ ${fontSmallCaps('Limit')}    : ${fontItalic('Unlimited')}\n\n✧ ${fontSmallCaps('Runtime')}  : 2h 14m\n✧ ${fontSmallCaps('Commands')} : ${feats.length}\n✧ ${fontSmallCaps('Category')} : ${feats.length > 0 ? 1 : 0}\n\n  ■■■■■■■■■■ 100%\n═══════════════════════\n⟡ ${fontSmallCaps('Status')} : ${fontItalic('Imperial Scholar')}`;
     } else if (state.menu === '4') {
-        text = `┌─✦ ${fontBold(name + ' SYSTEM')} ✦─┐\n│\n├ ⊛ ${fontSmallCaps('Mode')}     : PUBLIC\n├ ⊛ ${fontSmallCaps('Ping')}     : 10 ms\n├ ⊛ ${fontSmallCaps('Runtime')}  : 1s\n├ ⊛ ${fontSmallCaps('Users')}    : 1\n├ ⊛ ${fontSmallCaps('Chats')}    : 1\n├ ⊛ ${fontSmallCaps('Commands')} : ${feats.length}\n├ ⊛ ${fontSmallCaps('Category')} : 1\n├ ⊛ ${fontSmallCaps('Platform')} : linux\n├ ⊛ ${fontSmallCaps('RAM')}      : 50MB\n├ ⊛ ${fontSmallCaps('Status')}   : ᴏɴʟɪɴᴇ\n│\n└─ ■■■□□□□□□□ 30%\n\n   ⟡ ${fontItalic('CiKiZz is active and ready')} ⟡`;
+        text = `┌─✦ ${fontBold(name + ' SYSTEM')} ✦─┐\n│\n├ ⊛ ${fontSmallCaps('Mode')}     : PUBLIC\n├ ⊛ ${fontSmallCaps('Ping')}     : 10 ms\n├ ⊛ ${fontSmallCaps('Runtime')}  : 2h 14m\n├ ⊛ ${fontSmallCaps('Users')}    : 1\n├ ⊛ ${fontSmallCaps('Chats')}    : 1\n├ ⊛ ${fontSmallCaps('Commands')} : ${feats.length}\n├ ⊛ ${fontSmallCaps('Category')} : ${feats.length > 0 ? 1 : 0}\n├ ⊛ ${fontSmallCaps('Platform')} : linux\n├ ⊛ ${fontSmallCaps('RAM')}      : 50MB\n├ ⊛ ${fontSmallCaps('Status')}   : ᴏɴʟɪɴᴇ\n│\n└─ ■■■■■■■■■■ 100%\n\n   ⟡ ${fontItalic('CiKiZz is active and ready')} ⟡`;
     }
   } else {
     text = `🤖 ${name}\n\n${feats.map(f => '❒ /' + f).join('\n')}\n\nOwner: ${ownerName}\nUsername: ${ownerNum}`;
   }
 
-  const time = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}).replace(':','.');
-  document.getElementById('chatBubble').innerHTML = text.replace(/\n/g, '<br>') + `<div class="time">${time} <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>`;
+  // Khusus Style 3, pakai animasi
+  if (isWA && state.menu === '3') {
+      animateMenu3(() => {
+          const finalStyle3 = `[ ${fontBold(name.toUpperCase())} CORE_ ]\n-----------------------\n> ${fontBold('PROFILE')}\n  ${fontSmallCaps('User')}      : ${fontItalic(name)}\n  ${fontSmallCaps('Role')}      : ${fontItalic('Beginner')}\n  ${fontSmallCaps('Level')}     : 0\n  ${fontSmallCaps('Limit')}     : ${fontItalic('Unlimited')}\n\n> ${fontBold('SYSTEM')}\n  ${fontSmallCaps('Status')}    : ᴏɴʟɪɴᴇ\n  ${fontSmallCaps('Runtime')}   : 2h 14m 3s\n  ${fontSmallCaps('Platform')}  : linux x64\n  ${fontSmallCaps('Node')}      : v20.10.0\n\n> ${fontBold('STATISTICS')}\n  ${fontSmallCaps('Commands')}  : ${feats.length}\n  ${fontSmallCaps('Category')}  : ${feats.length > 0 ? 1 : 0}\n\n  ■■■■■■■■■■ 100%\n-----------------------`;
+          document.getElementById('chatBubble').innerHTML = finalStyle3.replace(/\n/g, '<br>') + `<div class="time">${new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}).replace(':','.')} <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>`;
+      }, name, feats);
+  } else {
+      clearInterval(typingInterval);
+      const time = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}).replace(':','.');
+      document.getElementById('chatBubble').innerHTML = text.replace(/\n/g, '<br>') + `<div class="time">${time} <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>`;
+  }
 
   const imgWrap = document.getElementById('chatImgWrap');
   const imgEl = document.getElementById('chatImg');
