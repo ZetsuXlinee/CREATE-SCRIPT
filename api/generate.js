@@ -1,4 +1,4 @@
-// api/generate.js - ULTIMATE FULL INTEGRATION (DYNAMIC MENU & ALL FEATURES)
+// api/generate.js - ULTIMATE FULL FIX (Button Support, Typing Presence, Log Console)
 import JSZip from 'jszip';
 
 export default async function handler(req, res) {
@@ -29,16 +29,14 @@ export default async function handler(req, res) {
       zip.file('thumbnail.jpg', Buffer.from(base64Data, 'base64'));
     }
 
-    const panelConfigString = usePanel ? `panel: { domain: "${panelDomain || ''}", ptla: "${panelPtla || ''}", egg: "${panelEgg || '15'}", loc: "${panelLoc || '1'}" },` : '';
+    const panelConfigString = usePanel ? `panel: { domain: "${panelDomain || ''}", ptla: "${panelPtla || ''}", egg: "${panelEgg || '15'} ", loc: "${panelLoc || '1'}" },` : '';
 
     // ================= 1. TELEGRAM =================
     if(platform === 'telegram'){
       const settingsTele = `module.exports = { botName: "${botName}", ownerName: "${ownerName}", features: ${JSON.stringify(list)} };`;
       zip.file('settings.js', settingsTele);
-      
       const pkgDeps = { telegraf: "^4.15.3", axios: "^1.7.2", "node-fetch": "^3.3.2", "moment-timezone": "^0.5.45", "jimp": "^0.22.12", "form-data": "^4.0.0" };
       zip.file('package.json', JSON.stringify({ name: safe, version: "1.0.0", type: "commonjs", dependencies: pkgDeps }, null, 2));
-      
       const buffer = await zip.generateAsync({ type: 'nodebuffer' });
       res.setHeader('Content-Type', 'application/zip');
       res.setHeader('Content-Disposition', `attachment; filename=${safe}.zip`);
@@ -47,9 +45,9 @@ export default async function handler(req, res) {
 
     // ================= 2. CASE =================
     if(base === 'case'){
+      // (Sama seperti versi sebelumnya, disingkat untuk ruang)
       const settingsCase = `module.exports = { botName: "${botName}", ownerNumber: "${ownerNumber}", ownerName: "${ownerName}", pairingNumber: "${pairingNumber}", prefix: ".", features: ${JSON.stringify(list)}, menuType: "${menuType}", btnType: "${btnType}", thumbType: "${thumbType}", ${panelConfigString} };`;
       
-      // CASE dengan Menu Dinamis & Fitur Dasar
       const indexCase = `const settings = require('./settings.js');
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, downloadMediaMessage } = require('noxleys-baileys');
 const pino = require('pino'); const fs = require('fs'); const path = require('path'); const axios = require('axios'); const os = require('os');
@@ -64,6 +62,7 @@ ${usePanel ? `global.panel = settings.panel;` : ''}
 
 ['./src/database/welcome', './src/database/welcome-bg'].forEach(d => { if(!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
 
+// FONT AESTHETIC
 function fontBold(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D400 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D41A + n - 97); if (n >= 48 && n <= 57) return String.fromCodePoint(0x1D7CE + n - 48); return c; }).join(''); }
 function fontSmallCaps(str) { const map = { 'a': 'ᴀ', 'b': 'ʙ', 'c': 'ᴄ', 'd': 'ᴅ', 'e': 'ᴇ', 'f': 'ғ', 'g': 'ɢ', 'h': 'ʜ', 'i': 'ɪ', 'j': 'ᴊ', 'k': 'ᴋ', 'l': 'ʟ', 'm': 'ᴍ', 'n': 'ɴ', 'o': 'ᴏ', 'p': 'ᴘ', 'q': 'ǫ', 'r': 'ʀ', 's': 's', 't': 'ᴛ', 'u': 'ᴜ', 'v': 'ᴠ', 'w': 'ᴡ', 'x': 'x', 'y': 'ʏ', 'z': 'ᴢ' }; return [...String(str).toLowerCase()].map(c => map[c] || c).join(''); }
 function fontItalic(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D608 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D622 + n - 97); return c; }).join(''); }
@@ -96,12 +95,16 @@ async function startBot(){
     const remoteJid = msg.key.remoteJid; const sender = msg.key.participant || remoteJid;
     let body = msg.message?.conversation || msg.message?.extendedTextMessage?.text || msg.message?.imageMessage?.caption || '';
     
+    if (body) console.log(\`\\x1b[36m[PESAN MASUK]\\x1b[0m Dari: \\x1b[33m\${sender.split('@')[0]}\\x1b[0m | Isi: \\x1b[32m\${body}\\x1b[0m\`);
+
     if(msg.key.fromMe && !body.startsWith('.')) return;
     if(!body.startsWith('.')) return;
     
+    // TYPING INDICATOR
+    await sock.sendPresenceUpdate('composing', remoteJid);
+
     const args = body.slice(1).trim().split(/ +/); const command = args.shift().toLowerCase(); const text = args.join(' ');
 
-    // MENU DINAMIS (CASE)
     if(command === 'menu' || command === 'help') {
         let textMenu = '';
         const d = { greeting: ucapan(), user: sender.split('@')[0], role: 'Beginner', level: 0, limit: 'Unlimited', runtime: runtime(), commands: settings.features.length, categories: 1 };
@@ -116,17 +119,32 @@ async function startBot(){
         } else {
             textMenu = \`┌─✦ \${fontBold(settings.botName + ' SYSTEM')} ✦─┐\\n│\\n├ ⊛ \${fontSmallCaps('Mode')}     : PUBLIC\\n├ ⊛ \${fontSmallCaps('Runtime')}  : \${d.runtime}\\n├ ⊛ \${fontSmallCaps('Commands')} : \${d.commands}\\n├ ⊛ \${fontSmallCaps('Platform')} : \${sys.platform}\\n├ ⊛ \${fontSmallCaps('RAM')}      : \${sys.ram}\\n├ ⊛ \${fontSmallCaps('Status')}   : ᴏɴʟɪɴᴇ\\n│\\n└─ ■■■■■■■■■■ 100%\`;
         }
-
-        // Tambahkan list fitur di bawah
         textMenu += \`\\n\\n╭━━━〔 \${settings.features.length} FITUR 〕━━━\\n\` + settings.features.map(f => '┃ ❒ .' + f).join('\\n') + \`\\n╰━━━━━━━━━━━━━━\`;
-
-        return await sock.sendMessage(remoteJid, { text: textMenu }, { quoted: msg });
+        
+        // LOGIKA BUTTON
+        if (settings.btnType === 'btn') {
+            try {
+                await sock.sendMessage(remoteJid, {
+                    text: textMenu,
+                    footer: 'Powered by ' + settings.botName,
+                    buttons: [
+                        { buttonId: '.menu', buttonText: { displayText: '≡ Menu' }, type: 1 },
+                        { buttonId: '.ping', buttonText: { displayText: '⟳ Ping' }, type: 1 },
+                        { buttonId: '.owner', buttonText: { displayText: '⟡ Owner' }, type: 1 }
+                    ],
+                    headerType: 1
+                }, { quoted: msg });
+            } catch (e) {
+                await sock.sendMessage(remoteJid, { text: textMenu }, { quoted: msg });
+            }
+        } else {
+            await sock.sendMessage(remoteJid, { text: textMenu }, { quoted: msg });
+        }
+        return;
     }
 
     if(command === 'ping') return await sock.sendMessage(remoteJid, { text: '🏓 Pong!' }, { quoted: msg });
     if(command === 'owner') return await sock.sendMessage(remoteJid, { text: '👑 Owner: ' + settings.ownerName }, { quoted: msg });
-    
-    // Note: Fitur kompleks seperti VidSave, Jimp, dll hanya tersedia di ESM karena butuh import module.
   });
 }
 startBot();
@@ -147,11 +165,11 @@ startBot();
       return res.send(buffer);
     }
 
-    // ================= 3. ESM (FULL FITUR DINAMIS) =================
+    // ================= 3. ESM =================
     const settingsESM = `export default { botName: "${botName}", ownerNumber: "${ownerNumber}", ownerName: "${ownerName}", pairingNumber: "${pairingNumber}", prefix: ".", features: ${JSON.stringify(list)}, menuType: "${menuType}", btnType: "${btnType}", thumbType: "${thumbType}", ${panelConfigString} };`;
     
     const indexESM = `import settings from './settings.js';
-import {makeWASocket, useMultiFileAuthState, DisconnectReason } from 'noxleys-baileys';
+import {makeWASocket, useMultiFileAuthState, DisconnectReason, downloadMediaMessage } from 'noxleys-baileys';
 import pino from 'pino'; import fs from 'fs'; import path from 'path'; import { pathToFileURL } from 'url';
 import os from 'os'; import moment from 'moment-timezone';
 
@@ -193,11 +211,16 @@ async function startBot(){
     const remoteJid = msg.key.remoteJid; const sender = msg.key.participant || remoteJid;
     let body = msg.message?.conversation || msg.message?.extendedTextMessage?.text || msg.message?.imageMessage?.caption || '';
     
+    if (body) console.log(\`\\x1b[36m[PESAN MASUK]\\x1b[0m Dari: \\x1b[33m\${sender.split('@')[0]}\\x1b[0m | Isi: \\x1b[32m\${body}\\x1b[0m\`);
+
     if (msg.key.fromMe && !body.startsWith('.')) return;
     if(body && global.db.autoreply[body.toLowerCase()]){ await sock.sendMessage(remoteJid, { text: global.db.autoreply[body.toLowerCase()] }, { quoted: msg }); return; }
     if(global.db.antilink.includes(remoteJid) && /https?:\\/\\/|www\\.|t\\.me\\//i.test(body)){ if(!msg.key.fromMe){ try{ await sock.sendMessage(remoteJid, { delete: msg.key }); }catch{} } return; }
     if(!body.startsWith('.')) return;
     
+    // TYPING INDICATOR
+    await sock.sendPresenceUpdate('composing', remoteJid);
+
     const args = body.slice(1).trim().split(/ +/); const command = args.shift().toLowerCase(); const text = args.join(' ');
     
     for(const p of plugins){ if(p.command && p.command.includes(command)){ try{ await p.handler(sock, msg, { remoteJid, sender, command, args, text, settings, isGroup: remoteJid.endsWith('@g.us') }); }catch(e){ console.error(e); } } }
@@ -220,12 +243,12 @@ startBot();
     // ================= PLUGINS =================
     const pf = zip.folder('plugins');
 
-    // MENU DINAMIS (ESM)
+    // MENU (SUPPORT BUTTON)
     if (list.includes('menu')) {
         pf.file('menu.js', `import moment from 'moment-timezone'; import fs from 'fs'; import os from 'os'; import sharp from 'sharp';
 const BOT_NAME = '${botName}'; const BOT_AUTHOR = '${ownerName}';
 const THUMB_URL = 'https://n.uguu.se/oVprmTOj.jpeg';
-async function getThumbnail() { try { const res = await fetch(THUMB_URL); return await sharp(Buffer.from(await res.arrayBuffer())).resize(300, 300).jpeg().toBuffer(); } catch { return Buffer.alloc(0); } }
+async function getThumbnail() { try { const res = await fetch(THUMB_URL); return await sharp(Buffer.from(await res.arrayBuffer())).resize(300, 300).jpeg().toBuffer(); } catch { return null; } }
 function fontBold(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D400 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D41A + n - 97); if (n >= 48 && n <= 57) return String.fromCodePoint(0x1D7CE + n - 48); return c; }).join(''); }
 function fontSmallCaps(str) { const map = { 'a': 'ᴀ', 'b': 'ʙ', 'c': 'ᴄ', 'd': 'ᴅ', 'e': 'ᴇ', 'f': 'ғ', 'g': 'ɢ', 'h': 'ʜ', 'i': 'ɪ', 'j': 'ᴊ', 'k': 'ᴋ', 'l': 'ʟ', 'm': 'ᴍ', 'n': 'ɴ', 'o': 'ᴏ', 'p': 'ᴘ', 'q': 'ǫ', 'r': 'ʀ', 's': 's', 't': 'ᴛ', 'u': 'ᴜ', 'v': 'ᴠ', 'w': 'ᴡ', 'x': 'x', 'y': 'ʏ', 'z': 'ᴢ' }; return [...String(str).toLowerCase()].map(c => map[c] || c).join(''); }
 function fontItalic(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D608 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D622 + n - 97); return c; }).join(''); }
@@ -249,8 +272,35 @@ export default { command: ['menu', 'help'], tags: ['main'], help: ['menu'], hand
     }
 
     textMenu += \`\\n\\n╭━━━〔 \${feats.length} FITUR 〕━━━\\n\` + feats.map(f => '┃ ❒ .' + f).join('\\n') + \`\\n╰━━━━━━━━━━━━━━\`;
-    const thumb = await getThumbnail();
-    await sock.sendMessage(o.remoteJid, { image: thumb, caption: textMenu }, { quoted: msg });
+    
+    // LOGIKA BUTTON DI ESM
+    if (o.settings.btnType === 'btn') {
+        try {
+            const thumb = await getThumbnail();
+            const msgPayload = {
+                text: textMenu,
+                footer: 'Powered by ' + BOT_NAME,
+                buttons: [
+                    { buttonId: '.menu', buttonText: { displayText: '≡ Menu' }, type: 1 },
+                    { buttonId: '.ping', buttonText: { displayText: '⟳ Ping' }, type: 1 },
+                    { buttonId: '.owner', buttonText: { displayText: '⟡ Owner' }, type: 1 }
+                ],
+                headerType: 1
+            };
+            if (thumb) { msgPayload.image = thumb; msgPayload.headerType = 4; }
+            await sock.sendMessage(o.remoteJid, msgPayload, { quoted: msg });
+        } catch (e) {
+            await sock.sendMessage(o.remoteJid, { text: textMenu }, { quoted: msg });
+        }
+    } else {
+        try {
+            const thumb = await getThumbnail();
+            if (thumb) await sock.sendMessage(o.remoteJid, { image: thumb, caption: textMenu }, { quoted: msg });
+            else throw new Error('no thumb');
+        } catch {
+            await sock.sendMessage(o.remoteJid, { text: textMenu }, { quoted: msg });
+        }
+    }
 } };`);
     }
 
@@ -258,7 +308,7 @@ export default { command: ['menu', 'help'], tags: ['main'], help: ['menu'], hand
     if (list.includes('vidsave')) {
         pf.file('downloader.js', `import { download } from '../lib/vidsave.js';
 export default { command: ['dl', 'tiktok', 'ig', 'yt'], tags: ['downloader'], help: ['dl <url>'], handler: async (sock, msg, o) => {
-    if (!o.args[0]) return sock.sendMessage(o.remoteJid, { text: 'Kirim URL TikTok/IG/YT!' }, { quoted: msg });
+    if (!o.args[0]) return sock.sendMessage(o.remoteJid, { text: 'Kirim URL TikTok/IG/YT!\\n\\nContoh:\\n.' + o.command + ' https://vt.tiktok.com/xxxx' }, { quoted: msg });
     await sock.sendMessage(o.remoteJid, { text: '⏳ Mendownload...' }, { quoted: msg });
     try { const res = await download(o.args[0]); await sock.sendMessage(o.remoteJid, { video: { url: res.downloadUrl }, caption: '✅ ' + res.title }, { quoted: msg }); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
 } };`);
@@ -268,7 +318,8 @@ export default { command: ['dl', 'tiktok', 'ig', 'yt'], tags: ['downloader'], he
     if (list.includes('bypass')) {
         pf.file('bypass.js', `import axios from 'axios';
 export default { command: ['bypass', 'bypass2'], tags: ['tools'], help: ['bypass <url>'], handler: async (sock, msg, o) => {
-    if (!o.text) return sock.sendMessage(o.remoteJid, { text: 'Kirim link yang mau dibypass!' }, { quoted: msg });
+    if (!o.text) return sock.sendMessage(o.remoteJid, { text: 'Kirim link yang mau dibypass!\\n\\nContoh:\\n.' + o.command + ' https://bit.ly/xxx' }, { quoted: msg });
+    await sock.sendMessage(o.remoteJid, { react: { text: '⏳', key: msg.key } }).catch(()=>{});
     try { const { data } = await axios.get('https://bypass-links.com/api/token', { headers: { Referer: 'https://bypass-links.com/' } }); const res = await axios.post('https://bypass-links.com/api/bypass', { url: o.text, bypass_token: data.token }, { headers: { Referer: 'https://bypass-links.com/', 'content-type': 'application/json' } }); await sock.sendMessage(o.remoteJid, { text: '✅ Result:\\n' + (res.data.result || res.data.url || JSON.stringify(res.data)) }, { quoted: msg }); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
 } };`);
     }
@@ -277,8 +328,9 @@ export default { command: ['bypass', 'bypass2'], tags: ['tools'], help: ['bypass
     if (list.includes('rch')) {
         pf.file('rch.js', `import axios from 'axios';
 export default { command: ['rch', 'reactch'], tags: ['tools'], help: ['rch <link> <emoji>'], handler: async (sock, msg, o) => {
-    if (!o.args[0] || !o.args[1]) return sock.sendMessage(o.remoteJid, { text: 'Format: .rch link emoji1,emoji2' }, { quoted: msg });
-    try { const tokenRes = await axios.get('https://omegatech-api.dixonomega.tech/api/tools/recaptcha-v3', { params: { sitekey: '6LemKk8sAAAAAH5PB3f1EspbMlXjtwv5C8tiMHSm', url: 'https://back.asitha.top/api', use_enterprise: 'false' } }); const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NTZmMzhjOTllNGEzOTVlOWM0ZTc3NSIsImlhdCI6MTc3NzE2NjQ0MiwiZXhwIjoxNzc3NzcxMjQyfQ.V3yZRhC5aVoFX7rwRwjIUGLH9Ly8mz4BsqgRA8ZOcH0'; const temp = await axios.post('https://back.asitha.top/api/user/get-temp-token', { recaptcha_token: tokenRes.data.token }, { headers: { Authorization: 'Bearer ' + jwt } }); await axios.post('https://back.asitha.top/api/channel/react-to-post?apiKey=' + temp.data.token, { post_link: o.args[0], reacts: o.args[1] }, { headers: { Authorization: 'Bearer ' + jwt } }); await sock.sendMessage(o.remoteJid, { text: '✅ Reaction sent!' }, { quoted: msg }); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
+    if (!o.args[0] || !o.args[1]) return sock.sendMessage(o.remoteJid, { text: 'Format Salah!\\n\\nContoh:\\n.' + o.command + ' https://whatsapp.com/channel/xxx 😭,🔥\\n\\n(Maks 4 emoji dipisah koma)' }, { quoted: msg });
+    await sock.sendMessage(o.remoteJid, { react: { text: '🕒', key: msg.key } }).catch(()=>{});
+    try { const tokenRes = await axios.get('https://omegatech-api.dixonomega.tech/api/tools/recaptcha-v3', { params: { sitekey: '6LemKk8sAAAAAH5PB3f1EspbMlXjtwv5C8tiMHSm', url: 'https://back.asitha.top/api', use_enterprise: 'false' } }); const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NTZmMzhjOTllNGEzOTVlOWM0ZTc3NSIsImlhdCI6MTc3NzE2NjQ0MiwiZXhwIjoxNzc3NzcxMjQyfQ.V3yZRhC5aVoFX7rwRwjIUGLH9Ly8mz4BsqgRA8ZOcH0'; const temp = await axios.post('https://back.asitha.top/api/user/get-temp-token', { recaptcha_token: tokenRes.data.token }, { headers: { Authorization: 'Bearer ' + jwt } }); await axios.post('https://back.asitha.top/api/channel/react-to-post?apiKey=' + temp.data.token, { post_link: o.args[0], reacts: o.args.slice(1).join(' ') }, { headers: { Authorization: 'Bearer ' + jwt } }); await sock.sendMessage(o.remoteJid, { react: { text: '✅', key: msg.key } }).catch(()=>{}); await sock.sendMessage(o.remoteJid, { text: '🔥 Reactions sent successfully.' }, { quoted: msg }); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
 } };`);
     }
 
@@ -286,19 +338,22 @@ export default { command: ['rch', 'reactch'], tags: ['tools'], help: ['rch <link
     if (list.includes('iqc')) {
         pf.file('iqc.js', `import axios from 'axios'; import FormData from 'form-data';
 export default { command: ['iqc', 'iqcv2'], tags: ['maker'], help: ['iqc <text>'], handler: async (sock, msg, o) => {
-    let text = o.text || 'Hello World';
+    let text = o.text;
+    if (!text && !msg.message.imageMessage && !msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage) return sock.sendMessage(o.remoteJid, { text: 'Kirim gambar atau reply + caption\\n\\nContoh:\\n.' + o.command + ' halo cihuyy' }, { quoted: msg });
+    
+    await sock.sendMessage(o.remoteJid, { react: { text: '⏳', key: msg.key } }).catch(()=>{});
     let imgUrl = '';
     if (msg.message.imageMessage || msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage) {
         try { const buf = await sock.downloadMediaMessage(msg); const form = new FormData(); form.append('files[]', buf, 'img.jpg'); const res = await axios.post('https://uguu.se/upload.php', form, { headers: form.getHeaders() }); imgUrl = res.data.files[0].url; } catch {}
     }
-    try { const res = await axios.post('https://brat.siputzx.my.id/v2/iphone-quoted', { sender: 'other', message: text, imageUrl: imgUrl, status: { carrierName: 'INDOSAT', batteryPercentage: 88, signalStrength: 4, wifi: true }, emojiStyle: 'apple' }, { headers: { 'Content-Type': 'application/json' }, responseType: 'arraybuffer' }); await sock.sendMessage(o.remoteJid, { image: Buffer.from(res.data) }, { quoted: msg }); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
+    try { const res = await axios.post('https://brat.siputzx.my.id/v2/iphone-quoted', { sender: 'other', message: text || ' ', imageUrl: imgUrl, status: { carrierName: 'INDOSAT', batteryPercentage: 88, signalStrength: 4, wifi: true }, emojiStyle: 'apple' }, { headers: { 'Content-Type': 'application/json' }, responseType: 'arraybuffer' }); await sock.sendMessage(o.remoteJid, { image: Buffer.from(res.data) }, { quoted: msg }); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
 } };`);
     }
 
     // WEB2APK
     if (list.includes('web2apk')) {
         pf.file('web2apk.js', `export default { command: ['web2apk'], tags: ['tools'], help: ['web2apk <url>'], handler: async (sock, msg, o) => {
-    if (!o.args[0]) return sock.sendMessage(o.remoteJid, { text: 'Kirim URL website!' }, { quoted: msg });
+    if (!o.args[0]) return sock.sendMessage(o.remoteJid, { text: 'Kirim URL website!\\n\\nContoh:\\n.' + o.command + ' https://google.com' }, { quoted: msg });
     await sock.sendMessage(o.remoteJid, { text: '⏳ Building APK...' }, { quoted: msg });
     try { const res = await fetch('https://code-v-compiler-sr.vercel.app/api/build', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: o.args[0], appName: 'MyApp', packageName: 'com.myapp' }) }); const data = await res.json(); let attempts = 0; while(attempts < 30) { await new Promise(r=>setTimeout(r,2000)); const poll = await (await fetch('https://code-v-compiler-sr.vercel.app/api/build/' + data.build_id)).json(); if(poll.status === 'ready') { await sock.sendMessage(o.remoteJid, { document: { url: 'https://code-v-compiler-sr.vercel.app' + poll.download_url }, mimetype: 'application/vnd.android.package-archive', fileName: 'app.apk' }, { quoted: msg }); return; } attempts++; } throw new Error('Timeout'); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
 } };`);
@@ -308,7 +363,7 @@ export default { command: ['iqc', 'iqcv2'], tags: ['maker'], help: ['iqc <text>'
     if (list.includes('unblur')) {
         pf.file('unblur.js', `import crypto from 'crypto';
 export default { command: ['unblur'], tags: ['ai'], help: ['unblur'], handler: async (sock, msg, o) => {
-    if (!msg.message.imageMessage && !msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage) return sock.sendMessage(o.remoteJid, { text: 'Kirim/reply gambar buram!' }, { quoted: msg });
+    if (!msg.message.imageMessage && !msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage) return sock.sendMessage(o.remoteJid, { text: 'Kirim/reply gambar buram!\\n\\nContoh:\\nKirim gambar + caption .' + o.command }, { quoted: msg });
     await sock.sendMessage(o.remoteJid, { text: '⏳ Processing...' }, { quoted: msg });
     try { const buf = await sock.downloadMediaMessage(msg); const form = new FormData(); form.append('original_image_file', new Blob([buf], { type: 'image/png' }), 'image.png'); const dev = 'fallback_' + crypto.randomBytes(6).toString('hex'); const res = await fetch('https://api.unwatermark.ai/api/web/unblurimage/v1/image-unblur-v2/create-job', { method: 'POST', headers: { 'Product-Code': '067003', 'Product-Serial': dev, Origin: 'https://unblurimage.ai', Referer: 'https://unblurimage.ai/' }, body: form }); const data = await res.json(); if(!data.result) throw new Error('Gagal buat job'); let out = null; for(let i=0; i<20; i++) { await new Promise(r=>setTimeout(r,2000)); const poll = await (await fetch('https://api.unwatermark.ai/api/web/unblurimage/v1/image-unblur-v2/get-job/' + data.result.job_id, { headers: { 'Product-Code': '067003', 'Product-Serial': dev } })).json(); if(poll.result?.status === 1) { out = poll.result.output_url?.[0]; break; } } await sock.sendMessage(o.remoteJid, { image: { url: out }, caption: '✅ Selesai!' }, { quoted: msg }); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
 } };`);
@@ -316,10 +371,32 @@ export default { command: ['unblur'], tags: ['ai'], help: ['unblur'], handler: a
 
     // FOTOLIVE
     if (list.includes('fotolive')) {
-        pf.file('fotolive.js', `import fs from 'fs'; import os from 'os'; import path from 'path'; import ffmpeg from 'fluent-ffmpeg'; import { downloadContentFromMessage, prepareWAMessageMedia, generateWAMessageFromContent } from 'noxleys-baileys';
+        pf.file('fotolive.js', `import fs from 'fs'; import os from 'os'; import path from 'path'; import ffmpeg from 'fluent-ffmpeg'; 
+import { downloadMediaMessage, prepareWAMessageMedia, generateWAMessageFromContent } from 'noxleys-baileys';
 export default { command: ['fotolive', 'livephoto'], tags: ['maker'], help: ['fotolive'], handler: async (sock, msg, o) => {
+    const q = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+    const isVideo = msg.message.videoMessage || q?.videoMessage;
+    if (!isVideo) return sock.sendMessage(o.remoteJid, { text: 'Balas/reply video yang valid untuk dijadikan Live Photo!\\n\\nContoh:\\nReply video + ketik .' + o.command }, { quoted: msg });
+
     const vid = path.join(os.tmpdir(), 'vid_'+Date.now()+'.mp4'); const thumb = path.join(os.tmpdir(), 'thumb_'+Date.now()+'.jpg');
-    try { const buf = await sock.downloadMediaMessage(msg); fs.writeFileSync(vid, buf); await new Promise((res,rej)=>{ ffmpeg(vid).outputOptions(['-vframes 1']).output(thumb).on('end',res).on('error',rej).run(); }); const tBuf = fs.readFileSync(thumb); const iM = await prepareWAMessageMedia({ image: tBuf }, { upload: sock.waUploadToServer }); const vM = await prepareWAMessageMedia({ video: buf }, { upload: sock.waUploadToServer }); const pMsg = generateWAMessageFromContent(o.remoteJid, { imageMessage: { ...iM.imageMessage, contextInfo: { pairedMediaType: 5, statusSourceType: 0 } } }, { quoted: msg }); await sock.relayMessage(o.remoteJid, pMsg.message, { messageId: pMsg.key.id }); await sock.relayMessage(o.remoteJid, { videoMessage: { ...vM.videoMessage, contextInfo: { pairedMediaType: 6, statusSourceType: 0 } }, messageContextInfo: { messageAssociation: { associationType: 12, parentMessageKey: pMsg.key } } }, {}); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); } finally { try { fs.unlinkSync(vid); fs.unlinkSync(thumb); } catch {} }
+    await sock.sendMessage(o.remoteJid, { react: { text: '⏳', key: msg.key } }).catch(()=>{});
+    await sock.sendMessage(o.remoteJid, { text: '⏳ Memproses Live Photo...' }, { quoted: msg });
+
+    try { 
+        const buf = await downloadMediaMessage(msg, 'buffer', {}); 
+        fs.writeFileSync(vid, buf); 
+        await new Promise((res,rej)=>{ ffmpeg(vid).outputOptions(['-vframes 1']).output(thumb).on('end',res).on('error',rej).run(); }); 
+        const tBuf = fs.readFileSync(thumb); 
+        const iM = await prepareWAMessageMedia({ image: tBuf }, { upload: sock.waUploadToServer }); 
+        const vM = await prepareWAMessageMedia({ video: buf }, { upload: sock.waUploadToServer }); 
+        const pMsg = generateWAMessageFromContent(o.remoteJid, { imageMessage: { ...iM.imageMessage, contextInfo: { pairedMediaType: 5, statusSourceType: 0 } } }, { quoted: msg }); 
+        await sock.relayMessage(o.remoteJid, pMsg.message, { messageId: pMsg.key.id }); 
+        await sock.relayMessage(o.remoteJid, { videoMessage: { ...vM.videoMessage, contextInfo: { pairedMediaType: 6, statusSourceType: 0 } }, messageContextInfo: { messageAssociation: { associationType: 12, parentMessageKey: pMsg.key } } }, {}); 
+        await sock.sendMessage(o.remoteJid, { react: { text: '✅', key: msg.key } }).catch(()=>{});
+    } catch(e) { 
+        await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); 
+        await sock.sendMessage(o.remoteJid, { react: { text: '❌', key: msg.key } }).catch(()=>{});
+    } finally { try { fs.unlinkSync(vid); fs.unlinkSync(thumb); } catch {} }
 } };`);
     }
 
