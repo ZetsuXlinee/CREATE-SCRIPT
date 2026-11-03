@@ -1,4 +1,4 @@
-// api/generate.js - FULL FIX (Sintaks Panel.js Diperbaiki)
+// api/generate.js - FULL FIX (Panel 204 Delete & Environment Variables)
 import JSZip from 'jszip';
 
 export default async function handler(req, res) {
@@ -40,7 +40,6 @@ export default async function handler(req, res) {
 
     // ================= 1. TELEGRAM =================
     if(platform === 'telegram'){
-      // (Kode Telegram disingkat karena fokus ke WA/ESM)
       const settingsTele = `module.exports = { botName: "${botName}", ownerName: "${ownerName}", features: ${JSON.stringify(list)} };`;
       zip.file('settings.js', settingsTele);
       zip.file('package.json', JSON.stringify({ name: safe, version: "1.0.0", type: "commonjs", dependencies: { telegraf: "^4.15.3" } }, null, 2));
@@ -72,7 +71,16 @@ ${usePanel ? `global.panel = settings.panel;` : ''}
 const botName = settings.botName; const owner = settings.ownerNumber; const ownerName = settings.ownerName; const pairingNumber = settings.pairingNumber;
 const quotes = ['Jangan berhenti ketika lelah, berhentilah ketika selesai.', 'Kesuksesan adalah hasil kerja keras dan doa.', 'Hidup itu seperti sepeda, untuk seimbang harus bergerak.'];
 
-console.log('Starting CASE ' + botName + ' - ' + ownerName);
+console.log(\`
+\\x1b[36m==================================================\\x1b[0m
+\\x1b[35m  🤖 BOT WHATSAPP STARTING... (CASE MODE)\\x1b[0m
+\\x1b[36m==================================================\\x1b[0m
+  \\x1b[33m»\\x1b[0m Nama Bot   : \\x1b[32m\${botName}\\x1b[0m
+  \\x1b[33m»\\x1b[0m Owner      : \\x1b[32m\${ownerName}\\x1b[0m
+  \\x1b[33m»\\x1b[0m Engine     : \\x1b[36mNoxleys Baileys\\x1b[0m
+  \\x1b[33m»\\x1b[0m Total Fitur: \\x1b[33m\${settings.features.length} Fitur\\x1b[0m
+\\x1b[36m==================================================\\x1b[0m
+\`);
 
 async function startBot(){
   const { state, saveCreds } = await useMultiFileAuthState('session');
@@ -80,12 +88,25 @@ async function startBot(){
   sock.ev.on('creds.update', saveCreds);
   
   if(!state.creds.registered){
-    setTimeout(async()=>{ try{ const code = await sock.requestPairingCode(pairingNumber); console.log('Pairing Code ' + botName + ': ' + code); }catch(e){} }, 3000);
+    setTimeout(async()=>{ 
+      try{ 
+        const code = await sock.requestPairingCode(pairingNumber); 
+        console.log(\`\\n\\x1b[33m[ PAIRING CODE ]\\x1b[0m \\x1b[32m\${code}\\x1b[0m\\n\\x1b[90mMasukkan kode di atas ke WhatsApp kamu.\\x1b[0m\\n\`); 
+      }catch(e){} 
+    }, 3000);
   }
   
   sock.ev.on('connection.update', (u)=>{
-    if(u.connection === 'open') console.log(botName + ' Connected!');
-    if(u.connection === 'close'){ const r = u.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut; if(r) setTimeout(()=>startBot(), 3000); }
+    if(u.connection === 'open') {
+        console.log(\`\\n\\x1b[32m[ SUCCESS ] \${botName} Connected to WhatsApp!\\x1b[0m\\n\`);
+    }
+    if(u.connection === 'close'){ 
+        const r = u.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut; 
+        if(r) {
+            console.log(\`\\n\\x1b[31m[ WARNING ] Koneksi terputus. Mencoba menghubungkan ulang...\\x1b[0m\\n\`);
+            setTimeout(()=>startBot(), 3000); 
+        }
+    }
   });
   
   sock.ev.on('group-participants.update', async (update) => {
@@ -105,7 +126,7 @@ async function startBot(){
     const remoteJid = msg.key.remoteJid; const sender = msg.key.participant || remoteJid;
     let body = msg.message?.conversation || msg.message?.extendedTextMessage?.text || msg.message?.imageMessage?.caption || '';
     
-    if (body) console.log('[PESAN MASUK] Dari: ' + sender + ' | Isi: ' + body);
+    if (body) console.log(\`\\x1b[90m[PESAN]\\x1b[0m \${sender.split('@')[0]} : \${body}\`);
     if(msg.key.fromMe && !body.startsWith('.')) return;
     
     if(body && global.db.autoreply[body.toLowerCase()]){ await sock.sendMessage(remoteJid, { text: global.db.autoreply[body.toLowerCase()] }, { quoted: msg }); return; }
@@ -169,22 +190,45 @@ async function startBot(){
         const { domain, ptla, egg, loc } = global.panel || {};
         if (!domain || !ptla) return sock.sendMessage(remoteJid, { text: "❌ Panel belum disetting di settings.js" }, { quoted: msg });
         if (command === "pannel") return sock.sendMessage(remoteJid, { text: \`☁️ MENU PANEL\\n\\n1GB - 10GB\\nUNLI\\ncreateadmin\\nlistpanel\\nlistadmin\\ndelpanel <id>\\ndeladmin <id>\` }, { quoted: msg });
+
+        const cleanDomain = domain.replace(/\\/$/, "");
+        const requestAPI = async (url, options = {}) => {
+            const headers = { "Accept": "application/json", "Content-Type": "application/json", "User-Agent": "Mozilla/5.0", ...options.headers };
+            const res = await fetch(url, { ...options, headers });
+            if (res.status === 204) return { status: 'success' };
+            const text = await res.text();
+            if (!text) return { status: 'success' };
+            try { return JSON.parse(text); } catch (e) { throw new Error(\`Panel Error (\${res.status}): URL tidak valid atau diblokir.\`); }
+        };
+
         try {
-          if (command === "listpanel") { let res = await fetch(domain + "/api/application/servers", { headers: { Authorization: "Bearer " + ptla } }); let data = await res.json(); if (!data.data?.length) return sock.sendMessage(remoteJid, { text: "Tidak ada server" }, { quoted: msg }); let txt = "📦 LIST SERVER\\n\\n"; data.data.forEach(s => { txt += \`ID: \${s.attributes.id}\\nName: \${s.attributes.name}\\nRAM: \${s.attributes.limits.memory == 0 ? "Unlimited" : s.attributes.limits.memory + "MB"}\\n\\n\`; }); return sock.sendMessage(remoteJid, { text: txt }, { quoted: msg }); }
-          if (command === "listadmin") { let res = await fetch(domain + "/api/application/users", { headers: { Authorization: "Bearer " + ptla } }); let data = await res.json(); if (!data.data?.length) return sock.sendMessage(remoteJid, { text: "Tidak ada user" }, { quoted: msg }); let txt = "👤 LIST USER PANEL\\n\\n"; data.data.forEach(u => { txt += \`ID: \${u.attributes.id}\\nUsername: \${u.attributes.username}\\nAdmin: \${u.attributes.root_admin ? "Yes" : "No"}\\n\\n\`; }); return sock.sendMessage(remoteJid, { text: txt }, { quoted: msg }); }
-          if (command === "delpanel") { if (!text) return sock.sendMessage(remoteJid, { text: "Contoh: .delpanel 3" }, { quoted: msg }); await fetch(domain + "/api/application/servers/" + text, { method: "DELETE", headers: { Authorization: "Bearer " + ptla } }); return sock.sendMessage(remoteJid, { text: "✅ Server berhasil dihapus" }, { quoted: msg }); }
-          if (command === "deladmin") { if (!text) return sock.sendMessage(remoteJid, { text: "Contoh: .deladmin 5" }, { quoted: msg }); await fetch(domain + "/api/application/users/" + text, { method: "DELETE", headers: { Authorization: "Bearer " + ptla } }); return sock.sendMessage(remoteJid, { text: "✅ User berhasil dihapus" }, { quoted: msg }); }
-          if (!text || text.split(/[, ]/).length < 2) return sock.sendMessage(remoteJid, { text: \`Contoh:\\n.\${command} username,@tag\\n.\${command} username,628xxxx\` }, { quoted: msg });
-          let username = text.split(/[, ]/)[0]; let target = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0] || sender; let jid = target.includes("@s.whatsapp.net") ? target : target.split("@")[0] + "@s.whatsapp.net";
+          if (command === "listpanel") { let data = await requestAPI(cleanDomain + "/api/application/servers", { headers: { Authorization: "Bearer " + ptla } }); if (!data.data?.length) return sock.sendMessage(remoteJid, { text: "Tidak ada server" }, { quoted: msg }); let txt = "📦 LIST SERVER\\n\\n"; data.data.forEach(s => { txt += \`ID: \${s.attributes.id}\\nName: \${s.attributes.name}\\nRAM: \${s.attributes.limits.memory == 0 ? "Unlimited" : s.attributes.limits.memory + "MB"}\\n\\n\`; }); return sock.sendMessage(remoteJid, { text: txt }, { quoted: msg }); }
+          if (command === "listadmin") { let data = await requestAPI(cleanDomain + "/api/application/users", { headers: { Authorization: "Bearer " + ptla } }); if (!data.data?.length) return sock.sendMessage(remoteJid, { text: "Tidak ada user" }, { quoted: msg }); let txt = "👤 LIST USER PANEL\\n\\n"; data.data.forEach(u => { txt += \`ID: \${u.attributes.id}\\nUsername: \${u.attributes.username}\\nAdmin: \${u.attributes.root_admin ? "Yes" : "No"}\\n\\n\`; }); return sock.sendMessage(remoteJid, { text: txt }, { quoted: msg }); }
+          if (command === "delpanel") { if (!text) return sock.sendMessage(remoteJid, { text: "Contoh: .delpanel 3" }, { quoted: msg }); await requestAPI(cleanDomain + "/api/application/servers/" + text, { method: "DELETE", headers: { Authorization: "Bearer " + ptla } }); return sock.sendMessage(remoteJid, { text: "✅ Server berhasil dihapus" }, { quoted: msg }); }
+          if (command === "deladmin") { if (!text) return sock.sendMessage(remoteJid, { text: "Contoh: .deladmin 5" }, { quoted: msg }); await requestAPI(cleanDomain + "/api/application/users/" + text, { method: "DELETE", headers: { Authorization: "Bearer " + ptla } }); return sock.sendMessage(remoteJid, { text: "✅ User berhasil dihapus" }, { quoted: msg }); }
+          
+          if (!text || text.split(/[, ]/).length < 1) return sock.sendMessage(remoteJid, { text: \`Contoh:\\n.\${command} username\\n.\${command} username @tag\\n.\${command} username 628xxxx\` }, { quoted: msg });
+          
+          let username = text.split(/[, ]/)[0];
+          let targetJid = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0] || msg.message?.extendedTextMessage?.contextInfo?.participant || (text.match(/\\d{10,15}/) ? text.match(/\\d{10,15}/)[0] + "@s.whatsapp.net" : sender);
+          
+          if (!targetJid.includes("@s.whatsapp.net") && !targetJid.includes("@lid")) targetJid = targetJid.split("@")[0] + "@s.whatsapp.net";
+          
           await sock.sendMessage(remoteJid, { text: "✨ Creating server panel..." }, { quoted: msg });
-          let userRes = await fetch(domain + "/api/application/users", { method: "POST", headers: { Authorization: "Bearer " + ptla, "Content-Type": "application/json" }, body: JSON.stringify({ email: username + "@panel.com", username, first_name: username, last_name: username, language: "en", password: Math.random().toString(36).slice(-8) }) });
-          let userData = await userRes.json(); if (userData.errors) return sock.sendMessage(remoteJid, { text: JSON.stringify(userData.errors[0], null, 2) }, { quoted: msg });
+          
+          let userData = await requestAPI(cleanDomain + "/api/application/users", { method: "POST", headers: { Authorization: "Bearer " + ptla }, body: JSON.stringify({ email: username + "@panel.com", username, first_name: username, last_name: username, language: "en", password: Math.random().toString(36).slice(-8) }) });
+          if (userData.errors) return sock.sendMessage(remoteJid, { text: \`❌ *Gagal Buat User:*\\n\${userData.errors[0].detail}\` }, { quoted: msg });
+          
           let pack = packages[command];
-          let serverRes = await fetch(domain + "/api/application/servers", { method: "POST", headers: { Authorization: "Bearer " + ptla, "Content-Type": "application/json" }, body: JSON.stringify({ name: \`\${username} Server\`, user: userData.attributes.id, egg: parseInt(egg), docker_image: "ghcr.io/parkervcp/yolks:nodejs_22", startup: "npm start", environment: { INST: "npm", USER_UPLOAD: "0", AUTO_UPDATE: "0", CMD_RUN: "npm start" }, limits: { memory: parseInt(pack.ram), swap: 0, disk: parseInt(pack.disk), io: 500, cpu: parseInt(pack.cpu) }, feature_limits: { databases: 5, backups: 5, allocations: 5 }, deploy: { locations: [parseInt(loc)], dedicated_ip: false, port_range: [] } }) });
-          let serverData = await serverRes.json(); if (serverData.errors) return sock.sendMessage(remoteJid, { text: JSON.stringify(serverData.errors[0], null, 2) }, { quoted: msg });
-          await sock.sendMessage(jid, { text: \`📦 DATA PANEL\\n\\nUsername: \${username}\\nPassword: \${password}\\nLogin: \${domain}\\n\\nRAM: \${pack.ram == 0 ? "Unlimited" : pack.ram + "MB"}\\nCPU: \${pack.cpu == 0 ? "Unlimited" : pack.cpu + "%"}\\nDisk: \${pack.disk == 0 ? "Unlimited" : pack.disk + "MB"}\` });
-          return sock.sendMessage(remoteJid, { text: "✅ Server berhasil dibuat & data dikirim ke PC" }, { quoted: msg });
-        } catch (err) { return sock.sendMessage(remoteJid, { text: "❌ Terjadi kesalahan saat menghubungi panel" }, { quoted: msg }); }
+          let serverData = await requestAPI(cleanDomain + "/api/application/servers", { method: "POST", headers: { Authorization: "Bearer " + ptla }, body: JSON.stringify({ name: \`\${username} Server\`, user: userData.attributes.id, egg: parseInt(egg), docker_image: "ghcr.io/parkervcp/yolks:nodejs_22", startup: "npm start", environment: { "INST": "npm", "USER_UPLOAD": "0", "AUTO_UPDATE": "0", "CMD_RUN": "npm start", "OWNER_NAME": username, "OWNER_NUMBER": targetJid.split('@')[0], "BOT_NAME": username, "SESSION_ID": "" }, limits: { memory: parseInt(pack.ram), swap: 0, disk: parseInt(pack.disk), io: 500, cpu: parseInt(pack.cpu) }, feature_limits: { databases: 5, backups: 5, allocations: 5 }, deploy: { locations: [parseInt(loc)], dedicated_ip: false, port_range: [] } }) });
+          if (serverData.errors) return sock.sendMessage(remoteJid, { text: \`❌ *Gagal Buat Server:*\\n\${serverData.errors[0].detail}\` }, { quoted: msg });
+          
+          const dataPanel = \`📦 *DATA PANEL*\\n\\nUsername: \${username}\\nPassword: \${Math.random().toString(36).slice(-8)}\\nLogin: \${cleanDomain}\\n\\nRAM: \${pack.ram == 0 ? "Unlimited" : pack.ram + "MB"}\\nCPU: \${pack.cpu == 0 ? "Unlimited" : pack.cpu + "%"}\\nDisk: \${pack.disk == 0 ? "Unlimited" : pack.disk + "MB"}\`;
+          
+          if (targetJid !== sender && targetJid !== remoteJid) await sock.sendMessage(targetJid, { text: dataPanel });
+          return sock.sendMessage(remoteJid, { text: \`✅ *Server berhasil dibuat!*\\n\\n\${dataPanel}\` }, { quoted: msg });
+          
+        } catch (err) { return sock.sendMessage(remoteJid, { text: \`❌ *System Error:*\\n\${err.message}\` }, { quoted: msg }); }
       }` : ''}
       default: { await sock.sendMessage(remoteJid, { text: '❓ Command tidak ada' }, { quoted: msg }); break; }
     }
@@ -224,14 +268,30 @@ global.saveDB = () => fs.writeFileSync('./database.json', JSON.stringify(global.
 global.startTime = Date.now();
 global.panel = settings.panel || {};
 
-console.log('Starting ESM ' + botName + ' - ' + settings.ownerName);
+console.log(\`
+\\x1b[36m==================================================\\x1b[0m
+\\x1b[35m  🤖 BOT WHATSAPP STARTING... (ESM MODE)\\x1b[0m
+\\x1b[36m==================================================\\x1b[0m
+  \\x1b[33m»\\x1b[0m Nama Bot   : \\x1b[32m\${botName}\\x1b[0m
+  \\x1b[33m»\\x1b[0m Owner      : \\x1b[32m\${settings.ownerName}\\x1b[0m
+  \\x1b[33m»\\x1b[0m Engine     : \\x1b[36mNoxleys Baileys\\x1b[0m
+  \\x1b[33m»\\x1b[0m Total Fitur: \\x1b[33m\${settings.features.length} Fitur\\x1b[0m
+\\x1b[36m==================================================\\x1b[0m
+\`);
 
 async function startBot(){
   const { state, saveCreds } = await useMultiFileAuthState('session');
   const sock = makeWASocket({ logger: pino({ level: "silent" }), auth: state, printQRInTerminal: false });
   sock.ev.on('creds.update', saveCreds);
   
-  if(!state.creds.registered){ setTimeout(async()=>{ try{ const code = await sock.requestPairingCode(settings.pairingNumber); console.log('Pairing Code ' + botName + ': ' + code); }catch(e){} }, 3000); }
+  if(!state.creds.registered){ 
+    setTimeout(async()=>{ 
+        try{ 
+            const code = await sock.requestPairingCode(settings.pairingNumber); 
+            console.log(\`\\n\\x1b[33m[ PAIRING CODE ]\\x1b[0m \\x1b[32m\${code}\\x1b[0m\\n\\x1b[90mMasukkan kode di atas ke WhatsApp kamu.\\x1b[0m\\n\`); 
+        }catch(e){} 
+    }, 3000); 
+  }
   
   const pluginsDir = path.join(process.cwd(), 'plugins');
   const plugins = [];
@@ -241,9 +301,18 @@ async function startBot(){
   }
   
   sock.ev.on('connection.update', (u)=>{
-    if(u.connection === 'open') console.log(botName + ' Connected!');
-    if(u.connection === 'close'){ const r = u.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut; if(r) setTimeout(()=>startBot(), 3000); }
+    if(u.connection === 'open') {
+        console.log(\`\\n\\x1b[32m[ SUCCESS ] \${botName} Connected to WhatsApp!\\x1b[0m\\n\`);
+    }
+    if(u.connection === 'close'){ 
+        const r = u.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut; 
+        if(r) {
+            console.log(\`\\n\\x1b[31m[ WARNING ] Koneksi terputus. Mencoba menghubungkan ulang...\\x1b[0m\\n\`);
+            setTimeout(()=>startBot(), 3000); 
+        }
+    }
   });
+  
   sock.ev.on('group-participants.update', async (update) => { for(const p of plugins){ if(p.onParticipantsUpdate) await p.onParticipantsUpdate(sock, update); } });
   
   sock.ev.on('messages.upsert', async (m)=>{
@@ -251,7 +320,7 @@ async function startBot(){
     const remoteJid = msg.key.remoteJid; const sender = msg.key.participant || remoteJid;
     let body = msg.message?.conversation || msg.message?.extendedTextMessage?.text || msg.message?.imageMessage?.caption || '';
     
-    if (body) console.log('[PESAN MASUK] Dari: ' + sender + ' | Isi: ' + body);
+    if (body) console.log(\`\\x1b[90m[PESAN]\\x1b[0m \${sender.split('@')[0]} : \${body}\`);
     if (msg.key.fromMe && !body.startsWith('.')) return;
     
     if(body && global.db.autoreply[body.toLowerCase()]){ await sock.sendMessage(remoteJid, { text: global.db.autoreply[body.toLowerCase()] }, { quoted: msg }); return; }
@@ -294,7 +363,7 @@ startBot();
     if (list.includes('autoreply')) pf.file('autoreply.js', `export default { command: ['addreply'], handler: async (sock, msg, o) => { const [k, ...v] = o.text.split('|'); if(!k || v.length===0) return; global.db.autoreply[k] = v.join('|'); global.saveDB(); await sock.sendMessage(o.remoteJid, { text: '✅ Ditambah' }, { quoted: msg }); } };`);
     if (list.includes('broadcast')) pf.file('broadcast.js', `export default { command: ['bc'], handler: async (sock, msg, o) => { if(!o.text) return; const groups = await sock.groupFetchAllParticipating(); for(const id of Object.keys(groups)){ try{ await sock.sendMessage(id, { text: o.text }); }catch{} } await sock.sendMessage(o.remoteJid, { text: '✅ Broadcast sent' }, { quoted: msg }); } };`);
 
-    // PERBAIKAN FATAL: Formatting panel.js ESM agar tidak error sintaksis
+    // PERBAIKAN ESM PANEL.JS
     if (usePanel && list.includes('panel')) {
       pf.file('panel.js', `import fetch from "node-fetch"
 import settings from "../settings.js"
@@ -308,86 +377,58 @@ const packages = {
   'unli': { ram: "0", disk: "0", cpu: "0" }, 'unlimited': { ram: "0", disk: "0", cpu: "0" } 
 }
 
+async function requestAPI(url, options = {}) {
+    const headers = { "Accept": "application/json", "Content-Type": "application/json", "User-Agent": "Mozilla/5.0", ...options.headers };
+    const res = await fetch(url, { ...options, headers });
+    if (res.status === 204) return { status: 'success' };
+    const text = await res.text();
+    if (!text) return { status: 'success' };
+    try { return JSON.parse(text); } catch (e) { throw new Error(\`Panel Error (\${res.status}): URL tidak valid atau diblokir.\`); }
+}
+
 export default { 
   command: ['pannel','1gb','2gb','3gb','4gb','5gb','6gb','7gb','8gb','9gb','10gb','unli','unlimited','createadmin','listpanel','listadmin','delpanel','deladmin'], 
   handler: async (sock, m, o) => {
-    const { domain, ptla, egg, loc } = global.panel || settings.panel || {}
+    let { domain, ptla, egg, loc } = global.panel || settings.panel || {}
     if (!domain || !ptla) return sock.sendMessage(o.remoteJid, { text: "❌ Panel belum disetting di settings.js" }, { quoted: m })
-    
+    const cleanDomain = domain.replace(/\\/$/, "");
+
     let cmd = o.command.toLowerCase()
     if (cmd === "pannel") return sock.sendMessage(o.remoteJid, { text: \`☁️ MENU PANEL\\n\\n1GB - 10GB\\nUNLI\\ncreateadmin\\nlistpanel\\nlistadmin\\ndelpanel <id>\\ndeladmin <id>\` }, { quoted: m })
     
     try {
-      if (cmd === "listpanel") { 
-        let res = await fetch(domain + "/api/application/servers", { headers: { Authorization: "Bearer " + ptla } }); 
-        let data = await res.json(); 
-        if (!data.data?.length) return sock.sendMessage(o.remoteJid, { text: "Tidak ada server" }, { quoted: m }); 
-        let txt = "📦 LIST SERVER\\n\\n"; 
-        data.data.forEach(s => { 
-          txt += \`ID: \${s.attributes.id}\\nName: \${s.attributes.name}\\nRAM: \${s.attributes.limits.memory == 0 ? "Unlimited" : s.attributes.limits.memory + "MB"}\\n\\n\`; 
-        }); 
-        return sock.sendMessage(o.remoteJid, { text: txt }, { quoted: m }); 
-      }
-      if (cmd === "listadmin") { 
-        let res = await fetch(domain + "/api/application/users", { headers: { Authorization: "Bearer " + ptla } }); 
-        let data = await res.json(); 
-        if (!data.data?.length) return sock.sendMessage(o.remoteJid, { text: "Tidak ada user" }, { quoted: m }); 
-        let txt = "👤 LIST USER PANEL\\n\\n"; 
-        data.data.forEach(u => { 
-          txt += \`ID: \${u.attributes.id}\\nUsername: \${u.attributes.username}\\nAdmin: \${u.attributes.root_admin ? "Yes" : "No"}\\n\\n\`; 
-        }); 
-        return sock.sendMessage(o.remoteJid, { text: txt }, { quoted: m }); 
-      }
-      if (cmd === "delpanel") { 
-        if (!o.text) return sock.sendMessage(o.remoteJid, { text: "Contoh: .delpanel 3" }, { quoted: m }); 
-        await fetch(domain + "/api/application/servers/" + o.text, { method: "DELETE", headers: { Authorization: "Bearer " + ptla } }); 
-        return sock.sendMessage(o.remoteJid, { text: "✅ Server berhasil dihapus" }, { quoted: m }); 
-      }
-      if (cmd === "deladmin") { 
-        if (!o.text) return sock.sendMessage(o.remoteJid, { text: "Contoh: .deladmin 5" }, { quoted: m }); 
-        await fetch(domain + "/api/application/users/" + o.text, { method: "DELETE", headers: { Authorization: "Bearer " + ptla } }); 
-        return sock.sendMessage(o.remoteJid, { text: "✅ User berhasil dihapus" }, { quoted: m }); 
-      }
+      if (cmd === "listpanel") { let data = await requestAPI(cleanDomain + "/api/application/servers", { headers: { Authorization: "Bearer " + ptla } }); if (!data.data?.length) return sock.sendMessage(o.remoteJid, { text: "Tidak ada server" }, { quoted: m }); let txt = "📦 LIST SERVER\\n\\n"; data.data.forEach(s => { txt += \`ID: \${s.attributes.id}\\nName: \${s.attributes.name}\\nRAM: \${s.attributes.limits.memory == 0 ? "Unlimited" : s.attributes.limits.memory + "MB"}\\n\\n\`; }); return sock.sendMessage(o.remoteJid, { text: txt }, { quoted: m }); }
+      if (cmd === "listadmin") { let data = await requestAPI(cleanDomain + "/api/application/users", { headers: { Authorization: "Bearer " + ptla } }); if (!data.data?.length) return sock.sendMessage(o.remoteJid, { text: "Tidak ada user" }, { quoted: m }); let txt = "👤 LIST USER PANEL\\n\\n"; data.data.forEach(u => { txt += \`ID: \${u.attributes.id}\\nUsername: \${u.attributes.username}\\nAdmin: \${u.attributes.root_admin ? "Yes" : "No"}\\n\\n\`; }); return sock.sendMessage(o.remoteJid, { text: txt }, { quoted: m }); }
+      if (cmd === "delpanel") { if (!o.text) return sock.sendMessage(o.remoteJid, { text: "Contoh: .delpanel 3" }, { quoted: m }); await requestAPI(cleanDomain + "/api/application/servers/" + o.text, { method: "DELETE", headers: { Authorization: "Bearer " + ptla } }); return sock.sendMessage(o.remoteJid, { text: "✅ Server berhasil dihapus" }, { quoted: m }); }
+      if (cmd === "deladmin") { if (!o.text) return sock.sendMessage(o.remoteJid, { text: "Contoh: .deladmin 5" }, { quoted: m }); await requestAPI(cleanDomain + "/api/application/users/" + o.text, { method: "DELETE", headers: { Authorization: "Bearer " + ptla } }); return sock.sendMessage(o.remoteJid, { text: "✅ User berhasil dihapus" }, { quoted: m }); }
       
-      if (!o.text || o.text.split(/[, ]/).length < 2) return sock.sendMessage(o.remoteJid, { text: \`Contoh:\\n.\${cmd} username,@tag\\n.\${cmd} username,628xxxx\` }, { quoted: m });
+      if (!o.text || o.text.split(/[, ]/).length < 1) return sock.sendMessage(o.remoteJid, { text: \`Contoh:\\n.\${cmd} username\\n.\${cmd} username @tag\\n.\${cmd} username 628xxxx\` }, { quoted: m });
       
       let username = o.text.split(/[, ]/)[0];
-      let target = m.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0] || o.sender;
-      let jid = target.includes("@s.whatsapp.net") ? target : target.split("@")[0] + "@s.whatsapp.net";
-      let email = username + "@panel.com";
-      let password = Math.random().toString(36).slice(-8);
+      let targetJid = m.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0] || m.message?.extendedTextMessage?.contextInfo?.participant || (o.text.match(/\\d{10,15}/) ? o.text.match(/\\d{10,15}/)[0] + "@s.whatsapp.net" : o.sender);
+      
+      if (!targetJid.includes("@s.whatsapp.net") && !targetJid.includes("@lid")) targetJid = targetJid.split("@")[0] + "@s.whatsapp.net";
       
       await sock.sendMessage(o.remoteJid, { text: "✨ Creating server panel..." }, { quoted: m });
       
-      let userRes = await fetch(domain + "/api/application/users", { 
-        method: "POST", headers: { Authorization: "Bearer " + ptla, "Content-Type": "application/json" }, 
-        body: JSON.stringify({ email, username, first_name: username, last_name: username, language: "en", password }) 
-      });
-      let userData = await userRes.json(); 
-      if (userData.errors) return sock.sendMessage(o.remoteJid, { text: JSON.stringify(userData.errors[0], null, 2) }, { quoted: m });
+      let password = Math.random().toString(36).slice(-8);
+      let userData = await requestAPI(cleanDomain + "/api/application/users", { method: "POST", headers: { Authorization: "Bearer " + ptla }, body: JSON.stringify({ email: username + "@panel.com", username, first_name: username, last_name: username, language: "en", password }) });
+      if (userData.errors) return sock.sendMessage(o.remoteJid, { text: \`❌ *Gagal Buat User:*\\n\${userData.errors[0].detail}\` }, { quoted: m });
       
       let pack = packages[cmd];
-      let serverRes = await fetch(domain + "/api/application/servers", { 
-        method: "POST", headers: { Authorization: "Bearer " + ptla, "Content-Type": "application/json" }, 
-        body: JSON.stringify({ 
-          name: \`\${username} Server\`, user: userData.attributes.id, egg: parseInt(egg), docker_image: "ghcr.io/parkervcp/yolks:nodejs_22", 
-          startup: "npm start", environment: { INST: "npm", USER_UPLOAD: "0", AUTO_UPDATE: "0", CMD_RUN: "npm start" }, 
-          limits: { memory: parseInt(pack.ram), swap: 0, disk: parseInt(pack.disk), io: 500, cpu: parseInt(pack.cpu) }, 
-          feature_limits: { databases: 5, backups: 5, allocations: 5 }, 
-          deploy: { locations: [parseInt(loc)], dedicated_ip: false, port_range: [] } 
-        }) 
-      });
-      let serverData = await serverRes.json(); 
-      if (serverData.errors) return sock.sendMessage(o.remoteJid, { text: JSON.stringify(serverData.errors[0], null, 2) }, { quoted: m });
+      let serverData = await requestAPI(cleanDomain + "/api/application/servers", { method: "POST", headers: { Authorization: "Bearer " + ptla }, body: JSON.stringify({ name: \`\${username} Server\`, user: userData.attributes.id, egg: parseInt(egg), docker_image: "ghcr.io/parkervcp/yolks:nodejs_22", startup: "npm start", environment: { "INST": "npm", "USER_UPLOAD": "0", "AUTO_UPDATE": "0", "CMD_RUN": "npm start", "OWNER_NAME": username, "OWNER_NUMBER": targetJid.split('@')[0], "BOT_NAME": username, "SESSION_ID": "" }, limits: { memory: parseInt(pack.ram), swap: 0, disk: parseInt(pack.disk), io: 500, cpu: parseInt(pack.cpu) }, feature_limits: { databases: 5, backups: 5, allocations: 5 }, deploy: { locations: [parseInt(loc)], dedicated_ip: false, port_range: [] } }) });
+      if (serverData.errors) return sock.sendMessage(o.remoteJid, { text: \`❌ *Gagal Buat Server:*\\n\${serverData.errors[0].detail}\` }, { quoted: m });
       
-      await sock.sendMessage(jid, { text: \`📦 DATA PANEL\\n\\nUsername: \${username}\\nPassword: \${password}\\nLogin: \${domain}\\n\\nRAM: \${pack.ram == 0 ? "Unlimited" : pack.ram + "MB"}\\nCPU: \${pack.cpu == 0 ? "Unlimited" : pack.cpu + "%"}\\nDisk: \${pack.disk == 0 ? "Unlimited" : pack.disk + "MB"}\` });
-      return sock.sendMessage(o.remoteJid, { text: "✅ Server berhasil dibuat & data dikirim ke PC" }, { quoted: m });
+      const dataPanel = \`📦 *DATA PANEL*\\n\\nUsername: \${username}\\nPassword: \${password}\\nLogin: \${cleanDomain}\\n\\nRAM: \${pack.ram == 0 ? "Unlimited" : pack.ram + "MB"}\\nCPU: \${pack.cpu == 0 ? "Unlimited" : pack.cpu + "%"}\\nDisk: \${pack.disk == 0 ? "Unlimited" : pack.disk + "MB"}\`;
+      
+      if (targetJid !== o.sender && targetJid !== o.remoteJid) await sock.sendMessage(targetJid, { text: dataPanel });
+      return sock.sendMessage(o.remoteJid, { text: \`✅ *Server berhasil dibuat!*\\n\\n\${dataPanel}\` }, { quoted: m });
       
     } catch (err) { 
-      return sock.sendMessage(o.remoteJid, { text: "❌ Terjadi kesalahan saat menghubungi panel" }, { quoted: m }); 
+      return sock.sendMessage(o.remoteJid, { text: \`❌ *System Error:*\\n\${err.message}\` }, { quoted: m }); 
     }
   } 
-}
+};
 `);
     }
 
