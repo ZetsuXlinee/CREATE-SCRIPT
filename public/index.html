@@ -14,10 +14,8 @@
     --aero-cyan: #06b6d4;
     --aero-blue: #3b82f6;
     --aero-lime: #a3e635;
-    --aero-purple: #8b5cf6;
     --glass-bg: rgba(255, 255, 255, 0.04);
     --glass-border: rgba(255, 255, 255, 0.15);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
     --font: 'Outfit', sans-serif;
@@ -40,7 +38,7 @@
 
   .container { max-width: 1300px; margin: 0 auto; padding: 20px 16px; position: relative; z-index: 1; width: 100%; }
 
-  /* ================= HEADER ================= */
+  /* HEADER */
   header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
   .brand { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 200px; }
   .brand-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--aero-cyan), var(--aero-blue)); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3), inset 0 2px 5px rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.3); flex-shrink: 0; }
@@ -50,18 +48,17 @@
   .dot { width: 8px; height: 8px; border-radius: 50%; background: #000; animation: pulse 2s infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-  /* ================= LAYOUT ================= */
+  /* LAYOUT */
   .layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 24px; align-items: start; width: 100%; }
   @media (max-width: 1024px) { .layout { grid-template-columns: 1fr; } }
   .main { width: 100%; min-width: 0; }
 
-  /* ================= GLASS BENTO CARDS ================= */
-  .bento { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; margin-bottom: 20px; backdrop-filter: blur(20px); box-shadow: var(--glass-shadow), inset 0 0 20px rgba(255,255,255,0.02); position: relative; overflow: hidden; width: 100%; }
-  .bento::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%; background: linear-gradient(to bottom, rgba(255,255,255,0.06), transparent); pointer-events: none; border-radius: 24px 24px 0 0; }
+  /* BENTO CARDS */
+  .bento { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; margin-bottom: 20px; backdrop-filter: blur(20px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(255,255,255,0.02); position: relative; overflow: hidden; width: 100%; }
   .sec-title { font-size: 13px; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px; }
   .sec-title .ic { width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--glass-border); flex-shrink: 0; }
 
-  /* ================= BUTTONS ================= */
+  /* BUTTONS */
   .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
   .btn-opt { background: linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, rgba(0,0,0,0.1) 100%); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.2s; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2); width: 100%; }
   .btn-opt:hover { background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.1) 100%); transform: translateY(-2px); }
@@ -78,14 +75,14 @@
   .btn-opt.tele.active { border-color: #229ED9; background: linear-gradient(to bottom, rgba(34,158,217,0.25) 0%, rgba(34,158,217,0.05) 100%); box-shadow: 0 0 20px rgba(34,158,217,0.2); }
   .btn-opt.tele.active .svg-ic { background: linear-gradient(135deg, #229ED9, #0e7abf); }
 
-  /* ================= INPUTS ================= */
+  /* INPUTS */
   .input-box { display: flex; flex-direction: column; gap: 6px; width: 100%; }
   .input-box label { font-size: 11px; font-weight: 800; color: #cbd5e1; margin-left: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
   .input-field { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 12px; padding: 14px; color: #fff; font-family: var(--mono); font-size: 13px; outline: none; transition: 0.2s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
   .input-field:focus { border-color: var(--aero-cyan); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5), 0 0 15px rgba(6, 182, 212, 0.2); background: rgba(0,0,0,0.6); }
   .input-field::placeholder { color: #475569; }
 
-  /* ================= TOGGLE SWITCH ================= */
+  /* TOGGLE */
   .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(0,0,0,0.2)); border: 1px solid var(--glass-border); border-radius: 16px; cursor: pointer; transition: 0.2s; margin-bottom: 12px; box-shadow: inset 0 1px 2px rgba(255,255,255,0.1); width: 100%; }
   .toggle-row:hover { background: linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(0,0,0,0.2)); }
   .toggle-row h4 { font-size: 14px; font-weight: 800; }
@@ -95,7 +92,7 @@
   .toggle-row.active .switch { background: var(--aero-lime); border-color: #bef264; box-shadow: 0 0 15px rgba(163, 230, 53, 0.4), inset 0 2px 5px rgba(0,0,0,0.2); }
   .toggle-row.active .switch::after { transform: translateX(22px); }
 
-  /* ================= FEATURE CHIPS ================= */
+  /* FEATURES */
   .feat-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
   .feat-chip { background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(0,0,0,0.2)); border: 1px solid var(--glass-border); border-radius: 30px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; user-select: none; box-shadow: inset 0 1px 2px rgba(255,255,255,0.1); }
   .feat-chip:hover { background: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(0,0,0,0.2)); }
@@ -105,37 +102,34 @@
   .feat-chip .check svg { display: none; stroke: #000; }
   .feat-chip.active .check svg { display: block; }
 
-  /* ================= WARNING BOX ================= */
+  /* WARNING */
   .warn-box { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(0,0,0,0.4)); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 24px; padding: 20px; margin-bottom: 24px; position: relative; overflow: hidden; width: 100%; }
-  .warn-box h4 { color: var(--warning); font-size: 14px; font-weight: 900; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .warn-box h4 { color: #f59e0b; font-size: 14px; font-weight: 900; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
   .warn-box p { font-size: 13px; color: #e2e8f0; margin-bottom: 16px; font-weight: 500; }
-  .warn-code { display: flex; justify-content: space-between; align-items: center; background: #000; padding: 12px 16px; border-radius: 12px; font-family: var(--mono); font-size: 13px; color: var(--aero-cyan); margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 5px rgba(0,0,0,0.8); width: 100%; }
+  .warn-code { display: flex; justify-content: space-between; align-items: center; background: #000; padding: 12px 16px; border-radius: 12px; font-family: var(--mono); font-size: 13px; color: var(--aero-cyan); margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.1); width: 100%; }
   .btn-copy { background: linear-gradient(to bottom, #fff, #cbd5e1); border: none; color: #000; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 11px; font-weight: 800; transition: 0.2s; flex-shrink: 0; }
-  .btn-copy:hover { transform: translateY(-2px); }
 
-  /* ================= GENERATE BUTTON ================= */
-  .btn-gen { width: 100%; padding: 18px; border: 1px solid #fff; border-radius: 50px; background: linear-gradient(to bottom, #22d3ee 0%, #0284c7 50%, #0369a1 100%); color: #fff; font-size: 16px; font-weight: 900; font-family: var(--font); letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3), inset 0 4px 10px rgba(255,255,255,0.6), inset 0 -4px 10px rgba(0,0,0,0.3); transition: all 0.2s; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-  .btn-gen:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(6, 182, 212, 0.5), inset 0 4px 10px rgba(255,255,255,0.8); }
-  .btn-gen:active { transform: translateY(2px); box-shadow: 0 5px 15px rgba(6, 182, 212, 0.3); }
-  .btn-gen:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+  /* GENERATE BUTTON */
+  .btn-gen { width: 100%; padding: 18px; border: 1px solid #fff; border-radius: 50px; background: linear-gradient(to bottom, #22d3ee 0%, #0284c7 50%, #0369a1 100%); color: #fff; font-size: 16px; font-weight: 900; font-family: var(--font); letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3), inset 0 4px 10px rgba(255,255,255,0.6); transition: all 0.2s; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+  .btn-gen:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(6, 182, 212, 0.5); }
 
-  /* ================= IPHONE 15 PRO MOCKUP ================= */
+  /* IPHONE MOCKUP */
   .sidebar { position: sticky; top: 24px; display: flex; flex-direction: column; align-items: center; width: 100%; }
   .iphone-frame { width: 100%; max-width: 340px; height: 680px; background: #000; border-radius: 50px; padding: 10px; box-shadow: 0 0 0 4px #333, 0 0 0 8px #111, 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.1); position: relative; overflow: hidden; display: flex; flex-direction: column; margin: 0 auto; }
   .dynamic-island { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 100px; height: 28px; background: #000; border-radius: 20px; z-index: 100; display: flex; justify-content: flex-end; align-items: center; padding-right: 10px; }
-  .camera-lens { width: 10px; height: 10px; background: #111; border-radius: 50%; border: 1px solid #333; box-shadow: inset 0 0 5px #000; }
+  .camera-lens { width: 10px; height: 10px; background: #111; border-radius: 50%; border: 1px solid #333; }
   .ios-screen { background: #0b141a; border-radius: 40px; overflow: hidden; width: 100%; height: 100%; position: relative; display: flex; flex-direction: column; }
-  .ios-status { height: 48px; padding: 16px 20px 0; display: flex; justify-content: space-between; align-items: center; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 600; color: #fff; z-index: 10; }
-  .ios-icons { display: flex; gap: 4px; align-items: center; }
+  .ios-status { height: 48px; padding: 16px 20px 0; display: flex; justify-content: space-between; align-items: center; font-family: -apple-system; font-size: 13px; font-weight: 600; color: #fff; z-index: 10; }
   .wa-header { background: #1f2c34; padding: 6px 10px 10px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid rgba(0,0,0,0.5); z-index: 9; }
-  .wa-back { color: #00a884; display: flex; align-items: center; gap: 2px; font-size: 14px; cursor: pointer; }
+  .wa-back { color: #00a884; display: flex; align-items: center; gap: 2px; font-size: 14px; }
   .wa-av { width: 32px; height: 32px; border-radius: 50%; background: #2a3942; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; color: #fff; margin-left: 2px; }
   .wa-info { flex: 1; text-align: center; }
   .wa-info h4 { font-size: 14px; font-weight: 600; color: #fff; }
   .wa-info p { font-size: 10px; color: #8696a0; }
   .wa-actions { color: #00a884; display: flex; gap: 12px; align-items: center; }
   .wa-chat { padding: 12px 10px; flex: 1; overflow-y: auto; background-color: #0b141a; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: 250px; background-blend-mode: overlay; display: flex; flex-direction: column; }
-  .bubble { background: #1f2c34; padding: 10px 12px; border-radius: 16px 16px 16px 4px; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12.5px; color: #e9edef; line-height: 1.4; max-width: 90%; margin-bottom: 4px; white-space: pre-wrap; word-wrap: break-word; box-shadow: 0 1px 1px rgba(0,0,0,0.2); align-self: flex-start; }
+  
+  .bubble { background: #1f2c34; padding: 10px 12px; border-radius: 16px 16px 16px 4px; font-family: -apple-system; font-size: 12.5px; color: #e9edef; line-height: 1.4; max-width: 95%; margin-bottom: 4px; white-space: pre-wrap; word-wrap: break-word; box-shadow: 0 1px 1px rgba(0,0,0,0.2); align-self: flex-start; }
   .bubble .time { font-size: 9px; color: #8696a0; text-align: right; margin-top: 4px; display: flex; justify-content: flex-end; align-items: center; gap: 2px; }
   .chat-img { padding: 3px; border-radius: 16px 16px 16px 4px; background: #1f2c34; margin-bottom: 4px; display: none; align-self: flex-start; max-width: 90%; }
   .chat-img img { width: 100%; border-radius: 13px; display: block; }
@@ -144,28 +138,23 @@
   .wa-input { background: #1f2c34; padding: 8px 10px 20px; display: flex; gap: 8px; align-items: center; }
   .wa-input-box { flex: 1; background: #2a3942; border-radius: 18px; padding: 8px 14px; display: flex; align-items: center; gap: 8px; color: #8696a0; font-size: 14px; }
 
-  /* ================= CONSOLE ================= */
+  /* CONSOLE */
   .console-box { background: #000; border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; font-family: var(--mono); font-size: 11px; color: var(--aero-lime); margin-top: 20px; line-height: 1.8; max-height: 150px; overflow-y: auto; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8); width: 100%; max-width: 340px; }
-  .console-box span { color: var(--text-muted); }
 
-  /* ================= AERO MODAL ================= */
+  /* MODAL */
   .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 999; padding: 20px; opacity: 0; transition: 0.3s; }
   .modal.active { display: flex; opacity: 1; }
-  .modal-card { background: linear-gradient(to bottom, rgba(30,41,59,0.9), rgba(15,23,42,0.9)); border: 1px solid var(--glass-border); border-radius: 32px; width: 100%; max-width: 450px; padding: 30px 20px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05); transform: scale(0.9); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(20px); }
+  .modal-card { background: linear-gradient(to bottom, rgba(30,41,59,0.9), rgba(15,23,42,0.9)); border: 1px solid var(--glass-border); border-radius: 32px; width: 100%; max-width: 450px; padding: 30px 20px; text-align: center; transform: scale(0.9); transition: 0.3s; }
   .modal.active .modal-card { transform: scale(1); }
-  .modal-icon { width: 70px; height: 70px; background: linear-gradient(135deg, #a3e635, #65a30d); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(163, 230, 53, 0.4), inset 0 4px 10px rgba(255,255,255,0.6); border: 1px solid #bef264; }
+  .modal-icon { width: 70px; height: 70px; background: linear-gradient(135deg, #a3e635, #65a30d); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(163, 230, 53, 0.4); }
   .modal-card h2 { font-size: 22px; font-weight: 900; margin-bottom: 10px; }
   .modal-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
   .modal-warn { background: rgba(0,0,0,0.5); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 16px; padding: 16px; text-align: left; margin-bottom: 24px; }
-  .modal-warn h4 { color: var(--warning); font-size: 13px; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-  .modal-warn code { display: block; background: #000; padding: 10px; border-radius: 8px; font-family: var(--mono); font-size: 12px; margin-bottom: 8px; color: var(--aero-cyan); border: 1px solid rgba(255,255,255,0.1); }
-  .btn-modal { width: 100%; padding: 16px; background: linear-gradient(to bottom, #a3e635, #65a30d); color: #000; border: 1px solid #bef264; border-radius: 50px; font-weight: 900; font-size: 15px; font-family: var(--font); cursor: pointer; transition: 0.2s; box-shadow: 0 10px 20px rgba(163, 230, 53, 0.3), inset 0 2px 5px rgba(255,255,255,0.6); }
-  .btn-modal:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(163, 230, 53, 0.5); }
-
-  /* UPLOAD */
-  .upload-area { border: 2px dashed var(--aero-cyan); border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; margin-top: 12px; display: none; transition: 0.2s; background: rgba(0,0,0,0.3); width: 100%; }
-  .upload-area:hover { background: rgba(6, 182, 212, 0.1); }
-  .upload-area img { max-width: 100%; height: 100px; object-fit: cover; border-radius: 12px; margin-top: 12px; display: none; border: 1px solid var(--aero-cyan); box-shadow: 0 0 15px rgba(6, 182, 212, 0.3); }
+  .modal-warn h4 { color: #f59e0b; font-size: 13px; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .modal-warn code { display: block; background: #000; padding: 10px; border-radius: 8px; font-family: var(--mono); font-size: 12px; margin-bottom: 8px; color: var(--aero-cyan); }
+  .btn-modal { width: 100%; padding: 16px; background: linear-gradient(to bottom, #a3e635, #65a30d); color: #000; border: none; border-radius: 50px; font-weight: 900; font-size: 15px; cursor: pointer; }
+  .upload-area { border: 2px dashed var(--aero-cyan); border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; margin-top: 12px; display: none; background: rgba(0,0,0,0.3); width: 100%; }
+  .upload-area img { max-width: 100%; height: 100px; object-fit: cover; border-radius: 12px; margin-top: 12px; display: none; }
 </style>
 </head>
 <body>
@@ -178,14 +167,13 @@
       </div>
       <div class="brand-text">
         <h1>CiKiZz</h1>
-        <p>Ultimate Bento Generator</p>
+        <p>Buat Script Bot Kalian</p>
       </div>
     </div>
     <div class="status"><div class="dot"></div> SYSTEM ONLINE</div>
   </header>
 
   <div class="layout">
-    <!-- KOLOM KIRI (FORM) -->
     <div class="main">
       
       <!-- 1. PLATFORM -->
@@ -227,11 +215,24 @@
           <div class="btn-opt active" data-base="esm" onclick="setBase('esm',this)"><div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></div><div><h4>ESM Plugin</h4><p>Modern (import)</p></div></div>
           <div class="btn-opt" data-base="case" onclick="setBase('case',this)"><div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div><h4>CASE</h4><p>Classic (switch)</p></div></div>
         </div>
+        
         <div class="grid-2" style="margin-top:16px">
-          <div class="btn-opt active" data-menu="1" onclick="setMenu('1',this)"><div><h4>Style 1: Premium</h4><p>Interactive</p></div></div>
-          <div class="btn-opt" data-menu="2" onclick="setMenu('2',this)"><div><h4>Style 2: Academy</h4><p>Sekolah</p></div></div>
-          <div class="btn-opt" data-menu="3" onclick="setMenu('3',this)"><div><h4>Style 3: Console</h4><p>Terminal</p></div></div>
-          <div class="btn-opt" data-menu="4" onclick="setMenu('4',this)"><div><h4>Style 4: System</h4><p>Lokasi</p></div></div>
+          <div class="btn-opt active" data-menu="1" onclick="setMenu('1',this)">
+            <div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+            <div><h4>Style 1: Premium</h4><p>Dashboard interaktif</p></div>
+          </div>
+          <div class="btn-opt" data-menu="2" onclick="setMenu('2',this)">
+            <div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+            <div><h4>Style 2: Academy</h4><p>Tema sekolah</p></div>
+          </div>
+          <div class="btn-opt" data-menu="3" onclick="setMenu('3',this)">
+            <div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></div>
+            <div><h4>Style 3: Console</h4><p>Terminal hacker</p></div>
+          </div>
+          <div class="btn-opt" data-menu="4" onclick="setMenu('4',this)">
+            <div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+            <div><h4>Style 4: System</h4><p>Info & Lokasi</p></div>
+          </div>
         </div>
       </div>
 
@@ -273,30 +274,24 @@
       <div class="bento">
         <div class="sec-title"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>Pilih Fitur Bot (<span id="featCount" style="color:var(--aero-cyan)">0</span>)</div>
         
-        <div class="feat-container">
-            <!-- INFORMASI -->
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="menu" checked hidden>Menu</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ping" checked hidden>Ping</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="owner" checked hidden>Owner</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="info" checked hidden>Info Bot</div>
+        <div class="feat-container" id="featureContainer">
+            <!-- Fitur tidak otomatis dicentang (checked) -->
+            <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="menu" hidden>Menu</div>
+            <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ping" hidden>Ping</div>
+            <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="owner" hidden>Owner</div>
+            <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="info" hidden>Info Bot</div>
             
-            <!-- DOWNLOADER -->
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="vidsave" checked hidden>VidSave (TT/IG/YT)</div>
+            <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="vidsave" hidden>VidSave</div>
+            <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="bypass" hidden>Bypass</div>
+            <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="rch" hidden>React Ch</div>
+            <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="iqc" hidden>IQC v2</div>
+            <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="web2apk" hidden>Web2APK</div>
+            <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="unblur" hidden>Unblur AI</div>
+            <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="fotolive" hidden>Foto Live</div>
             
-            <!-- TOOLS -->
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="bypass" checked hidden>Bypass Link</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="rch" checked hidden>React Ch</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="iqc" checked hidden>IQC v2</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="web2apk" checked hidden>Web2APK</div>
-            
-            <!-- AI & MAKER -->
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="unblur" checked hidden>Unblur AI</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="fotolive" checked hidden>Foto Live</div>
-            
-            <!-- ADMIN -->
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="welcome" checked hidden>Welcome Baru</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="antilink" checked hidden>Antilink</div>
-            <div class="feat-chip active" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="hidetag" checked hidden>Hidetag</div>
+            <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="welcome" hidden>Welcome</div>
+            <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="antilink" hidden>Antilink</div>
+            <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="hidetag" hidden>Hidetag</div>
         </div>
       </div>
 
@@ -314,7 +309,7 @@
       </button>
     </div>
 
-    <!-- KOLOM KANAN (PREVIEW IPHONE) -->
+    <!-- PREVIEW IPHONE -->
     <div class="sidebar">
       <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
         <div class="iphone-frame">
@@ -374,15 +369,27 @@
 <script>
 let state = { platform: 'whatsapp', base: 'esm', menu: '1', btn: 'nobtn', thumb: 'nothumb', thumbData: null, usePanel: false };
 
+// --- AESTHETIC FONTS UNTUK PREVIEW ---
+function fontBold(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D400 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D41A + n - 97); if (n >= 48 && n <= 57) return String.fromCodePoint(0x1D7CE + n - 48); return c; }).join(''); }
+function fontSmallCaps(str) { const map = { 'a': 'ᴀ', 'b': 'ʙ', 'c': 'ᴄ', 'd': 'ᴅ', 'e': 'ᴇ', 'f': 'ғ', 'g': 'ɢ', 'h': 'ʜ', 'i': 'ɪ', 'j': 'ᴊ', 'k': 'ᴋ', 'l': 'ʟ', 'm': 'ᴍ', 'n': 'ɴ', 'o': 'ᴏ', 'p': 'ᴘ', 'q': 'ǫ', 'r': 'ʀ', 's': 's', 't': 'ᴛ', 'u': 'ᴜ', 'v': 'ᴠ', 'w': 'ᴡ', 'x': 'x', 'y': 'ʏ', 'z': 'ᴢ' }; return [...String(str).toLowerCase()].map(c => map[c] || c).join(''); }
+function fontItalic(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D608 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D622 + n - 97); return c; }).join(''); }
+
 function copyText(text) { navigator.clipboard.writeText(text).then(() => { alert('Berhasil dicopy: ' + text); }).catch(() => alert('Gagal copy')); }
+
 function setPlatform(val, el) { state.platform = val; document.querySelectorAll('[data-platform]').forEach(e => e.classList.remove('active')); el.classList.add('active'); document.getElementById('wa-config').style.display = val === 'whatsapp' ? 'grid' : 'none'; document.getElementById('tele-config').style.display = val === 'telegram' ? 'grid' : 'none'; document.getElementById('base-config').style.display = val === 'whatsapp' ? 'block' : 'none'; updatePreview(); }
 function setBase(val, el) { state.base = val; document.querySelectorAll('[data-base]').forEach(e => e.classList.remove('active')); el.classList.add('active'); updatePreview(); }
 function setMenu(val, el) { state.menu = val; document.querySelectorAll('[data-menu]').forEach(e => e.classList.remove('active')); el.classList.add('active'); updatePreview(); }
 function setBtn(val, el) { state.btn = val; document.querySelectorAll('[data-btn]').forEach(e => e.classList.remove('active')); el.classList.add('active'); updatePreview(); }
 function setThumb(val, el) { state.thumb = val; document.querySelectorAll('[data-thumb]').forEach(e => e.classList.remove('active')); el.classList.add('active'); document.getElementById('uploadArea').style.display = val === 'thumb' ? 'block' : 'none'; updatePreview(); }
-function togglePanel() { state.usePanel = !state.usePanel; const el = document.getElementById('panelToggle'); el.classList.toggle('active', state.usePanel); document.getElementById('panelConfig').style.display = state.usePanel ? 'grid' : 'none'; if (state.usePanel) document.getElementById('featCount').textContent = parseInt(document.getElementById('featCount').textContent) + 1; else document.getElementById('featCount').textContent = parseInt(document.getElementById('featCount').textContent) - 1; updatePreview(); }
+function togglePanel() { state.usePanel = !state.usePanel; const el = document.getElementById('panelToggle'); el.classList.toggle('active', state.usePanel); document.getElementById('panelConfig').style.display = state.usePanel ? 'grid' : 'none'; updateFeatureCount(); updatePreview(); }
 function handleImage(input) { if (input.files && input.files[0]) { const reader = new FileReader(); reader.onload = function(e) { state.thumbData = e.target.result; const img = document.getElementById('imgPreview'); img.src = e.target.result; img.style.display = 'block'; updatePreview(); }; reader.readAsDataURL(input.files[0]); } }
-function toggleFeat(el) { const cb = el.querySelector('input'); cb.checked = !cb.checked; el.classList.toggle('active', cb.checked); let baseCount = document.querySelectorAll('#featureContainer input:checked').length; document.getElementById('featCount').textContent = state.usePanel ? baseCount + 1 : baseCount; updatePreview(); }
+function toggleFeat(el) { const cb = el.querySelector('input'); cb.checked = !cb.checked; el.classList.toggle('active', cb.checked); updateFeatureCount(); updatePreview(); }
+
+// BUG FIX 1: Hitung fitur dengan benar
+function updateFeatureCount() {
+    let baseCount = document.querySelectorAll('#featureContainer input:checked').length;
+    document.getElementById('featCount').textContent = state.usePanel ? baseCount + 1 : baseCount;
+}
 
 function updatePreview() {
   const isWA = state.platform === 'whatsapp';
@@ -406,10 +413,17 @@ function updatePreview() {
   }
 
   let text = '';
+  // BUG FIX 2: Rendering preview untuk style 1 s/d 4 agar sesuai font aesthetic
   if (isWA) {
-    if (state.menu === '2') text = `⟪ EDEN ACADEMY ⟫\n═══════════════════════\n✧ Student : ${name}\n✧ Rank    : Beginner\n✧ Level   : 1\n═══════════════════════`;
-    else if (state.menu === '3') text = `[ CiKiZz CORE_ ]\n-----------------------\n> PROFILE\n  User : ${name}\n  Role : Beginner\n-----------------------\n> SYSTEM\n  Status : ONLINE\n-----------------------`;
-    else text = `╭━━━〔 ${name} 〕━━━✦\n┃ Owner: ${ownerName}\n┃ Nomor: ${ownerNum}\n┣━━━〔 ${feats.length} FITUR 〕━━━\n${feats.slice(0, 5).map(f => '┃ ❒ .' + f).join('\n')}\n┃ ...dan lainnya\n╰━━━━━━━━━━━━━━`;
+    if (state.menu === '1') {
+        text = `╭─── ⟡ ${fontBold(name)} ⟡ ───\n│ Good Morning, ${fontItalic(name)}\n│\n├ ⊛ ${fontSmallCaps('Role')}     : ${fontItalic('Beginner')}\n├ ⊛ ${fontSmallCaps('Level')}    : 0\n├ ⊛ ${fontSmallCaps('Limit')}    : ${fontItalic('Unlimited')}\n│\n├ ⊛ ${fontSmallCaps('Runtime')}  : 1s\n├ ⊛ ${fontSmallCaps('Commands')} : ${feats.length}\n├ ⊛ ${fontSmallCaps('Category')} : 1\n│\n╰── ■■■□□□□□□□ 30%`;
+    } else if (state.menu === '2') {
+        text = `⟪ ${fontBold('EDEN ACADEMY')} ⟫\n═══════════════════════\n✧ ${fontSmallCaps('Student')}  : ${fontItalic(name)}\n✧ ${fontSmallCaps('Rank')}     : ${fontItalic('Beginner')}\n✧ ${fontSmallCaps('Level')}    : 0\n✧ ${fontSmallCaps('Limit')}    : ${fontItalic('Unlimited')}\n\n✧ ${fontSmallCaps('Runtime')}  : 1s\n✧ ${fontSmallCaps('Commands')} : ${feats.length}\n✧ ${fontSmallCaps('Category')} : 1\n\n  ■■■□□□□□□□ 30%\n═══════════════════════\n⟡ ${fontSmallCaps('Status')} : ${fontItalic('Imperial Scholar')}`;
+    } else if (state.menu === '3') {
+        text = `[ ${fontBold('CiKiZz CORE_')} ]\n-----------------------\n> ${fontBold('PROFILE')}\n  ${fontSmallCaps('User')}      : ${fontItalic(name)}\n  ${fontSmallCaps('Role')}      : ${fontItalic('Beginner')}\n  ${fontSmallCaps('Level')}     : 0\n  ${fontSmallCaps('Limit')}     : ${fontItalic('Unlimited')}\n\n> ${fontBold('SYSTEM')}\n  ${fontSmallCaps('Status')}    : ᴏɴʟɪɴᴇ\n  ${fontSmallCaps('Runtime')}   : 1s\n  ${fontSmallCaps('Platform')}  : linux\n  ${fontSmallCaps('Node')}      : v18.0.0\n\n> ${fontBold('STATISTICS')}\n  ${fontSmallCaps('Commands')}  : ${feats.length}\n  ${fontSmallCaps('Category')}  : 1\n\n  ■■■□□□□□□□ 30%\n-----------------------`;
+    } else if (state.menu === '4') {
+        text = `┌─✦ ${fontBold(name + ' SYSTEM')} ✦─┐\n│\n├ ⊛ ${fontSmallCaps('Mode')}     : PUBLIC\n├ ⊛ ${fontSmallCaps('Ping')}     : 10 ms\n├ ⊛ ${fontSmallCaps('Runtime')}  : 1s\n├ ⊛ ${fontSmallCaps('Users')}    : 1\n├ ⊛ ${fontSmallCaps('Chats')}    : 1\n├ ⊛ ${fontSmallCaps('Commands')} : ${feats.length}\n├ ⊛ ${fontSmallCaps('Category')} : 1\n├ ⊛ ${fontSmallCaps('Platform')} : linux\n├ ⊛ ${fontSmallCaps('RAM')}      : 50MB\n├ ⊛ ${fontSmallCaps('Status')}   : ᴏɴʟɪɴᴇ\n│\n└─ ■■■□□□□□□□ 30%\n\n   ⟡ ${fontItalic('CiKiZz is active and ready')} ⟡`;
+    }
   } else {
     text = `🤖 ${name}\n\n${feats.map(f => '❒ /' + f).join('\n')}\n\nOwner: ${ownerName}\nUsername: ${ownerNum}`;
   }
@@ -483,6 +497,8 @@ async function generateScript() {
   finally { btnText.textContent = oldText; btn.disabled = false; }
 }
 
+// Inisialisasi awal
+updateFeatureCount();
 updatePreview();
 </script>
 </body>
