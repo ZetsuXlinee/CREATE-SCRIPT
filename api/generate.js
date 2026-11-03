@@ -3,6 +3,7 @@ import JSZip from 'jszip';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Use POST' });
+  
   try {
     const {
       botName, ownerNumber, ownerName, pairingNumber,
@@ -16,7 +17,7 @@ export default async function handler(req, res) {
     const zip = new JSZip();
     const list = ['menu','welcome','antilink','sticker','downloader','ai','group','rpg','store','autoreply','broadcast'];
 
-    // ================= 1. TELEGRAM - TELEGRAF - BEDA TOTAL =================
+    // ================= 1. TELEGRAM - TELEGRAF =================
     if(platform === 'telegram'){
       const settingsTele = `module.exports = {
   botName: "${botName}",
@@ -46,21 +47,33 @@ console.log('Starting ' + settings.botName + ' - ' + settings.ownerName + ' - Te
 
 const pluginsDir = path.join(__dirname, 'plugins');
 const files = fs.readdirSync(pluginsDir).filter(f=>f.endsWith('.js'));
+const plugins = files.map(f => require(path.join(pluginsDir, f)));
 
-console.log('Loaded ' + files.length + ' plugins - ' + settings.botName);
+console.log('Loaded ' + plugins.length + ' plugins - ' + settings.botName);
 
-bot.start((ctx) => ctx.reply('Halo ' + settings.botName + ' 👋\\nOwner: ' + settings.ownerName + '\\nKetik /menu'));
-
-files.forEach(file => {
-  const plugin = require(path.join(pluginsDir, file));
-  plugin.command.forEach(cmd => {
-    bot.command(cmd, (ctx) => plugin.handler(bot, ctx));
-  });
+// Register Commands
+plugins.forEach(plugin => {
+  if(plugin.command) {
+    const cmds = Array.isArray(plugin.command) ? plugin.command : [plugin.command];
+    cmds.forEach(cmd => bot.command(cmd, (ctx) => plugin.handler(bot, ctx)));
+  }
 });
 
+// Register onMessage (Antilink, Autoreply)
+bot.on('message', async (ctx) => {
+  for (const plugin of plugins) {
+    if (plugin.onMessage) {
+      const handled = await plugin.onMessage(bot, ctx);
+      if (handled) break;
+    }
+  }
+});
+
+// Register Event Welcome
 bot.on('new_chat_members', (ctx) => {
-  const welcome = require('./plugins/welcome.js');
-  if(welcome.onNewMember) welcome.onNewMember(bot, ctx);
+  plugins.forEach(plugin => {
+    if(plugin.onNewMember) plugin.onNewMember(bot, ctx);
+  });
 });
 
 bot.launch().then(()=>console.log(settings.botName + ' Running'));
@@ -71,13 +84,13 @@ bot.launch().then(()=>console.log(settings.botName + ' Running'));
         name: safe, version: "1.0.0", description: botName + " Telegram",
         type: "commonjs", main: "index.js",
         scripts: { start: "node index.js" },
-        dependencies: { telegraf: "^4.15.3" }
+        dependencies: { telegraf: "^4.15.3", "axios": "^1.7.2" }
       }, null, 2));
       zip.file('database.json', JSON.stringify({ welcome:[], antilink:[], autoreply:{}, rpg:{}, produk:[] }, null, 2));
       zip.file('index.js', indexTele);
 
       const pf = zip.folder('plugins');
-      // TELE PLUGINS - CommonJS - bot.command
+      // TELE PLUGINS
       pf.file('menu.js', `module.exports = {
   command: ['menu','start','help'],
   handler: async (bot, ctx) => {
@@ -115,7 +128,7 @@ bot.launch().then(()=>console.log(settings.botName + ' Running'));
       pf.file('sticker.js', `module.exports = {
   command: ['s','sticker','stiker'],
   handler: async (bot, ctx) => {
-    await ctx.reply('Kirim foto dengan caption /s');
+    await ctx.reply('Kirim foto dengan caption /s (Fitur sticker telegram butuh library tambahan)');
   }
 };`);
       pf.file('downloader.js', `const axios = require('axios');
@@ -183,7 +196,7 @@ module.exports = {
       return res.send(buffer);
     }
 
-    // ================= 2. CASE - COMMONJS - SWITCH CASE - BEDA TOTAL =================
+    // ================= 2. CASE - COMMONJS =================
     if(base === 'case'){
       const settingsCase = `module.exports = {
   botName: "${botName}",
@@ -197,36 +210,55 @@ module.exports = {
 };
 `;
       const indexCase = `const settings = require('./settings.js');
-const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
+const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, downloadMediaMessage } = require('@whiskeysockets/baileys');
 const pino = require('pino');
 const fs = require('fs');
+const axios = require('axios');
+
 global.db = JSON.parse(fs.readFileSync('./database.json'));
 global.saveDB = () => fs.writeFileSync('./database.json', JSON.stringify(global.db, null, 2));
+
 const botName = settings.botName;
 const owner = settings.ownerNumber;
 const ownerName = settings.ownerName;
 const pairingNumber = settings.pairingNumber;
-console.log('Starting CASE ' + botName + ' - ' + ownerName + ' - ' + list.length + ' plugins');
+
+console.log('Starting CASE ' + botName + ' - ' + ownerName + ' - ' + settings.features.length + ' plugins');
+
 async function startBot(){
   const { state, saveCreds } = await useMultiFileAuthState('session');
   const sock = makeWASocket({ auth: state, logger: pino({ level: 'silent' }) });
+  
   sock.ev.on('creds.update', saveCreds);
-  if(!sock.authState.creds.registered){
-    setTimeout(async()=>{ const code = await sock.requestPairingCode(pairingNumber); console.log('Pairing Code ' + botName + ': ' + code); }, 3000);
+  
+  if(!state.creds.registered){
+    setTimeout(async()=>{ 
+      try {
+        const code = await sock.requestPairingCode(pairingNumber); 
+        console.log('Pairing Code ' + botName + ': ' + code); 
+      } catch(e) { console.log('Pairing Error:', e.message); }
+    }, 3000);
   }
+  
   sock.ev.on('connection.update', (u)=>{
     if(u.connection === 'open') console.log(botName + ' Connected - Owner: ' + ownerName);
-    if(u.connection === 'close'){ const r = u.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut; if(r) setTimeout(()=>startBot(), 3000); }
+    if(u.connection === 'close'){ 
+      const r = u.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut; 
+      if(r) setTimeout(()=>startBot(), 3000); 
+    }
   });
+  
   sock.ev.on('messages.upsert', async (m)=>{
     const msg = m.messages[0]; if(!msg || msg.key.fromMe) return;
     let body = msg.message?.conversation || msg.message?.extendedTextMessage?.text || '';
     if(!body.startsWith('.')) return;
+    
     const args = body.slice(1).trim().split(/ +/);
     const command = args.shift().toLowerCase();
     const text = args.join(' ');
     const remoteJid = msg.key.remoteJid;
     const sender = msg.key.participant || remoteJid;
+    
     console.log('[' + botName + '] ' + command + ' from ' + sender);
 
     switch(command){
@@ -252,19 +284,20 @@ async function startBot(){
       case 'sticker':
       case 'stiker': {
         const c = msg.message?.ephemeralMessage ? msg.message.ephemeralMessage.message : msg.message;
-        const b = await sock.downloadMediaMessage({ message: c, key: msg.key });
+        const b = await downloadMediaMessage({ message: c, key: msg.key }, 'buffer', {});
         if(b) await sock.sendMessage(remoteJid, { sticker: b });
         break;
       }
       case 'tiktok':
       case 'tt': {
         const url = args[0]; if(!url) return sock.sendMessage(remoteJid, { text: 'Kirim link' });
+        try{ const r = await axios.get('https://tikwm.com/api/?url=' + encodeURIComponent(url)); const v = r.data?.data?.play; if(v) await sock.sendMessage(remoteJid, { video: { url: v } }); }catch{}
         break;
       }
       case 'ai':
       case 'gpt': {
         if(!text) return sock.sendMessage(remoteJid, { text: 'Tanya apa?' });
-        await sock.sendMessage(remoteJid, { text: 'AI: ' + text + ' - ' + botName });
+        try{ const r = await axios.get('https://api.popcat.xyz/chatbot?msg=' + encodeURIComponent(text)); await sock.sendMessage(remoteJid, { text: r.data.response }); }catch{}
         break;
       }
       case 'hidetag': {
@@ -314,20 +347,14 @@ startBot();
         name: safe, version: "1.0.0", description: botName + " CASE - " + ownerName,
         type: "commonjs", main: "index.js",
         scripts: { start: "node index.js" },
-        dependencies: { "@whiskeysockets/baileys": "^6.7.8", "pino": "^9.3.2" }
+        dependencies: { "@whiskeysockets/baileys": "^6.7.8", "pino": "^9.3.2", "axios": "^1.7.2" }
       }, null, 2));
       zip.file('database.json', JSON.stringify({ welcome:[], antilink:[], autoreply:{}, rpg:{}, produk:[] }, null, 2));
       zip.file('index.js', indexCase);
 
       const pf = zip.folder('plugins');
-      // CASE PLUGINS - CommonJS terpisah, tapi handler tetep dipanggil dari index.js kalau mau
       list.forEach(f=>{
-        pf.file(f+'.js', `module.exports = {
-  command: ['${f}'],
-  handler: async (sock, msg, o) => {
-    await sock.sendMessage(o.remoteJid, { text: '${f} - ' + require('../settings.js').botName });
-  }
-};`);
+        pf.file(f+'.js', `// File ini tidak dipakai di mode CASE, karena logika sudah ada di index.js\nmodule.exports = {};\n`);
       });
 
       const buffer = await zip.generateAsync({ type: 'nodebuffer' });
@@ -336,7 +363,7 @@ startBot();
       return res.send(buffer);
     }
 
-    // ================= 3. ESM - ESM PLUGIN - BEDA TOTAL =================
+    // ================= 3. ESM - ESM PLUGIN =================
     const settingsESM = `export default {
   botName: "${botName}",
   ownerNumber: "${ownerNumber}",
@@ -349,7 +376,7 @@ startBot();
 };
 `;
     const indexESM = `import settings from './settings.js';
-import makeWASocket, { useMultiFileAuthState, DisconnectReason } from '@whiskeysockets/baileys';
+import makeWASocket, { useMultiFileAuthState, DisconnectReason, downloadMediaMessage } from '@whiskeysockets/baileys';
 import pino from 'pino';
 import fs from 'fs';
 import path from 'path';
@@ -365,9 +392,16 @@ async function startBot(){
   const { state, saveCreds } = await useMultiFileAuthState('session');
   const sock = makeWASocket({ auth: state, logger: pino({ level: 'silent' }) });
   sock.ev.on('creds.update', saveCreds);
-  if(!sock.authState.creds.registered){
-    setTimeout(async()=>{ const code = await sock.requestPairingCode(settings.pairingNumber); console.log('Pairing Code ' + botName + ': ' + code); }, 3000);
+  
+  if(!state.creds.registered){
+    setTimeout(async()=>{ 
+      try {
+        const code = await sock.requestPairingCode(settings.pairingNumber); 
+        console.log('Pairing Code ' + botName + ': ' + code); 
+      } catch(e) {}
+    }, 3000);
   }
+  
   const pluginsDir = path.join(process.cwd(), 'plugins');
   const plugins = [];
   if(fs.existsSync(pluginsDir)){
@@ -378,18 +412,22 @@ async function startBot(){
     }
   }
   console.log('Loaded ' + plugins.length + ' plugins - ' + botName);
+  
   sock.ev.on('connection.update', (u)=>{
     if(u.connection === 'open') console.log(botName + ' Connected');
     if(u.connection === 'close'){ const r = u.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut; if(r) setTimeout(()=>startBot(), 3000); }
   });
+  
   sock.ev.on('messages.upsert', async (m)=>{
     const msg = m.messages[0]; if(!msg || msg.key.fromMe) return;
     let body = msg.message?.conversation || msg.message?.extendedTextMessage?.text || '';
     if(!body.startsWith('.')) return;
+    
     const args = body.slice(1).trim().split(/ +/);
     const command = args.shift().toLowerCase();
     const text = args.join(' ');
     const remoteJid = msg.key.remoteJid;
+    
     for(const p of plugins){
       if(p.command && p.command.includes(command)){
         await p.handler(sock, msg, { remoteJid, sender: msg.key.participant || remoteJid, command, args, text, settings });
@@ -397,6 +435,14 @@ async function startBot(){
       if(p.onMessage){
         const handled = await p.onMessage(sock, msg);
         if(handled) break;
+      }
+    }
+  });
+  
+  sock.ev.on('group-participants.update', async (update) => {
+    for (const p of plugins) {
+      if (p.onParticipantsUpdate) {
+        await p.onParticipantsUpdate(sock, update);
       }
     }
   });
@@ -409,7 +455,7 @@ startBot();
       name: safe, version: "1.0.0", description: botName + " ESM - " + ownerName,
       type: "module", main: "index.js",
       scripts: { start: "node index.js" },
-      dependencies: { "@whiskeysockets/baileys": "^6.7.8", "pino": "^9.3.2" }
+      dependencies: { "@whiskeysockets/baileys": "^6.7.8", "pino": "^9.3.2", "axios": "^1.7.2" }
     }, null, 2));
     zip.file('database.json', JSON.stringify({ welcome:[], antilink:[], autoreply:{}, rpg:{}, produk:[] }, null, 2));
     zip.file('index.js', indexESM);
@@ -442,6 +488,7 @@ export default {
   command: ['antilink'],
   handler: async (sock, msg, o) => {
     if(o.text === 'on'){ if(!global.db.antilink.includes(o.remoteJid)) global.db.antilink.push(o.remoteJid); global.saveDB(); await sock.sendMessage(o.remoteJid, { text: 'Antilink ON' }); }
+    else if(o.text === 'off'){ global.db.antilink = global.db.antilink.filter(v=>v!==o.remoteJid); global.saveDB(); await sock.sendMessage(o.remoteJid, { text: 'Antilink OFF' }); }
   },
   onMessage: async (sock, msg) => {
     const jid = msg.key.remoteJid; if(!global.db.antilink.includes(jid)) return false;
@@ -451,11 +498,12 @@ export default {
   }
 };`);
     pf.file('sticker.js', `import settings from '../settings.js';
+import { downloadMediaMessage } from '@whiskeysockets/baileys';
 export default {
   command: ['s','sticker','stiker'],
   handler: async (sock, msg, o) => {
     const c = msg.message?.ephemeralMessage ? msg.message.ephemeralMessage.message : msg.message;
-    const b = await sock.downloadMediaMessage({ message: c, key: msg.key });
+    const b = await downloadMediaMessage({ message: c, key: msg.key }, 'buffer', {});
     if(b) await sock.sendMessage(o.remoteJid, { sticker: b });
   }
 };`);
@@ -491,7 +539,7 @@ export default {
   command: ['daily','balance'],
   handler: async (sock, msg, o) => {
     if(!global.db.rpg[o.sender]) global.db.rpg[o.sender] = { money: 0, lastDaily: 0 };
-    if(Date.now() - global.db.rpg[o.sender].lastDaily < 86400000) return;
+    if(Date.now() - global.db.rpg[o.sender].lastDaily < 86400000) return sock.sendMessage(o.remoteJid, { text: 'Cooldown' });
     global.db.rpg[o.sender].money += 1000; global.db.rpg[o.sender].lastDaily = Date.now(); global.saveDB();
     await sock.sendMessage(o.remoteJid, { text: 'Balance: ' + global.db.rpg[o.sender].money });
   }
@@ -509,6 +557,7 @@ export default {
   command: ['addreply'],
   handler: async (sock, msg, o) => {
     const parts = o.text.split(' '); global.db.autoreply[parts[0].toLowerCase()] = parts.slice(1).join(' '); global.saveDB();
+    await sock.sendMessage(o.remoteJid, { text: 'Autoreply ' + parts[0] });
   },
   onMessage: async (sock, msg) => {
     const rep = global.db.autoreply[(msg.message?.conversation||'').toLowerCase()]; if(rep){ await sock.sendMessage(msg.key.remoteJid, { text: rep }); return true; } return false;
@@ -529,6 +578,7 @@ export default {
     return res.send(buffer);
 
   } catch (e) {
+    console.error('Generate Error:', e);
     return res.status(500).json({ error: e.message });
   }
 }
