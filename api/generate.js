@@ -1,4 +1,4 @@
-// api/generate.js - ULTIMATE FULL FIX (Button Support, Typing Presence, Log Console)
+// api/generate.js - ULTIMATE FULL FIX (9 BUGS FIXED)
 import JSZip from 'jszip';
 
 export default async function handler(req, res) {
@@ -45,7 +45,6 @@ export default async function handler(req, res) {
 
     // ================= 2. CASE =================
     if(base === 'case'){
-      // (Sama seperti versi sebelumnya, disingkat untuk ruang)
       const settingsCase = `module.exports = { botName: "${botName}", ownerNumber: "${ownerNumber}", ownerName: "${ownerName}", pairingNumber: "${pairingNumber}", prefix: ".", features: ${JSON.stringify(list)}, menuType: "${menuType}", btnType: "${btnType}", thumbType: "${thumbType}", ${panelConfigString} };`;
       
       const indexCase = `const settings = require('./settings.js');
@@ -62,7 +61,6 @@ ${usePanel ? `global.panel = settings.panel;` : ''}
 
 ['./src/database/welcome', './src/database/welcome-bg'].forEach(d => { if(!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
 
-// FONT AESTHETIC
 function fontBold(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D400 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D41A + n - 97); if (n >= 48 && n <= 57) return String.fromCodePoint(0x1D7CE + n - 48); return c; }).join(''); }
 function fontSmallCaps(str) { const map = { 'a': 'ᴀ', 'b': 'ʙ', 'c': 'ᴄ', 'd': 'ᴅ', 'e': 'ᴇ', 'f': 'ғ', 'g': 'ɢ', 'h': 'ʜ', 'i': 'ɪ', 'j': 'ᴊ', 'k': 'ᴋ', 'l': 'ʟ', 'm': 'ᴍ', 'n': 'ɴ', 'o': 'ᴏ', 'p': 'ᴘ', 'q': 'ǫ', 'r': 'ʀ', 's': 's', 't': 'ᴛ', 'u': 'ᴜ', 'v': 'ᴠ', 'w': 'ᴡ', 'x': 'x', 'y': 'ʏ', 'z': 'ᴢ' }; return [...String(str).toLowerCase()].map(c => map[c] || c).join(''); }
 function fontItalic(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D608 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D622 + n - 97); return c; }).join(''); }
@@ -81,26 +79,23 @@ async function startBot(){
     if(u.connection === 'close'){ const r = u.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut; if(r) setTimeout(()=>startBot(), 3000); }
   });
 
-  sock.ev.on('group-participants.update', async (update) => {
-      if(!global.db.welcome.includes(update.id)) return;
-      if(update.action === 'add'){
-        for(const p of update.participants){
-          await sock.sendMessage(update.id, { text: '👋 Selamat datang @' + p.split('@')[0], mentions: [p] });
-        }
-      }
-  });
-  
   sock.ev.on('messages.upsert', async (m)=>{
     const msg = m.messages[0]; if(!msg || !msg.message) return;
     const remoteJid = msg.key.remoteJid; const sender = msg.key.participant || remoteJid;
     let body = msg.message?.conversation || msg.message?.extendedTextMessage?.text || msg.message?.imageMessage?.caption || '';
     
+    // FIX BUTTON CLICK CASE
+    if (msg.message?.buttonsResponseMessage) {
+        body = msg.message.buttonsResponseMessage.selectedButtonId;
+    } else if (msg.message?.templateButtonReplyMessage) {
+        body = msg.message.templateButtonReplyMessage.selectedId;
+    }
+
     if (body) console.log(\`\\x1b[36m[PESAN MASUK]\\x1b[0m Dari: \\x1b[33m\${sender.split('@')[0]}\\x1b[0m | Isi: \\x1b[32m\${body}\\x1b[0m\`);
 
     if(msg.key.fromMe && !body.startsWith('.')) return;
     if(!body.startsWith('.')) return;
     
-    // TYPING INDICATOR
     await sock.sendPresenceUpdate('composing', remoteJid);
 
     const args = body.slice(1).trim().split(/ +/); const command = args.shift().toLowerCase(); const text = args.join(' ');
@@ -115,34 +110,24 @@ async function startBot(){
         } else if (settings.menuType === '2') {
             textMenu = \`⟪ \${fontBold('EDEN ACADEMY')} ⟫\\n═══════════════════════\\n✧ \${fontSmallCaps('Student')}  : \${fontItalic(d.user)}\\n✧ \${fontSmallCaps('Rank')}     : \${fontItalic(d.role)}\\n✧ \${fontSmallCaps('Level')}    : \${d.level}\\n✧ \${fontSmallCaps('Limit')}    : \${fontItalic(d.limit)}\\n\\n✧ \${fontSmallCaps('Runtime')}  : \${d.runtime}\\n✧ \${fontSmallCaps('Commands')} : \${d.commands}\\n✧ \${fontSmallCaps('Category')} : \${d.categories}\\n\\n  ■■■■■■■■■■ 100%\\n═══════════════════════\\n⟡ \${fontSmallCaps('Status')} : \${fontItalic('Imperial Scholar')}\`;
         } else if (settings.menuType === '3') {
-            textMenu = \`[ \${fontBold(settings.botName.toUpperCase())} CORE_ ]\\n-----------------------\\n> \${fontBold('PROFILE')}\\n  \${fontSmallCaps('User')}      : \${fontItalic(d.user)}\\n  \${fontSmallCaps('Role')}      : \${fontItalic(d.role)}\\n  \${fontSmallCaps('Level')}     : \${d.level}\\n  \${fontSmallCaps('Limit')}     : \${fontItalic(d.limit)}\\n\\n> \${fontBold('SYSTEM')}\\n  \${fontSmallCaps('Status')}    : ᴏɴʟɪɴᴇ\\n  \${fontSmallCaps('Runtime')}   : \${d.runtime}\\n  \${fontSmallCaps('Platform')}  : \${sys.platform}\\n  \${fontSmallCaps('Node')}      : \${sys.node}\\n\\n> \${fontBold('STATISTICS')}\\n  \${fontSmallCaps('Commands')}  : \${d.commands}\\n  \${fontSmallCaps('Category')}  : \${d.categories}\\n\\n  ■■■■■■■■■■ 100%\\n-----------------------\`;
+            textMenu = \`[ \${fontBold(settings.botName.toUpperCase())} ]\\n-----------------------\\n> \${fontBold('PROFILE')}\\n  \${fontSmallCaps('User')}      : \${fontItalic(d.user)}\\n  \${fontSmallCaps('Role')}      : \${fontItalic(d.role)}\\n  \${fontSmallCaps('Level')}     : \${d.level}\\n  \${fontSmallCaps('Limit')}     : \${fontItalic(d.limit)}\\n\\n> \${fontBold('SYSTEM')}\\n  \${fontSmallCaps('Status')}    : ᴏɴʟɪɴᴇ\\n  \${fontSmallCaps('Runtime')}   : \${d.runtime}\\n  \${fontSmallCaps('Platform')}  : \${sys.platform}\\n  \${fontSmallCaps('Node')}      : \${sys.node}\\n\\n> \${fontBold('STATISTICS')}\\n  \${fontSmallCaps('Commands')}  : \${d.commands}\\n  \${fontSmallCaps('Category')}  : \${d.categories}\\n\\n  ■■■■■■■■■■ 100%\\n-----------------------\`;
         } else {
             textMenu = \`┌─✦ \${fontBold(settings.botName + ' SYSTEM')} ✦─┐\\n│\\n├ ⊛ \${fontSmallCaps('Mode')}     : PUBLIC\\n├ ⊛ \${fontSmallCaps('Runtime')}  : \${d.runtime}\\n├ ⊛ \${fontSmallCaps('Commands')} : \${d.commands}\\n├ ⊛ \${fontSmallCaps('Platform')} : \${sys.platform}\\n├ ⊛ \${fontSmallCaps('RAM')}      : \${sys.ram}\\n├ ⊛ \${fontSmallCaps('Status')}   : ᴏɴʟɪɴᴇ\\n│\\n└─ ■■■■■■■■■■ 100%\`;
         }
         textMenu += \`\\n\\n╭━━━〔 \${settings.features.length} FITUR 〕━━━\\n\` + settings.features.map(f => '┃ ❒ .' + f).join('\\n') + \`\\n╰━━━━━━━━━━━━━━\`;
         
-        // LOGIKA BUTTON
         if (settings.btnType === 'btn') {
             try {
-                await sock.sendMessage(remoteJid, {
-                    text: textMenu,
-                    footer: 'Powered by ' + settings.botName,
-                    buttons: [
-                        { buttonId: '.menu', buttonText: { displayText: '≡ Menu' }, type: 1 },
-                        { buttonId: '.ping', buttonText: { displayText: '⟳ Ping' }, type: 1 },
-                        { buttonId: '.owner', buttonText: { displayText: '⟡ Owner' }, type: 1 }
-                    ],
-                    headerType: 1
-                }, { quoted: msg });
-            } catch (e) {
-                await sock.sendMessage(remoteJid, { text: textMenu }, { quoted: msg });
-            }
+                const imgPath = './thumbnail.jpg';
+                const msgPayload = { text: textMenu, footer: 'Powered by ' + settings.botName, buttons: [ { buttonId: '.menu', buttonText: { displayText: '≡ Menu' }, type: 1 }, { buttonId: '.ping', buttonText: { displayText: '⟳ Ping' }, type: 1 }, { buttonId: '.owner', buttonText: { displayText: '⟡ Owner' }, type: 1 } ], headerType: 1 };
+                if (fs.existsSync(imgPath)) { msgPayload.image = fs.readFileSync(imgPath); msgPayload.headerType = 4; }
+                await sock.sendMessage(remoteJid, msgPayload, { quoted: msg });
+            } catch (e) { await sock.sendMessage(remoteJid, { text: textMenu }, { quoted: msg }); }
         } else {
             await sock.sendMessage(remoteJid, { text: textMenu }, { quoted: msg });
         }
         return;
     }
-
     if(command === 'ping') return await sock.sendMessage(remoteJid, { text: '🏓 Pong!' }, { quoted: msg });
     if(command === 'owner') return await sock.sendMessage(remoteJid, { text: '👑 Owner: ' + settings.ownerName }, { quoted: msg });
   });
@@ -211,6 +196,13 @@ async function startBot(){
     const remoteJid = msg.key.remoteJid; const sender = msg.key.participant || remoteJid;
     let body = msg.message?.conversation || msg.message?.extendedTextMessage?.text || msg.message?.imageMessage?.caption || '';
     
+    // FIX BUTTON CLICK ESM
+    if (msg.message?.buttonsResponseMessage) {
+        body = msg.message.buttonsResponseMessage.selectedButtonId;
+    } else if (msg.message?.templateButtonReplyMessage) {
+        body = msg.message.templateButtonReplyMessage.selectedId;
+    }
+
     if (body) console.log(\`\\x1b[36m[PESAN MASUK]\\x1b[0m Dari: \\x1b[33m\${sender.split('@')[0]}\\x1b[0m | Isi: \\x1b[32m\${body}\\x1b[0m\`);
 
     if (msg.key.fromMe && !body.startsWith('.')) return;
@@ -218,7 +210,6 @@ async function startBot(){
     if(global.db.antilink.includes(remoteJid) && /https?:\\/\\/|www\\.|t\\.me\\//i.test(body)){ if(!msg.key.fromMe){ try{ await sock.sendMessage(remoteJid, { delete: msg.key }); }catch{} } return; }
     if(!body.startsWith('.')) return;
     
-    // TYPING INDICATOR
     await sock.sendPresenceUpdate('composing', remoteJid);
 
     const args = body.slice(1).trim().split(/ +/); const command = args.shift().toLowerCase(); const text = args.join(' ');
@@ -238,17 +229,19 @@ startBot();
     // ================= LIB FOLDER =================
     const libFolder = zip.folder('lib');
     libFolder.file('levelling.js', `export const xpRange = (level) => { let min = level * 100; let max = min + 100; return { min, max, xp: max - min }; };\nexport const getLevel = (exp) => { let level = 0; while (xpRange(level).max <= exp) level++; return level; };`);
-    libFolder.file('vidsave.js', `import crypto from "crypto";\nconst AES_KEYS = ["4c9b7d2e".repeat(3) + "4c9b7d21", "rz18efAXUbdiaO7k"];\nconst BASE_API = "https://api.vidssave.com/api/contentsite_api";\nconst SSE_BASE = "https://api.vidssave.com/sse/contentsite_api";\nconst DEFAULT_HEADERS = { "User-Agent": "Mozilla/5.0", "Referer": "https://vidssave.com/", "Origin": "https://vidssave.com", "Content-Type": "application/x-www-form-urlencoded" };\nfunction decryptAES(cipherTextB64) {\n  for (const keyStr of AES_KEYS) {\n    try {\n      const key = Buffer.from(keyStr, "utf8"); const iv = Buffer.from(keyStr.slice(0, 16), "utf8");\n      const decipher = crypto.createDecipheriv(key.length === 32 ? "aes-256-cbc" : "aes-128-cbc", key, iv);\n      decipher.setAutoPadding(false);\n      const decrypted = Buffer.concat([decipher.update(Buffer.from(cipherTextB64.trim(), "base64")), decipher.final()]);\n      let end = decrypted.length; while (end > 0 && decrypted[end - 1] === 0) end--;\n      return JSON.parse(decrypted.slice(0, end).toString("utf8"));\n    } catch {}\n  }\n  throw new Error("Gagal dekripsi VidSave");\n}\nasync function requestApi(path, data = {}) {\n  const payload = { hostname: "vidssave.com", auth: "4c9b7d21", domain: "api-ak.vidssave.com", ...data };\n  const res = await fetch(\`\${BASE_API}/\${path}\`, { method: "POST", headers: DEFAULT_HEADERS, body: new URLSearchParams(payload).toString() });\n  const json = await res.json(); if (json.status !== 1) throw new Error("API Error");\n  return typeof json.data === "string" ? decryptAES(json.data) : json.data;\n}\nexport async function parse(url) { const data = await requestApi("media/parse", { origin: "source", link: url }); return { title: data.title, resources: data.resources }; }\nexport async function download(videoUrl, format = "") { const info = await parse(videoUrl); let target = format ? info.resources.find(r => r.quality.toLowerCase() === format.toLowerCase() || r.type === format.toLowerCase()) : info.resources[0]; if (!target) target = info.resources[0]; const dlData = await requestApi("media/download", { request: target.resource_content, no_encrypt: 1, ...(format ? { output: format } : {}) }); const sseUrl = \`\${SSE_BASE}/media/download_query?auth=20250901majwlqo&domain=api-ak.vidssave.com&task_id=\${dlData.task_id}&download_domain=vidssave.com&origin=content_site\`; const sseRes = await fetch(sseUrl, { headers: { "User-Agent": "Mozilla/5.0", Accept: "text/event-stream" } }); const reader = sseRes.body.getReader(); const decoder = new TextDecoder(); let dlUrl = null; while (true) { const { done, value } = await reader.read(); if (done) break; const chunk = decoder.decode(value); for (const line of chunk.split("\\n")) { if (line.startsWith("data:")) { try { const p = JSON.parse(line.slice(5).trim()); if (p.download_link) { dlUrl = p.download_link; break; } } catch {} } } if (dlUrl) break; } const redRes = await fetch(dlUrl, { redirect: "manual" }); return { title: info.title, downloadUrl: redRes.headers.get("location") || dlUrl }; }`);
+    libFolder.file('vidsave.js', `import crypto from "crypto";\nconst AES_KEYS = ["4c9b7d2e".repeat(3) + "4c9b7d21", "rz18efAXUbdiaO7k"];\nconst BASE_API = "https://api.vidssave.com/api/contentsite_api";\nconst SSE_BASE = "https://api.vidssave.com/sse/contentsite_api";\nconst DEFAULT_HEADERS = { "User-Agent": "Mozilla/5.0", "Referer": "https://vidssave.com/", "Origin": "https://vidssave.com", "Content-Type": "application/x-www-form-urlencoded" };\nfunction decryptAES(cipherTextB64) {\n  for (const keyStr of AES_KEYS) {\n    try {\n      const key = Buffer.from(keyStr, "utf8"); const iv = Buffer.from(keyStr.slice(0, 16), "utf8");\n      const decipher = crypto.createDecipheriv(key.length === 32 ? "aes-256-cbc" : "aes-128-cbc", key, iv);\n      decipher.setAutoPadding(false);\n      const decrypted = Buffer.concat([decipher.update(Buffer.from(cipherTextB64.trim(), "base64")), decipher.final()]);\n      let end = decrypted.length; while (end > 0 && decrypted[end - 1] === 0) end--;\n      return JSON.parse(decrypted.slice(0, end).toString("utf8"));\n    } catch {}\n  }\n  throw new Error("Gagal dekripsi VidSave");\n}\nasync function requestApi(path, data = {}) {\n  const payload = { hostname: "vidssave.com", auth: "4c9b7d21", domain: "api-ak.vidssave.com", ...data };\n  const res = await fetch(\`\${BASE_API}/\${path}\`, { method: "POST", headers: DEFAULT_HEADERS, body: new URLSearchParams(payload).toString() });\n  const json = await res.json(); if (json.status !== 1) throw new Error("API Error");\n  return typeof json.data === "string" ? decryptAES(json.data) : json.data;\n}\nexport async function parse(url) { const data = await requestApi("media/parse", { origin: "source", link: url }); return { title: data.title, resources: data.resources }; }\nexport async function download(videoUrl, format = "") { const info = await parse(videoUrl); let target = format ? info.resources.find(r => r.quality.toLowerCase() === format.toLowerCase() || r.type === format.toLowerCase()) : info.resources[0]; if (!target) target = info.resources[0]; if(!target || !target.resource_content) throw new Error("Resource tidak ditemukan"); const dlData = await requestApi("media/download", { request: target.resource_content, no_encrypt: 1, ...(format ? { output: format } : {}) }); const sseUrl = \`\${SSE_BASE}/media/download_query?auth=20250901majwlqo&domain=api-ak.vidssave.com&task_id=\${dlData.task_id}&download_domain=vidssave.com&origin=content_site\`; const sseRes = await fetch(sseUrl, { headers: { "User-Agent": "Mozilla/5.0", Accept: "text/event-stream" } }); const reader = sseRes.body.getReader(); const decoder = new TextDecoder(); let dlUrl = null; while (true) { const { done, value } = await reader.read(); if (done) break; const chunk = decoder.decode(value); for (const line of chunk.split("\\n")) { if (line.startsWith("data:")) { try { const p = JSON.parse(line.slice(5).trim()); if (p.download_link) { dlUrl = p.download_link; break; } } catch {} } } if (dlUrl) break; } if(!dlUrl) throw new Error("Gagal mendapatkan link download"); const redRes = await fetch(dlUrl, { redirect: "manual" }); return { title: info.title, downloadUrl: redRes.headers.get("location") || dlUrl }; }`);
 
     // ================= PLUGINS =================
     const pf = zip.folder('plugins');
 
-    // MENU (SUPPORT BUTTON)
     if (list.includes('menu')) {
         pf.file('menu.js', `import moment from 'moment-timezone'; import fs from 'fs'; import os from 'os'; import sharp from 'sharp';
 const BOT_NAME = '${botName}'; const BOT_AUTHOR = '${ownerName}';
 const THUMB_URL = 'https://n.uguu.se/oVprmTOj.jpeg';
-async function getThumbnail() { try { const res = await fetch(THUMB_URL); return await sharp(Buffer.from(await res.arrayBuffer())).resize(300, 300).jpeg().toBuffer(); } catch { return null; } }
+async function getThumbnail() { 
+    if (fs.existsSync('./thumbnail.jpg')) return fs.readFileSync('./thumbnail.jpg');
+    try { const res = await fetch(THUMB_URL); return await sharp(Buffer.from(await res.arrayBuffer())).resize(300, 300).jpeg().toBuffer(); } catch { return null; } 
+}
 function fontBold(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D400 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D41A + n - 97); if (n >= 48 && n <= 57) return String.fromCodePoint(0x1D7CE + n - 48); return c; }).join(''); }
 function fontSmallCaps(str) { const map = { 'a': 'ᴀ', 'b': 'ʙ', 'c': 'ᴄ', 'd': 'ᴅ', 'e': 'ᴇ', 'f': 'ғ', 'g': 'ɢ', 'h': 'ʜ', 'i': 'ɪ', 'j': 'ᴊ', 'k': 'ᴋ', 'l': 'ʟ', 'm': 'ᴍ', 'n': 'ɴ', 'o': 'ᴏ', 'p': 'ᴘ', 'q': 'ǫ', 'r': 'ʀ', 's': 's', 't': 'ᴛ', 'u': 'ᴜ', 'v': 'ᴠ', 'w': 'ᴡ', 'x': 'x', 'y': 'ʏ', 'z': 'ᴢ' }; return [...String(str).toLowerCase()].map(c => map[c] || c).join(''); }
 function fontItalic(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D608 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D622 + n - 97); return c; }).join(''); }
@@ -266,14 +259,13 @@ export default { command: ['menu', 'help'], tags: ['main'], help: ['menu'], hand
     } else if (o.settings.menuType === '2') {
         textMenu = \`⟪ \${fontBold('EDEN ACADEMY')} ⟫\\n═══════════════════════\\n✧ \${fontSmallCaps('Student')}  : \${fontItalic(d.user)}\\n✧ \${fontSmallCaps('Rank')}     : \${fontItalic(d.role)}\\n✧ \${fontSmallCaps('Level')}    : \${d.level}\\n✧ \${fontSmallCaps('Limit')}    : \${fontItalic(d.limit)}\\n\\n✧ \${fontSmallCaps('Runtime')}  : \${d.runtime}\\n✧ \${fontSmallCaps('Commands')} : \${d.commands}\\n✧ \${fontSmallCaps('Category')} : \${d.categories}\\n\\n  ■■■■■■■■■■ 100%\\n═══════════════════════\\n⟡ \${fontSmallCaps('Status')} : \${fontItalic('Imperial Scholar')}\`;
     } else if (o.settings.menuType === '3') {
-        textMenu = \`[ \${fontBold(BOT_NAME.toUpperCase())} CORE_ ]\\n-----------------------\\n> \${fontBold('PROFILE')}\\n  \${fontSmallCaps('User')}      : \${fontItalic(d.user)}\\n  \${fontSmallCaps('Role')}      : \${fontItalic(d.role)}\\n  \${fontSmallCaps('Level')}     : \${d.level}\\n  \${fontSmallCaps('Limit')}     : \${fontItalic(d.limit)}\\n\\n> \${fontBold('SYSTEM')}\\n  \${fontSmallCaps('Status')}    : ᴏɴʟɪɴᴇ\\n  \${fontSmallCaps('Runtime')}   : \${d.runtime}\\n  \${fontSmallCaps('Platform')}  : \${sys.platform}\\n  \${fontSmallCaps('Node')}      : \${sys.node}\\n\\n> \${fontBold('STATISTICS')}\\n  \${fontSmallCaps('Commands')}  : \${d.commands}\\n  \${fontSmallCaps('Category')}  : \${d.categories}\\n\\n  ■■■■■■■■■■ 100%\\n-----------------------\`;
+        textMenu = \`[ \${fontBold(BOT_NAME.toUpperCase())} ]\\n-----------------------\\n> \${fontBold('PROFILE')}\\n  \${fontSmallCaps('User')}      : \${fontItalic(d.user)}\\n  \${fontSmallCaps('Role')}      : \${fontItalic(d.role)}\\n  \${fontSmallCaps('Level')}     : \${d.level}\\n  \${fontSmallCaps('Limit')}     : \${fontItalic(d.limit)}\\n\\n> \${fontBold('SYSTEM')}\\n  \${fontSmallCaps('Status')}    : ᴏɴʟɪɴᴇ\\n  \${fontSmallCaps('Runtime')}   : \${d.runtime}\\n  \${fontSmallCaps('Platform')}  : \${sys.platform}\\n  \${fontSmallCaps('Node')}      : \${sys.node}\\n\\n> \${fontBold('STATISTICS')}\\n  \${fontSmallCaps('Commands')}  : \${d.commands}\\n  \${fontSmallCaps('Category')}  : \${d.categories}\\n\\n  ■■■■■■■■■■ 100%\\n-----------------------\`;
     } else {
         textMenu = \`┌─✦ \${fontBold(BOT_NAME + ' SYSTEM')} ✦─┐\\n│\\n├ ⊛ \${fontSmallCaps('Mode')}     : PUBLIC\\n├ ⊛ \${fontSmallCaps('Runtime')}  : \${d.runtime}\\n├ ⊛ \${fontSmallCaps('Commands')} : \${d.commands}\\n├ ⊛ \${fontSmallCaps('Platform')} : \${sys.platform}\\n├ ⊛ \${fontSmallCaps('RAM')}      : \${sys.ram}\\n├ ⊛ \${fontSmallCaps('Status')}   : ᴏɴʟɪɴᴇ\\n│\\n└─ ■■■■■■■■■■ 100%\`;
     }
 
     textMenu += \`\\n\\n╭━━━〔 \${feats.length} FITUR 〕━━━\\n\` + feats.map(f => '┃ ❒ .' + f).join('\\n') + \`\\n╰━━━━━━━━━━━━━━\`;
     
-    // LOGIKA BUTTON DI ESM
     if (o.settings.btnType === 'btn') {
         try {
             const thumb = await getThumbnail();
@@ -304,7 +296,6 @@ export default { command: ['menu', 'help'], tags: ['main'], help: ['menu'], hand
 } };`);
     }
 
-    // VIDSAVE (DOWNLOADER)
     if (list.includes('vidsave')) {
         pf.file('downloader.js', `import { download } from '../lib/vidsave.js';
 export default { command: ['dl', 'tiktok', 'ig', 'yt'], tags: ['downloader'], help: ['dl <url>'], handler: async (sock, msg, o) => {
@@ -314,7 +305,6 @@ export default { command: ['dl', 'tiktok', 'ig', 'yt'], tags: ['downloader'], he
 } };`);
     }
 
-    // BYPASS
     if (list.includes('bypass')) {
         pf.file('bypass.js', `import axios from 'axios';
 export default { command: ['bypass', 'bypass2'], tags: ['tools'], help: ['bypass <url>'], handler: async (sock, msg, o) => {
@@ -324,55 +314,103 @@ export default { command: ['bypass', 'bypass2'], tags: ['tools'], help: ['bypass
 } };`);
     }
 
-    // RCH
     if (list.includes('rch')) {
         pf.file('rch.js', `import axios from 'axios';
 export default { command: ['rch', 'reactch'], tags: ['tools'], help: ['rch <link> <emoji>'], handler: async (sock, msg, o) => {
     if (!o.args[0] || !o.args[1]) return sock.sendMessage(o.remoteJid, { text: 'Format Salah!\\n\\nContoh:\\n.' + o.command + ' https://whatsapp.com/channel/xxx 😭,🔥\\n\\n(Maks 4 emoji dipisah koma)' }, { quoted: msg });
     await sock.sendMessage(o.remoteJid, { react: { text: '🕒', key: msg.key } }).catch(()=>{});
-    try { const tokenRes = await axios.get('https://omegatech-api.dixonomega.tech/api/tools/recaptcha-v3', { params: { sitekey: '6LemKk8sAAAAAH5PB3f1EspbMlXjtwv5C8tiMHSm', url: 'https://back.asitha.top/api', use_enterprise: 'false' } }); const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NTZmMzhjOTllNGEzOTVlOWM0ZTc3NSIsImlhdCI6MTc3NzE2NjQ0MiwiZXhwIjoxNzc3NzcxMjQyfQ.V3yZRhC5aVoFX7rwRwjIUGLH9Ly8mz4BsqgRA8ZOcH0'; const temp = await axios.post('https://back.asitha.top/api/user/get-temp-token', { recaptcha_token: tokenRes.data.token }, { headers: { Authorization: 'Bearer ' + jwt } }); await axios.post('https://back.asitha.top/api/channel/react-to-post?apiKey=' + temp.data.token, { post_link: o.args[0], reacts: o.args.slice(1).join(' ') }, { headers: { Authorization: 'Bearer ' + jwt } }); await sock.sendMessage(o.remoteJid, { react: { text: '✅', key: msg.key } }).catch(()=>{}); await sock.sendMessage(o.remoteJid, { text: '🔥 Reactions sent successfully.' }, { quoted: msg }); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
+    try { 
+        const tokenRes = await axios.get('https://omegatech-api.dixonomega.tech/api/tools/recaptcha-v3', { params: { sitekey: '6LemKk8sAAAAAH5PB3f1EspbMlXjtwv5C8tiMHSm', url: 'https://back.asitha.top/api', use_enterprise: 'false' } }); 
+        const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NTZmMzhjOTllNGEzOTVlOWM0ZTc3NSIsImlhdCI6MTc3NzE2NjQ0MiwiZXhwIjoxNzc3NzcxMjQyfQ.V3yZRhC5aVoFX7rwRwjIUGLH9Ly8mz4BsqgRA8ZOcH0'; 
+        const temp = await axios.post('https://back.asitha.top/api/user/get-temp-token', { recaptcha_token: tokenRes.data.token }, { headers: { Authorization: 'Bearer ' + jwt } }); 
+        await axios.post('https://back.asitha.top/api/channel/react-to-post?apiKey=' + temp.data.token, { post_link: o.args[0], reacts: o.args.slice(1).join(' ') }, { headers: { Authorization: 'Bearer ' + jwt } }); 
+        await sock.sendMessage(o.remoteJid, { react: { text: '✅', key: msg.key } }).catch(()=>{}); 
+        await sock.sendMessage(o.remoteJid, { text: '🔥 Reactions sent successfully.' }, { quoted: msg }); 
+    } catch(e) { 
+        let errMsg = e.message;
+        if (errMsg.includes('ENOTFOUND')) errMsg = 'Server API sedang down (Domain tidak ditemukan).';
+        await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + errMsg }, { quoted: msg }); 
+    }
 } };`);
     }
 
-    // IQC
     if (list.includes('iqc')) {
         pf.file('iqc.js', `import axios from 'axios'; import FormData from 'form-data';
 export default { command: ['iqc', 'iqcv2'], tags: ['maker'], help: ['iqc <text>'], handler: async (sock, msg, o) => {
     let text = o.text;
-    if (!text && !msg.message.imageMessage && !msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage) return sock.sendMessage(o.remoteJid, { text: 'Kirim gambar atau reply + caption\\n\\nContoh:\\n.' + o.command + ' halo cihuyy' }, { quoted: msg });
+    const q = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+    if (!text && !msg.message.imageMessage && !q?.imageMessage) return sock.sendMessage(o.remoteJid, { text: 'Kirim gambar atau reply + caption\\n\\nContoh:\\n.' + o.command + ' halo cihuyy' }, { quoted: msg });
     
     await sock.sendMessage(o.remoteJid, { react: { text: '⏳', key: msg.key } }).catch(()=>{});
     let imgUrl = '';
-    if (msg.message.imageMessage || msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage) {
-        try { const buf = await sock.downloadMediaMessage(msg); const form = new FormData(); form.append('files[]', buf, 'img.jpg'); const res = await axios.post('https://uguu.se/upload.php', form, { headers: form.getHeaders() }); imgUrl = res.data.files[0].url; } catch {}
+    if (msg.message.imageMessage || q?.imageMessage) {
+        try { 
+            const targetMsg = q ? { message: q, key: { ...msg.key, id: msg.message.extendedTextMessage.contextInfo.stanzaId } } : msg;
+            const buf = await downloadMediaMessage(targetMsg, 'buffer', {}, { logger: pino() }); 
+            const form = new FormData(); form.append('files[]', buf, 'img.jpg'); 
+            const res = await axios.post('https://uguu.se/upload.php', form, { headers: form.getHeaders() }); 
+            imgUrl = res.data.files[0].url; 
+        } catch {}
     }
     try { const res = await axios.post('https://brat.siputzx.my.id/v2/iphone-quoted', { sender: 'other', message: text || ' ', imageUrl: imgUrl, status: { carrierName: 'INDOSAT', batteryPercentage: 88, signalStrength: 4, wifi: true }, emojiStyle: 'apple' }, { headers: { 'Content-Type': 'application/json' }, responseType: 'arraybuffer' }); await sock.sendMessage(o.remoteJid, { image: Buffer.from(res.data) }, { quoted: msg }); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
 } };`);
     }
 
-    // WEB2APK
     if (list.includes('web2apk')) {
-        pf.file('web2apk.js', `export default { command: ['web2apk'], tags: ['tools'], help: ['web2apk <url>'], handler: async (sock, msg, o) => {
-    if (!o.args[0]) return sock.sendMessage(o.remoteJid, { text: 'Kirim URL website!\\n\\nContoh:\\n.' + o.command + ' https://google.com' }, { quoted: msg });
-    await sock.sendMessage(o.remoteJid, { text: '⏳ Building APK...' }, { quoted: msg });
-    try { const res = await fetch('https://code-v-compiler-sr.vercel.app/api/build', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: o.args[0], appName: 'MyApp', packageName: 'com.myapp' }) }); const data = await res.json(); let attempts = 0; while(attempts < 30) { await new Promise(r=>setTimeout(r,2000)); const poll = await (await fetch('https://code-v-compiler-sr.vercel.app/api/build/' + data.build_id)).json(); if(poll.status === 'ready') { await sock.sendMessage(o.remoteJid, { document: { url: 'https://code-v-compiler-sr.vercel.app' + poll.download_url }, mimetype: 'application/vnd.android.package-archive', fileName: 'app.apk' }, { quoted: msg }); return; } attempts++; } throw new Error('Timeout'); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
+        pf.file('web2apk.js', `export default { command: ['web2apk'], tags: ['tools'], help: ['web2apk <url> | <Nama> | <Package>'], handler: async (sock, msg, o) => {
+    if (!o.text) return sock.sendMessage(o.remoteJid, { text: 'Format: .web2apk <url> | <Nama App> | <Package>\\n\\nContoh:\\n.web2apk https://google.com | GoogleKu | com.google.ku' }, { quoted: msg });
+    
+    const parts = o.text.split('|');
+    const url = parts[0]?.trim();
+    const appName = parts[1]?.trim() || 'MyApp';
+    const packageName = parts[2]?.trim() || 'com.myapp';
+
+    if (!url || !url.startsWith('http')) return sock.sendMessage(o.remoteJid, { text: 'URL tidak valid!' }, { quoted: msg });
+
+    await sock.sendMessage(o.remoteJid, { text: '⏳ Building APK... (Bisa memakan waktu 1-2 menit)' }, { quoted: msg });
+    try { 
+        const res = await fetch('https://code-v-compiler-sr.vercel.app/api/build', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url, appName, packageName }) }); 
+        const data = await res.json(); 
+        let attempts = 0; 
+        while(attempts < 40) { 
+            await new Promise(r=>setTimeout(r,3000)); 
+            const poll = await (await fetch('https://code-v-compiler-sr.vercel.app/api/build/' + data.build_id)).json(); 
+            if(poll.status === 'ready') { 
+                await sock.sendMessage(o.remoteJid, { document: { url: 'https://code-v-compiler-sr.vercel.app' + poll.download_url }, mimetype: 'application/vnd.android.package-archive', fileName: appName + '.apk' }, { quoted: msg }); 
+                return; 
+            } 
+            attempts++; 
+        } 
+        throw new Error('Timeout'); 
+    } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
 } };`);
     }
 
-    // UNBLUR
     if (list.includes('unblur')) {
         pf.file('unblur.js', `import crypto from 'crypto';
+import { downloadMediaMessage } from 'noxleys-baileys';
+import pino from 'pino';
 export default { command: ['unblur'], tags: ['ai'], help: ['unblur'], handler: async (sock, msg, o) => {
-    if (!msg.message.imageMessage && !msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage) return sock.sendMessage(o.remoteJid, { text: 'Kirim/reply gambar buram!\\n\\nContoh:\\nKirim gambar + caption .' + o.command }, { quoted: msg });
+    const q = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
+    if (!msg.message.imageMessage && !q?.imageMessage) return sock.sendMessage(o.remoteJid, { text: 'Kirim/reply gambar buram!\\n\\nContoh:\\nKirim gambar + caption .' + o.command }, { quoted: msg });
     await sock.sendMessage(o.remoteJid, { text: '⏳ Processing...' }, { quoted: msg });
-    try { const buf = await sock.downloadMediaMessage(msg); const form = new FormData(); form.append('original_image_file', new Blob([buf], { type: 'image/png' }), 'image.png'); const dev = 'fallback_' + crypto.randomBytes(6).toString('hex'); const res = await fetch('https://api.unwatermark.ai/api/web/unblurimage/v1/image-unblur-v2/create-job', { method: 'POST', headers: { 'Product-Code': '067003', 'Product-Serial': dev, Origin: 'https://unblurimage.ai', Referer: 'https://unblurimage.ai/' }, body: form }); const data = await res.json(); if(!data.result) throw new Error('Gagal buat job'); let out = null; for(let i=0; i<20; i++) { await new Promise(r=>setTimeout(r,2000)); const poll = await (await fetch('https://api.unwatermark.ai/api/web/unblurimage/v1/image-unblur-v2/get-job/' + data.result.job_id, { headers: { 'Product-Code': '067003', 'Product-Serial': dev } })).json(); if(poll.result?.status === 1) { out = poll.result.output_url?.[0]; break; } } await sock.sendMessage(o.remoteJid, { image: { url: out }, caption: '✅ Selesai!' }, { quoted: msg }); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
+    try { 
+        const targetMsg = q ? { message: q, key: { ...msg.key, id: msg.message.extendedTextMessage.contextInfo.stanzaId } } : msg;
+        const buf = await downloadMediaMessage(targetMsg, 'buffer', {}, { logger: pino() }); 
+        const form = new FormData(); form.append('original_image_file', new Blob([buf], { type: 'image/png' }), 'image.png'); 
+        const dev = 'fallback_' + crypto.randomBytes(6).toString('hex'); 
+        const res = await fetch('https://api.unwatermark.ai/api/web/unblurimage/v1/image-unblur-v2/create-job', { method: 'POST', headers: { 'Product-Code': '067003', 'Product-Serial': dev, Origin: 'https://unblurimage.ai', Referer: 'https://unblurimage.ai/' }, body: form }); 
+        const data = await res.json(); if(!data.result) throw new Error('Gagal buat job'); let out = null; 
+        for(let i=0; i<20; i++) { await new Promise(r=>setTimeout(r,2000)); const poll = await (await fetch('https://api.unwatermark.ai/api/web/unblurimage/v1/image-unblur-v2/get-job/' + data.result.job_id, { headers: { 'Product-Code': '067003', 'Product-Serial': dev } })).json(); if(poll.result?.status === 1) { out = poll.result.output_url?.[0]; break; } } 
+        await sock.sendMessage(o.remoteJid, { image: { url: out }, caption: '✅ Selesai!' }, { quoted: msg }); 
+    } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
 } };`);
     }
 
-    // FOTOLIVE
     if (list.includes('fotolive')) {
         pf.file('fotolive.js', `import fs from 'fs'; import os from 'os'; import path from 'path'; import ffmpeg from 'fluent-ffmpeg'; 
 import { downloadMediaMessage, prepareWAMessageMedia, generateWAMessageFromContent } from 'noxleys-baileys';
+import pino from 'pino';
 export default { command: ['fotolive', 'livephoto'], tags: ['maker'], help: ['fotolive'], handler: async (sock, msg, o) => {
     const q = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage;
     const isVideo = msg.message.videoMessage || q?.videoMessage;
@@ -383,7 +421,8 @@ export default { command: ['fotolive', 'livephoto'], tags: ['maker'], help: ['fo
     await sock.sendMessage(o.remoteJid, { text: '⏳ Memproses Live Photo...' }, { quoted: msg });
 
     try { 
-        const buf = await downloadMediaMessage(msg, 'buffer', {}); 
+        const targetMsg = q ? { message: q, key: { ...msg.key, id: msg.message.extendedTextMessage.contextInfo.stanzaId } } : msg;
+        const buf = await downloadMediaMessage(targetMsg, 'buffer', {}, { logger: pino() }); 
         fs.writeFileSync(vid, buf); 
         await new Promise((res,rej)=>{ ffmpeg(vid).outputOptions(['-vframes 1']).output(thumb).on('end',res).on('error',rej).run(); }); 
         const tBuf = fs.readFileSync(thumb); 
@@ -400,7 +439,6 @@ export default { command: ['fotolive', 'livephoto'], tags: ['maker'], help: ['fo
 } };`);
     }
 
-    // WELCOME (JIMP)
     if (list.includes('welcome')) {
         pf.file('welcome.js', `import fs from 'fs'; import path from 'path'; import Jimp from 'jimp'; import { downloadContentFromMessage } from 'noxleyss'; import settings from '../settings.js';
 const DIR = './src/database/welcome'; const BGDIR = './src/database/welcome-bg';
@@ -430,7 +468,6 @@ export default { command: ['welcome', 'left'], tags: ['admin'], help: ['welcome 
 } };`);
     }
 
-    // DUMMY PLUGINS
     list.forEach(f => {
         if (['menu','vidsave','bypass','rch','iqc','web2apk','unblur','fotolive','welcome'].includes(f)) return;
         if (f === 'panel' && usePanel) {
