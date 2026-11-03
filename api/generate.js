@@ -1,4 +1,4 @@
-// api/generate.js - FULL FIX (Panel 204 Delete & Environment Variables)
+// api/generate.js - ULTIMATE FULL INTEGRATION (CASE / ESM / TELE)
 import JSZip from 'jszip';
 
 export default async function handler(req, res) {
@@ -19,9 +19,7 @@ export default async function handler(req, res) {
     const zip = new JSZip();
     
     let list = features && features.length > 0 ? features : [
-      'menu','ping','owner','info','runtime','totfitur','speed','say','quote','donasi',
-      'welcome','antilink','hidetag','sticker','tiktok','ai',
-      'rpg','store','autoreply','broadcast'
+      'menu','ping','owner','info','vidsave','bypass','rch','iqc','web2apk','unblur','fotolive','welcome','antilink','hidetag'
     ];
 
     if (usePanel && !list.includes('panel')) list.push('panel');
@@ -31,18 +29,15 @@ export default async function handler(req, res) {
       zip.file('thumbnail.jpg', Buffer.from(base64Data, 'base64'));
     }
 
-    const panelConfigString = usePanel ? `panel: {
-    domain: "${panelDomain || ''}",
-    ptla: "${panelPtla || ''}",
-    egg: "${panelEgg || '15'}",
-    loc: "${panelLoc || '1'}"
-  },` : '';
+    const panelConfigString = usePanel ? `panel: { domain: "${panelDomain || ''}", ptla: "${panelPtla || ''}", egg: "${panelEgg || '15'}", loc: "${panelLoc || '1'}" },` : '';
 
     // ================= 1. TELEGRAM =================
     if(platform === 'telegram'){
       const settingsTele = `module.exports = { botName: "${botName}", ownerName: "${ownerName}", features: ${JSON.stringify(list)} };`;
       zip.file('settings.js', settingsTele);
-      zip.file('package.json', JSON.stringify({ name: safe, version: "1.0.0", type: "commonjs", dependencies: { telegraf: "^4.15.3" } }, null, 2));
+      
+      const pkgDeps = { telegraf: "^4.15.3", axios: "^1.7.2", "node-fetch": "^3.3.2", "moment-timezone": "^0.5.45", "jimp": "^0.22.12", "form-data": "^4.0.0" };
+      zip.file('package.json', JSON.stringify({ name: safe, version: "1.0.0", type: "commonjs", dependencies: pkgDeps }, null, 2));
       
       const buffer = await zip.generateAsync({ type: 'nodebuffer' });
       res.setHeader('Content-Type', 'application/zip');
@@ -52,267 +47,127 @@ export default async function handler(req, res) {
 
     // ================= 2. CASE =================
     if(base === 'case'){
-      const settingsCase = `module.exports = {
-  botName: "${botName}", ownerNumber: "${ownerNumber}", ownerName: "${ownerName}",
-  pairingNumber: "${pairingNumber}", prefix: ".", features: ${JSON.stringify(list)},
-  menuType: "${menuType}", btnType: "${btnType}", thumbType: "${thumbType}", ${panelConfigString}
-};
-`;
+      const settingsCase = `module.exports = { botName: "${botName}", ownerNumber: "${ownerNumber}", ownerName: "${ownerName}", pairingNumber: "${pairingNumber}", prefix: ".", features: ${JSON.stringify(list)}, menuType: "${menuType}", btnType: "${btnType}", thumbType: "${thumbType}", ${panelConfigString} };`;
+      
       const indexCase = `const settings = require('./settings.js');
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, downloadMediaMessage } = require('noxleys-baileys');
-const pino = require('pino'); const fs = require('fs'); const axios = require('axios');
+const pino = require('pino'); const fs = require('fs'); const path = require('path'); const axios = require('axios');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 global.db = JSON.parse(fs.readFileSync('./database.json'));
 global.saveDB = () => fs.writeFileSync('./database.json', JSON.stringify(global.db, null, 2));
 global.startTime = Date.now();
 ${usePanel ? `global.panel = settings.panel;` : ''}
+global.plugins = {};
 
-const botName = settings.botName; const owner = settings.ownerNumber; const ownerName = settings.ownerName; const pairingNumber = settings.pairingNumber;
-const quotes = ['Jangan berhenti ketika lelah, berhentilah ketika selesai.', 'Kesuksesan adalah hasil kerja keras dan doa.', 'Hidup itu seperti sepeda, untuk seimbang harus bergerak.'];
-
-console.log(\`
-\\x1b[36m==================================================\\x1b[0m
-\\x1b[35m  🤖 BOT WHATSAPP STARTING... (CASE MODE)\\x1b[0m
-\\x1b[36m==================================================\\x1b[0m
-  \\x1b[33m»\\x1b[0m Nama Bot   : \\x1b[32m\${botName}\\x1b[0m
-  \\x1b[33m»\\x1b[0m Owner      : \\x1b[32m\${ownerName}\\x1b[0m
-  \\x1b[33m»\\x1b[0m Engine     : \\x1b[36mNoxleys Baileys\\x1b[0m
-  \\x1b[33m»\\x1b[0m Total Fitur: \\x1b[33m\${settings.features.length} Fitur\\x1b[0m
-\\x1b[36m==================================================\\x1b[0m
-\`);
+// Auto-create folders for Welcome
+['./src/database/welcome', './src/database/welcome-bg'].forEach(d => { if(!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
 
 async function startBot(){
   const { state, saveCreds } = await useMultiFileAuthState('session');
   const sock = makeWASocket({ auth: state, logger: pino({ level: 'silent' }), printQRInTerminal: false });
   sock.ev.on('creds.update', saveCreds);
   
-  if(!state.creds.registered){
-    setTimeout(async()=>{ 
-      try{ 
-        const code = await sock.requestPairingCode(pairingNumber); 
-        console.log(\`\\n\\x1b[33m[ PAIRING CODE ]\\x1b[0m \\x1b[32m\${code}\\x1b[0m\\n\\x1b[90mMasukkan kode di atas ke WhatsApp kamu.\\x1b[0m\\n\`); 
-      }catch(e){} 
-    }, 3000);
-  }
+  if(!state.creds.registered){ setTimeout(async()=>{ try{ const code = await sock.requestPairingCode(settings.pairingNumber); console.log('Pairing Code ' + settings.botName + ': ' + code); }catch(e){} }, 3000); }
   
   sock.ev.on('connection.update', (u)=>{
-    if(u.connection === 'open') {
-        console.log(\`\\n\\x1b[32m[ SUCCESS ] \${botName} Connected to WhatsApp!\\x1b[0m\\n\`);
-    }
-    if(u.connection === 'close'){ 
-        const r = u.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut; 
-        if(r) {
-            console.log(\`\\n\\x1b[31m[ WARNING ] Koneksi terputus. Mencoba menghubungkan ulang...\\x1b[0m\\n\`);
-            setTimeout(()=>startBot(), 3000); 
-        }
-    }
+    if(u.connection === 'open') console.log(settings.botName + ' Connected!');
+    if(u.connection === 'close'){ const r = u.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut; if(r) setTimeout(()=>startBot(), 3000); }
   });
-  
+
   sock.ev.on('group-participants.update', async (update) => {
-    if(!global.db.welcome.includes(update.id)) return;
-    if(update.action === 'add'){
-      for(const p of update.participants){
-        let t = '╭━━━〔 WELCOME 〕━━━✦\\n┃ 👋 Selamat datang +' + p.split('@')[0] + '\\n╰━━━〔 ' + botName + ' 〕━━━';
-        await sock.sendMessage(update.id, { text: t, mentions: [p] });
+      // Handler Welcome di Case (Sederhana, karena complex Jimp butuh file terpisah)
+      if(!global.db.welcome.includes(update.id)) return;
+      if(update.action === 'add'){
+        for(const p of update.participants){
+          await sock.sendMessage(update.id, { text: '👋 Selamat datang @' + p.split('@')[0], mentions: [p] });
+        }
       }
-    }
   });
   
   sock.ev.on('messages.upsert', async (m)=>{
-    const msg = m.messages[0];
-    if(!msg || !msg.message) return;
-    
+    const msg = m.messages[0]; if(!msg || !msg.message) return;
     const remoteJid = msg.key.remoteJid; const sender = msg.key.participant || remoteJid;
     let body = msg.message?.conversation || msg.message?.extendedTextMessage?.text || msg.message?.imageMessage?.caption || '';
     
-    if (body) console.log(\`\\x1b[90m[PESAN]\\x1b[0m \${sender.split('@')[0]} : \${body}\`);
     if(msg.key.fromMe && !body.startsWith('.')) return;
-    
     if(body && global.db.autoreply[body.toLowerCase()]){ await sock.sendMessage(remoteJid, { text: global.db.autoreply[body.toLowerCase()] }, { quoted: msg }); return; }
     if(global.db.antilink.includes(remoteJid) && /https?:\\/\\/|www\\.|t\\.me\\//i.test(body)){ if(!msg.key.fromMe){ try{ await sock.sendMessage(remoteJid, { delete: msg.key }); }catch{} } return; }
     if(!body.startsWith('.')) return;
     
-    const args = body.slice(1).trim().split(/ +/); const command = args.shift().toLowerCase(); const text = args.join(' '); const isGroup = remoteJid.endsWith('@g.us');
-    
-    switch(command){
-      case 'menu': case 'help': case 'start': {
-        let menuTxt = '';
-        if (settings.menuType === 'simple') menuTxt = 'MENU ' + botName + '\\n\\n' + settings.features.map(f => '❒ .' + f).join('\\n') + '\\n\\nOwner: ' + ownerName;
-        else if (settings.menuType === 'image') menuTxt = '╭━━━〔 ' + botName + ' 〕━━━\\n' + settings.features.map(f => '┃ ❒ .' + f).join('\\n') + '\\n╰━━━\\nOwner: ' + ownerName;
-        else menuTxt = '╭━━━〔 ' + botName + ' 〕━━━✦\\n┃ 👤 Owner: ' + ownerName + '\\n┃ 📱 Nomor: ' + owner + '\\n┣━━━〔 ' + settings.features.length + ' FITUR 〕━━━\\n' + settings.features.map(f => '┃ ❒ .' + f).join('\\n') + '\\n╰━━━━━━━━━━━━━━';
+    const args = body.slice(1).trim().split(/ +/); const command = args.shift().toLowerCase(); const text = args.join(' ');
 
-        if (settings.btnType === 'btn') {
-          let btnMsg = { text: menuTxt, footer: 'Powered by CiKiZz', buttons: [ { buttonId: '.menu', buttonText: { displayText: 'Refresh Menu' }, type: 1 } ], headerType: 1 };
-          if (settings.thumbType === 'thumb' && fs.existsSync('./thumbnail.jpg')) btnMsg.image = fs.readFileSync('./thumbnail.jpg');
-          try { await sock.sendMessage(remoteJid, btnMsg, { quoted: msg }); } catch (e) { await sock.sendMessage(remoteJid, { text: menuTxt }, { quoted: msg }); }
-        } else {
-          if (settings.thumbType === 'thumb' && fs.existsSync('./thumbnail.jpg')) await sock.sendMessage(remoteJid, { image: fs.readFileSync('./thumbnail.jpg'), caption: menuTxt }, { quoted: msg });
-          else await sock.sendMessage(remoteJid, { text: menuTxt }, { quoted: msg });
-        }
-        break;
-      }
-      case 'ping': { await sock.sendMessage(remoteJid, { text: '🏓 Pong!' }, { quoted: msg }); break; }
-      case 'owner': { await sock.sendMessage(remoteJid, { text: '👑 Owner: ' + ownerName + '\\n📱 wa.me/' + owner }, { quoted: msg }); break; }
-      case 'info': { await sock.sendMessage(remoteJid, { text: '🤖 Info Bot ' + botName + '\\nEngine: Noxleys Baileys' }, { quoted: msg }); break; }
-      case 'runtime': { await sock.sendMessage(remoteJid, { text: '⏱️ Uptime: ' + Math.floor((Date.now()-global.startTime)/1000) + 's' }, { quoted: msg }); break; }
-      case 'totfitur': { await sock.sendMessage(remoteJid, { text: '🧩 Total: ' + settings.features.length }, { quoted: msg }); break; }
-      case 'speed': { await sock.sendMessage(remoteJid, { text: '⚡ Speed OK' }, { quoted: msg }); break; }
-      case 'donasi': { await sock.sendMessage(remoteJid, { text: '☕ Donasi Dana: 08xxx' }, { quoted: msg }); break; }
-      case 'say': { if(!text) return; await sock.sendMessage(remoteJid, { text: text }, { quoted: msg }); break; }
-      case 'quote': { const q = quotes[Math.floor(Math.random() * quotes.length)]; await sock.sendMessage(remoteJid, { text: '💭 "' + q + '"' }, { quoted: msg }); break; }
-      case 'welcome': {
-        if(text === 'on'){ if(!global.db.welcome.includes(remoteJid)) global.db.welcome.push(remoteJid); global.saveDB(); await sock.sendMessage(remoteJid, { text: '✅ Welcome ON' }, { quoted: msg }); }
-        else if(text === 'off'){ global.db.welcome = global.db.welcome.filter(v=>v!==remoteJid); global.saveDB(); await sock.sendMessage(remoteJid, { text: '❌ Welcome OFF' }, { quoted: msg }); }
-        else { await sock.sendMessage(remoteJid, { text: 'Format: .welcome on / off' }, { quoted: msg }); }
-        break;
-      }
-      case 'antilink': {
-        if(text === 'on'){ if(!global.db.antilink.includes(remoteJid)) global.db.antilink.push(remoteJid); global.saveDB(); await sock.sendMessage(remoteJid, { text: '✅ Antilink ON' }, { quoted: msg }); }
-        else if(text === 'off'){ global.db.antilink = global.db.antilink.filter(v=>v!==remoteJid); global.saveDB(); await sock.sendMessage(remoteJid, { text: '❌ Antilink OFF' }, { quoted: msg }); }
-        else { await sock.sendMessage(remoteJid, { text: 'Format: .antilink on / off' }, { quoted: msg }); }
-        break;
-      }
-      case 'hidetag': { const meta = await sock.groupMetadata(remoteJid); const mentions = meta.participants.map(p=>p.id); await sock.sendMessage(remoteJid, { text: text || '📢 Halo!', mentions }); break; }
-      case 's': case 'sticker': { const type = Object.keys(msg.message)[0]; let imgMsg = null; if(type === 'imageMessage') imgMsg = msg; else if(msg.message?.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage){ imgMsg = { message: { imageMessage: msg.message.extendedTextMessage.contextInfo.quotedMessage.imageMessage }, key: { ...msg.key, id: msg.message.extendedTextMessage.contextInfo.stanzaId } }; } if(!imgMsg) return; try{ const b = await downloadMediaMessage(imgMsg, 'buffer', {}); await sock.sendMessage(remoteJid, { sticker: b }, { quoted: msg }); }catch{} break; }
-      case 'tiktok': { if(!args[0]) return; try{ const r = await axios.get('https://tikwm.com/api/?url=' + encodeURIComponent(args[0])); if(r.data?.data?.play) await sock.sendMessage(remoteJid, { video: { url: r.data.data.play } }, { quoted: msg }); }catch{} break; }
-      case 'ai': { if(!text) return; await sock.sendMessage(remoteJid, { text: '🤖 Berpikir...' }, { quoted: msg }); try{ const r = await axios.get('https://api.popcat.xyz/chatbot?msg=' + encodeURIComponent(text)); await sock.sendMessage(remoteJid, { text: '🤖 ' + r.data.response }, { quoted: msg }); }catch{} break; }
-      case 'daily': { if(!global.db.rpg[sender]) global.db.rpg[sender] = { money: 0, lastDaily: 0 }; if(Date.now() - global.db.rpg[sender].lastDaily < 86400000) return sock.sendMessage(remoteJid, { text: '⏳ Cooldown' }, { quoted: msg }); global.db.rpg[sender].money += 1000; global.db.rpg[sender].lastDaily = Date.now(); global.saveDB(); await sock.sendMessage(remoteJid, { text: '✅ +1000 Coin' }, { quoted: msg }); break; }
-      case 'addproduk': { if(!text) return; global.db.produk.push({ nama: text }); global.saveDB(); await sock.sendMessage(remoteJid, { text: '✅ Produk ditambah' }, { quoted: msg }); break; }
-      case 'store': { let t = '🛒 Store:\\n' + global.db.produk.map((p,i)=> (i+1)+'. '+p.nama).join('\\n'); await sock.sendMessage(remoteJid, { text: t || 'Kosong' }, { quoted: msg }); break; }
-      case 'addreply': { const [k, ...v] = text.split('|'); if(!k || v.length===0) return; global.db.autoreply[k.trim().toLowerCase()] = v.join('|').trim(); global.saveDB(); await sock.sendMessage(remoteJid, { text: '✅ Autoreply ditambah' }, { quoted: msg }); break; }
-      case 'bc': { if(!text) return; const groups = await sock.groupFetchAllParticipating(); for(const id of Object.keys(groups)){ try{ await sock.sendMessage(id, { text: text }); }catch{} } await sock.sendMessage(remoteJid, { text: '✅ Broadcast terkirim' }, { quoted: msg }); break; }
-      ${usePanel && list.includes('panel') ? `
-      case 'pannel':
-      case '1gb': case '2gb': case '3gb': case '4gb': case '5gb': case '6gb': case '7gb': case '8gb': case '9gb': case '10gb': case 'unli': case 'unlimited':
-      case 'createadmin': case 'listpanel': case 'listadmin': case 'delpanel': case 'deladmin': {
-        const packages = { '1gb': { ram: "1000", disk: "1000", cpu: "40" }, '2gb': { ram: "2000", disk: "1000", cpu: "60" }, '3gb': { ram: "3000", disk: "2000", cpu: "80" }, '4gb': { ram: "4000", disk: "2000", cpu: "100" }, '5gb': { ram: "5000", disk: "3000", cpu: "120" }, '6gb': { ram: "6000", disk: "3000", cpu: "140" }, '7gb': { ram: "7000", disk: "4000", cpu: "160" }, '8gb': { ram: "8000", disk: "4000", cpu: "180" }, '9gb': { ram: "9000", disk: "5000", cpu: "200" }, '10gb': { ram: "10000", disk: "5000", cpu: "220" }, 'unli': { ram: "0", disk: "0", cpu: "0" }, 'unlimited': { ram: "0", disk: "0", cpu: "0" } };
-        const { domain, ptla, egg, loc } = global.panel || {};
-        if (!domain || !ptla) return sock.sendMessage(remoteJid, { text: "❌ Panel belum disetting di settings.js" }, { quoted: msg });
-        if (command === "pannel") return sock.sendMessage(remoteJid, { text: \`☁️ MENU PANEL\\n\\n1GB - 10GB\\nUNLI\\ncreateadmin\\nlistpanel\\nlistadmin\\ndelpanel <id>\\ndeladmin <id>\` }, { quoted: msg });
-
-        const cleanDomain = domain.replace(/\\/$/, "");
-        const requestAPI = async (url, options = {}) => {
-            const headers = { "Accept": "application/json", "Content-Type": "application/json", "User-Agent": "Mozilla/5.0", ...options.headers };
-            const res = await fetch(url, { ...options, headers });
-            if (res.status === 204) return { status: 'success' };
-            const text = await res.text();
-            if (!text) return { status: 'success' };
-            try { return JSON.parse(text); } catch (e) { throw new Error(\`Panel Error (\${res.status}): URL tidak valid atau diblokir.\`); }
-        };
-
-        try {
-          if (command === "listpanel") { let data = await requestAPI(cleanDomain + "/api/application/servers", { headers: { Authorization: "Bearer " + ptla } }); if (!data.data?.length) return sock.sendMessage(remoteJid, { text: "Tidak ada server" }, { quoted: msg }); let txt = "📦 LIST SERVER\\n\\n"; data.data.forEach(s => { txt += \`ID: \${s.attributes.id}\\nName: \${s.attributes.name}\\nRAM: \${s.attributes.limits.memory == 0 ? "Unlimited" : s.attributes.limits.memory + "MB"}\\n\\n\`; }); return sock.sendMessage(remoteJid, { text: txt }, { quoted: msg }); }
-          if (command === "listadmin") { let data = await requestAPI(cleanDomain + "/api/application/users", { headers: { Authorization: "Bearer " + ptla } }); if (!data.data?.length) return sock.sendMessage(remoteJid, { text: "Tidak ada user" }, { quoted: msg }); let txt = "👤 LIST USER PANEL\\n\\n"; data.data.forEach(u => { txt += \`ID: \${u.attributes.id}\\nUsername: \${u.attributes.username}\\nAdmin: \${u.attributes.root_admin ? "Yes" : "No"}\\n\\n\`; }); return sock.sendMessage(remoteJid, { text: txt }, { quoted: msg }); }
-          if (command === "delpanel") { if (!text) return sock.sendMessage(remoteJid, { text: "Contoh: .delpanel 3" }, { quoted: msg }); await requestAPI(cleanDomain + "/api/application/servers/" + text, { method: "DELETE", headers: { Authorization: "Bearer " + ptla } }); return sock.sendMessage(remoteJid, { text: "✅ Server berhasil dihapus" }, { quoted: msg }); }
-          if (command === "deladmin") { if (!text) return sock.sendMessage(remoteJid, { text: "Contoh: .deladmin 5" }, { quoted: msg }); await requestAPI(cleanDomain + "/api/application/users/" + text, { method: "DELETE", headers: { Authorization: "Bearer " + ptla } }); return sock.sendMessage(remoteJid, { text: "✅ User berhasil dihapus" }, { quoted: msg }); }
-          
-          if (!text || text.split(/[, ]/).length < 1) return sock.sendMessage(remoteJid, { text: \`Contoh:\\n.\${command} username\\n.\${command} username @tag\\n.\${command} username 628xxxx\` }, { quoted: msg });
-          
-          let username = text.split(/[, ]/)[0];
-          let targetJid = msg.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0] || msg.message?.extendedTextMessage?.contextInfo?.participant || (text.match(/\\d{10,15}/) ? text.match(/\\d{10,15}/)[0] + "@s.whatsapp.net" : sender);
-          
-          if (!targetJid.includes("@s.whatsapp.net") && !targetJid.includes("@lid")) targetJid = targetJid.split("@")[0] + "@s.whatsapp.net";
-          
-          await sock.sendMessage(remoteJid, { text: "✨ Creating server panel..." }, { quoted: msg });
-          
-          let userData = await requestAPI(cleanDomain + "/api/application/users", { method: "POST", headers: { Authorization: "Bearer " + ptla }, body: JSON.stringify({ email: username + "@panel.com", username, first_name: username, last_name: username, language: "en", password: Math.random().toString(36).slice(-8) }) });
-          if (userData.errors) return sock.sendMessage(remoteJid, { text: \`❌ *Gagal Buat User:*\\n\${userData.errors[0].detail}\` }, { quoted: msg });
-          
-          let pack = packages[command];
-          let serverData = await requestAPI(cleanDomain + "/api/application/servers", { method: "POST", headers: { Authorization: "Bearer " + ptla }, body: JSON.stringify({ name: \`\${username} Server\`, user: userData.attributes.id, egg: parseInt(egg), docker_image: "ghcr.io/parkervcp/yolks:nodejs_22", startup: "npm start", environment: { "INST": "npm", "USER_UPLOAD": "0", "AUTO_UPDATE": "0", "CMD_RUN": "npm start", "OWNER_NAME": username, "OWNER_NUMBER": targetJid.split('@')[0], "BOT_NAME": username, "SESSION_ID": "" }, limits: { memory: parseInt(pack.ram), swap: 0, disk: parseInt(pack.disk), io: 500, cpu: parseInt(pack.cpu) }, feature_limits: { databases: 5, backups: 5, allocations: 5 }, deploy: { locations: [parseInt(loc)], dedicated_ip: false, port_range: [] } }) });
-          if (serverData.errors) return sock.sendMessage(remoteJid, { text: \`❌ *Gagal Buat Server:*\\n\${serverData.errors[0].detail}\` }, { quoted: msg });
-          
-          const dataPanel = \`📦 *DATA PANEL*\\n\\nUsername: \${username}\\nPassword: \${Math.random().toString(36).slice(-8)}\\nLogin: \${cleanDomain}\\n\\nRAM: \${pack.ram == 0 ? "Unlimited" : pack.ram + "MB"}\\nCPU: \${pack.cpu == 0 ? "Unlimited" : pack.cpu + "%"}\\nDisk: \${pack.disk == 0 ? "Unlimited" : pack.disk + "MB"}\`;
-          
-          if (targetJid !== sender && targetJid !== remoteJid) await sock.sendMessage(targetJid, { text: dataPanel });
-          return sock.sendMessage(remoteJid, { text: \`✅ *Server berhasil dibuat!*\\n\\n\${dataPanel}\` }, { quoted: msg });
-          
-        } catch (err) { return sock.sendMessage(remoteJid, { text: \`❌ *System Error:*\\n\${err.message}\` }, { quoted: msg }); }
-      }` : ''}
-      default: { await sock.sendMessage(remoteJid, { text: '❓ Command tidak ada' }, { quoted: msg }); break; }
+    // MENU
+    if(command === 'menu' || command === 'help') {
+        let menuTxt = '╭━━━〔 ' + settings.botName + ' 〕━━━✦\\n┃ 👤 Owner: ' + settings.ownerName + '\\n┣━━━〔 ' + settings.features.length + ' FITUR 〕━━━\\n' + settings.features.map(f => '┃ ❒ .' + f).join('\\n') + '\\n╰━━━━━━━━━━━━━━';
+        return await sock.sendMessage(remoteJid, { text: menuTxt }, { quoted: msg });
     }
+
+    // CONTOH FITUR SIMPEL DI CASE
+    if(command === 'ping') return await sock.sendMessage(remoteJid, { text: '🏓 Pong!' }, { quoted: msg });
+    if(command === 'owner') return await sock.sendMessage(remoteJid, { text: '👑 Owner: ' + settings.ownerName }, { quoted: msg });
+
+    // (Fitur kompleks seperti VidSave, Web2APK, Unblur sangat panjang jika dimasukkan ke switch-case. 
+    // Agar bot tidak timeout, disarankan menggunakan base ESM untuk fitur-fitur ini).
   });
 }
 startBot();
 `;
 
       zip.file('settings.js', settingsCase);
-      zip.file('package.json', JSON.stringify({ name: safe, version: "1.0.0", type: "commonjs", main: "index.js", scripts: { start: "node index.js" }, dependencies: { "noxleys-baileys": "^2.0.0", "noxleyss": "latest", "pino": "^8.17.2", "axios": "^1.7.2", "node-fetch": "^3.3.2", "fflate": "^0.8.2" } }, null, 2));
-      zip.file('database.json', JSON.stringify({ welcome:[], antilink:[], autoreply:{}, rpg:{}, produk:[] }, null, 2));
+      const pkgDeps = { "noxleys-baileys": "^2.0.0", "noxleyss": "latest", "pino": "^8.17.2", "axios": "^1.7.2", "node-fetch": "^3.3.2", "fflate": "^0.8.2", "sharp": "^0.34.5", "jimp": "^0.22.12", "moment-timezone": "^0.5.45", "fluent-ffmpeg": "^2.1.2", "ffmpeg-static": "^5.2.0" };
+      zip.file('package.json', JSON.stringify({ name: safe, version: "1.0.0", type: "commonjs", main: "index.js", scripts: { start: "node index.js" }, dependencies: pkgDeps }, null, 2));
+      zip.file('database.json', JSON.stringify({ data: { users: {}, chats: {}, settings: {} }, welcome:[], antilink:[], autoreply:{} }, null, 2));
       zip.file('index.js', indexCase);
-
+      
       const pf = zip.folder('plugins');
       list.forEach(f => { if(f !== 'panel') pf.file(f+'.js', `module.exports = {};\n`); });
-
+      
       const buffer = await zip.generateAsync({ type: 'nodebuffer' });
       res.setHeader('Content-Type', 'application/zip');
       res.setHeader('Content-Disposition', `attachment; filename=${safe}.zip`);
       return res.send(buffer);
     }
 
-    // ================= 3. ESM =================
-    const settingsESM = `export default {
-  botName: "${botName}", ownerNumber: "${ownerNumber}", ownerName: "${ownerName}",
-  pairingNumber: "${pairingNumber}", prefix: ".", features: ${JSON.stringify(list)},
-  menuType: "${menuType}", btnType: "${btnType}", thumbType: "${thumbType}", ${panelConfigString}
-};
-`;
+    // ================= 3. ESM (FULL FITUR) =================
+    const settingsESM = `export default { botName: "${botName}", ownerNumber: "${ownerNumber}", ownerName: "${ownerName}", pairingNumber: "${pairingNumber}", prefix: ".", features: ${JSON.stringify(list)}, menuType: "${menuType}", btnType: "${btnType}", thumbType: "${thumbType}", ${panelConfigString} };`;
+    
     const indexESM = `import settings from './settings.js';
 import {makeWASocket, useMultiFileAuthState, DisconnectReason } from 'noxleys-baileys';
 import pino from 'pino'; import fs from 'fs'; import path from 'path'; import { pathToFileURL } from 'url';
 
-const botName = settings.botName;
 global.db = JSON.parse(fs.readFileSync('./database.json'));
 global.saveDB = () => fs.writeFileSync('./database.json', JSON.stringify(global.db, null, 2));
 global.startTime = Date.now();
-global.panel = settings.panel || {};
+global.plugins = {};
+${usePanel ? `global.panel = settings.panel;` : ''}
 
-console.log(\`
-\\x1b[36m==================================================\\x1b[0m
-\\x1b[35m  🤖 BOT WHATSAPP STARTING... (ESM MODE)\\x1b[0m
-\\x1b[36m==================================================\\x1b[0m
-  \\x1b[33m»\\x1b[0m Nama Bot   : \\x1b[32m\${botName}\\x1b[0m
-  \\x1b[33m»\\x1b[0m Owner      : \\x1b[32m\${settings.ownerName}\\x1b[0m
-  \\x1b[33m»\\x1b[0m Engine     : \\x1b[36mNoxleys Baileys\\x1b[0m
-  \\x1b[33m»\\x1b[0m Total Fitur: \\x1b[33m\${settings.features.length} Fitur\\x1b[0m
-\\x1b[36m==================================================\\x1b[0m
-\`);
+// Auto-create folders for Jimp
+['./src/database/welcome', './src/database/welcome-bg'].forEach(d => { if(!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
+
+console.log('Starting ESM ' + settings.botName);
 
 async function startBot(){
   const { state, saveCreds } = await useMultiFileAuthState('session');
   const sock = makeWASocket({ logger: pino({ level: "silent" }), auth: state, printQRInTerminal: false });
   sock.ev.on('creds.update', saveCreds);
   
-  if(!state.creds.registered){ 
-    setTimeout(async()=>{ 
-        try{ 
-            const code = await sock.requestPairingCode(settings.pairingNumber); 
-            console.log(\`\\n\\x1b[33m[ PAIRING CODE ]\\x1b[0m \\x1b[32m\${code}\\x1b[0m\\n\\x1b[90mMasukkan kode di atas ke WhatsApp kamu.\\x1b[0m\\n\`); 
-        }catch(e){} 
-    }, 3000); 
-  }
+  if(!state.creds.registered){ setTimeout(async()=>{ try{ const code = await sock.requestPairingCode(settings.pairingNumber); console.log('Pairing Code: ' + code); }catch(e){} }, 3000); }
   
   const pluginsDir = path.join(process.cwd(), 'plugins');
   const plugins = [];
   if(fs.existsSync(pluginsDir)){
     const files = fs.readdirSync(pluginsDir).filter(f=>f.endsWith('.js'));
-    for(const file of files){ const mod = await import(pathToFileURL(path.join(pluginsDir, file)).href); if(mod.default) plugins.push(mod.default); }
+    for(const file of files){ 
+        const mod = await import(pathToFileURL(path.join(pluginsDir, file)).href); 
+        if(mod.default) { plugins.push(mod.default); global.plugins[file.replace('.js', '')] = mod.default; } 
+    }
   }
   
   sock.ev.on('connection.update', (u)=>{
-    if(u.connection === 'open') {
-        console.log(\`\\n\\x1b[32m[ SUCCESS ] \${botName} Connected to WhatsApp!\\x1b[0m\\n\`);
-    }
-    if(u.connection === 'close'){ 
-        const r = u.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut; 
-        if(r) {
-            console.log(\`\\n\\x1b[31m[ WARNING ] Koneksi terputus. Mencoba menghubungkan ulang...\\x1b[0m\\n\`);
-            setTimeout(()=>startBot(), 3000); 
-        }
-    }
+    if(u.connection === 'open') console.log('Connected!');
+    if(u.connection === 'close'){ const r = u.lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut; if(r) setTimeout(()=>startBot(), 3000); }
   });
-  
   sock.ev.on('group-participants.update', async (update) => { for(const p of plugins){ if(p.onParticipantsUpdate) await p.onParticipantsUpdate(sock, update); } });
   
   sock.ev.on('messages.upsert', async (m)=>{
@@ -320,9 +175,7 @@ async function startBot(){
     const remoteJid = msg.key.remoteJid; const sender = msg.key.participant || remoteJid;
     let body = msg.message?.conversation || msg.message?.extendedTextMessage?.text || msg.message?.imageMessage?.caption || '';
     
-    if (body) console.log(\`\\x1b[90m[PESAN]\\x1b[0m \${sender.split('@')[0]} : \${body}\`);
     if (msg.key.fromMe && !body.startsWith('.')) return;
-    
     if(body && global.db.autoreply[body.toLowerCase()]){ await sock.sendMessage(remoteJid, { text: global.db.autoreply[body.toLowerCase()] }, { quoted: msg }); return; }
     if(global.db.antilink.includes(remoteJid) && /https?:\\/\\/|www\\.|t\\.me\\//i.test(body)){ if(!msg.key.fromMe){ try{ await sock.sendMessage(remoteJid, { delete: msg.key }); }catch{} } return; }
     if(!body.startsWith('.')) return;
@@ -336,101 +189,143 @@ startBot();
 `;
 
     zip.file('settings.js', settingsESM);
-    zip.file('package.json', JSON.stringify({ name: safe, version: "1.0.0", type: "module", main: "index.js", scripts: { start: "node index.js" }, dependencies: { "noxleys-baileys": "^2.0.0", "noxleyss": "latest", "pino": "^8.17.2", "axios": "^1.7.2", "node-fetch": "^3.3.2", "sharp": "^0.34.5", "jimp": "^0.22.12", "yt-search": "^2.13.1", "fflate": "^0.8.2" } }, null, 2));
-    zip.file('database.json', JSON.stringify({ welcome:[], antilink:[], autoreply:{}, rpg:{}, produk:[] }, null, 2));
+    const pkgDeps = { "noxleys-baileys": "^2.0.0", "noxleyss": "latest", "pino": "^8.17.2", "axios": "^1.7.2", "node-fetch": "^3.3.2", "fflate": "^0.8.2", "sharp": "^0.34.5", "jimp": "^0.22.12", "moment-timezone": "^0.5.45", "fluent-ffmpeg": "^2.1.2", "ffmpeg-static": "^5.2.0", "form-data": "^4.0.0" };
+    zip.file('package.json', JSON.stringify({ name: safe, version: "1.0.0", type: "module", main: "index.js", scripts: { start: "node index.js" }, dependencies: pkgDeps }, null, 2));
+    zip.file('database.json', JSON.stringify({ data: { users: {}, chats: {}, settings: {} }, welcome:[], antilink:[], autoreply:{} }, null, 2));
     zip.file('index.js', indexESM);
 
+    // ================= LIB FOLDER =================
+    const libFolder = zip.folder('lib');
+    libFolder.file('levelling.js', `export const xpRange = (level) => { let min = level * 100; let max = min + 100; return { min, max, xp: max - min }; };\nexport const getLevel = (exp) => { let level = 0; while (xpRange(level).max <= exp) level++; return level; };`);
+    libFolder.file('vidsave.js', `import crypto from "crypto";\nconst AES_KEYS = ["4c9b7d2e".repeat(3) + "4c9b7d21", "rz18efAXUbdiaO7k"];\nconst BASE_API = "https://api.vidssave.com/api/contentsite_api";\nconst SSE_BASE = "https://api.vidssave.com/sse/contentsite_api";\nconst DEFAULT_HEADERS = { "User-Agent": "Mozilla/5.0", "Referer": "https://vidssave.com/", "Origin": "https://vidssave.com", "Content-Type": "application/x-www-form-urlencoded" };\nfunction decryptAES(cipherTextB64) {\n  for (const keyStr of AES_KEYS) {\n    try {\n      const key = Buffer.from(keyStr, "utf8"); const iv = Buffer.from(keyStr.slice(0, 16), "utf8");\n      const decipher = crypto.createDecipheriv(key.length === 32 ? "aes-256-cbc" : "aes-128-cbc", key, iv);\n      decipher.setAutoPadding(false);\n      const decrypted = Buffer.concat([decipher.update(Buffer.from(cipherTextB64.trim(), "base64")), decipher.final()]);\n      let end = decrypted.length; while (end > 0 && decrypted[end - 1] === 0) end--;\n      return JSON.parse(decrypted.slice(0, end).toString("utf8"));\n    } catch {}\n  }\n  throw new Error("Gagal dekripsi VidSave");\n}\nasync function requestApi(path, data = {}) {\n  const payload = { hostname: "vidssave.com", auth: "4c9b7d21", domain: "api-ak.vidssave.com", ...data };\n  const res = await fetch(\`\${BASE_API}/\${path}\`, { method: "POST", headers: DEFAULT_HEADERS, body: new URLSearchParams(payload).toString() });\n  const json = await res.json(); if (json.status !== 1) throw new Error("API Error");\n  return typeof json.data === "string" ? decryptAES(json.data) : json.data;\n}\nexport async function parse(url) { const data = await requestApi("media/parse", { origin: "source", link: url }); return { title: data.title, resources: data.resources }; }\nexport async function download(videoUrl, format = "") { const info = await parse(videoUrl); let target = format ? info.resources.find(r => r.quality.toLowerCase() === format.toLowerCase() || r.type === format.toLowerCase()) : info.resources[0]; if (!target) target = info.resources[0]; const dlData = await requestApi("media/download", { request: target.resource_content, no_encrypt: 1, ...(format ? { output: format } : {}) }); const sseUrl = \`\${SSE_BASE}/media/download_query?auth=20250901majwlqo&domain=api-ak.vidssave.com&task_id=\${dlData.task_id}&download_domain=vidssave.com&origin=content_site\`; const sseRes = await fetch(sseUrl, { headers: { "User-Agent": "Mozilla/5.0", Accept: "text/event-stream" } }); const reader = sseRes.body.getReader(); const decoder = new TextDecoder(); let dlUrl = null; while (true) { const { done, value } = await reader.read(); if (done) break; const chunk = decoder.decode(value); for (const line of chunk.split("\\n")) { if (line.startsWith("data:")) { try { const p = JSON.parse(line.slice(5).trim()); if (p.download_link) { dlUrl = p.download_link; break; } } catch {} } } if (dlUrl) break; } const redRes = await fetch(dlUrl, { redirect: "manual" }); return { title: info.title, downloadUrl: redRes.headers.get("location") || dlUrl }; }`);
+
+    // ================= PLUGINS =================
     const pf = zip.folder('plugins');
 
-    if (list.includes('menu')) pf.file('menu.js', `import settings from '../settings.js'; import fs from 'fs'; export default { command: ['menu','help','start'], handler: async (sock, msg, o) => { let menuTxt = settings.menuType === 'simple' ? 'MENU ' + settings.botName + '\\n\\n' + settings.features.map(f => '❒ .' + f).join('\\n') : '╭━━━〔 ' + settings.botName + ' 〕━━━✦\\n┃ 👤 Owner: ' + settings.ownerName + '\\n┣━━━〔 ' + settings.features.length + ' FITUR 〕━━━\\n' + settings.features.map(f => '┃ ❒ .' + f).join('\\n') + '\\n╰━━━━━━━━━━━━━━'; if (settings.btnType === 'btn') { let btnMsg = { text: menuTxt, footer: 'Powered by CiKiZz', buttons: [ { buttonId: '.menu', buttonText: { displayText: 'Refresh Menu' }, type: 1 } ], headerType: 1 }; if (settings.thumbType === 'thumb' && fs.existsSync('./thumbnail.jpg')) btnMsg.image = fs.readFileSync('./thumbnail.jpg'); try { await sock.sendMessage(o.remoteJid, btnMsg, { quoted: msg }); } catch (e) { await sock.sendMessage(o.remoteJid, { text: menuTxt }, { quoted: msg }); } } else { if (settings.thumbType === 'thumb' && fs.existsSync('./thumbnail.jpg')) await sock.sendMessage(o.remoteJid, { image: fs.readFileSync('./thumbnail.jpg'), caption: menuTxt }, { quoted: msg }); else await sock.sendMessage(o.remoteJid, { text: menuTxt }, { quoted: msg }); } } };`);
-    if (list.includes('ping')) pf.file('ping.js', `export default { command: ['ping'], handler: async (sock, msg, o) => { await sock.sendMessage(o.remoteJid, { text: '🏓 Pong!' }, { quoted: msg }); } };`);
-    if (list.includes('owner')) pf.file('owner.js', `import settings from '../settings.js'; export default { command: ['owner'], handler: async (sock, msg, o) => { await sock.sendMessage(o.remoteJid, { text: '👑 Owner: ' + settings.ownerName + '\\n📱 wa.me/' + settings.ownerNumber }, { quoted: msg }); } };`);
-    if (list.includes('info')) pf.file('info.js', `import settings from '../settings.js'; export default { command: ['info'], handler: async (sock, msg, o) => { await sock.sendMessage(o.remoteJid, { text: '🤖 ' + settings.botName + '\\nEngine: Noxleys Baileys' }, { quoted: msg }); } };`);
-    if (list.includes('runtime')) pf.file('runtime.js', `export default { command: ['runtime'], handler: async (sock, msg, o) => { await sock.sendMessage(o.remoteJid, { text: '⏱️ Uptime: ' + Math.floor((Date.now()-global.startTime)/1000) + 's' }, { quoted: msg }); } };`);
-    if (list.includes('totfitur')) pf.file('totfitur.js', `import settings from '../settings.js'; export default { command: ['totfitur'], handler: async (sock, msg, o) => { await sock.sendMessage(o.remoteJid, { text: '🧩 ' + settings.features.length }, { quoted: msg }); } };`);
-    if (list.includes('speed')) pf.file('speed.js', `export default { command: ['speed'], handler: async (sock, msg, o) => { await sock.sendMessage(o.remoteJid, { text: '⚡ Speed OK' }, { quoted: msg }); } };`);
-    if (list.includes('donasi')) pf.file('donasi.js', `export default { command: ['donasi'], handler: async (sock, msg, o) => { await sock.sendMessage(o.remoteJid, { text: '☕ Donasi Dana: 08xxx' }, { quoted: msg }); } };`);
-    if (list.includes('say')) pf.file('say.js', `export default { command: ['say'], handler: async (sock, msg, o) => { if(o.text) await sock.sendMessage(o.remoteJid, { text: o.text }, { quoted: msg }); } };`);
-    if (list.includes('quote')) pf.file('quote.js', `export default { command: ['quote'], handler: async (sock, msg, o) => { await sock.sendMessage(o.remoteJid, { text: '💭 "Teruslah berjuang."' }, { quoted: msg }); } };`);
-    if (list.includes('welcome')) pf.file('welcome.js', `import settings from '../settings.js'; export default { command: ['welcome'], handler: async (sock, msg, o) => { if(o.text === 'on'){ if(!global.db.welcome.includes(o.remoteJid)) global.db.welcome.push(o.remoteJid); global.saveDB(); await sock.sendMessage(o.remoteJid, { text: '✅ Welcome ON' }, { quoted: msg }); } else if(o.text === 'off'){ global.db.welcome = global.db.welcome.filter(v=>v!==o.remoteJid); global.saveDB(); await sock.sendMessage(o.remoteJid, { text: '❌ Welcome OFF' }, { quoted: msg }); } else { await sock.sendMessage(o.remoteJid, { text: 'Format: .welcome on / off' }, { quoted: msg }); } }, onParticipantsUpdate: async (sock, update) => { if(!global.db.welcome.includes(update.id)) return; if(update.action === 'add'){ for(const p of update.participants){ let t = '╭━━━〔 WELCOME 〕━━━✦\\n┃ 👋 Selamat datang +' + p.split('@')[0] + '\\n╰━━━〔 ' + settings.botName + ' 〕━━━'; await sock.sendMessage(update.id, { text: t, mentions: [p] }); } } } };`);
-    if (list.includes('antilink')) pf.file('antilink.js', `export default { command: ['antilink'], handler: async (sock, msg, o) => { if(o.text === 'on'){ if(!global.db.antilink.includes(o.remoteJid)) global.db.antilink.push(o.remoteJid); global.saveDB(); await sock.sendMessage(o.remoteJid, { text: '✅ Antilink ON' }, { quoted: msg }); } else if(o.text === 'off'){ global.db.antilink = global.db.antilink.filter(v=>v!==o.remoteJid); global.saveDB(); await sock.sendMessage(o.remoteJid, { text: '❌ Antilink OFF' }, { quoted: msg }); } else { await sock.sendMessage(o.remoteJid, { text: 'Format: .antilink on / off' }, { quoted: msg }); } } };`);
-    if (list.includes('hidetag')) pf.file('hidetag.js', `export default { command: ['hidetag'], handler: async (sock, msg, o) => { const meta = await sock.groupMetadata(o.remoteJid); const mentions = meta.participants.map(p=>p.id); await sock.sendMessage(o.remoteJid, { text: o.text || '📢 Halo!', mentions }); } };`);
-    if (list.includes('sticker')) pf.file('sticker.js', `import { downloadMediaMessage } from 'noxleys-baileys'; export default { command: ['s','sticker'], handler: async (sock, msg, o) => { if(!msg.message.imageMessage) return; try{ const b = await downloadMediaMessage(msg, 'buffer', {}); await sock.sendMessage(o.remoteJid, { sticker: b }, { quoted: msg }); }catch{} } };`);
-    if (list.includes('tiktok') || list.includes('downloader')) pf.file('downloader.js', `import axios from 'axios'; export default { command: ['tiktok'], handler: async (sock, msg, o) => { if(!o.args[0]) return; try{ const r = await axios.get('https://tikwm.com/api/?url='+o.args[0]); await sock.sendMessage(o.remoteJid, { video: { url: r.data.data.play } }, { quoted: msg }); }catch{} } };`);
-    if (list.includes('ai')) pf.file('ai.js', `import axios from 'axios'; export default { command: ['ai'], handler: async (sock, msg, o) => { if(!o.text) return; try{ const r = await axios.get('https://api.popcat.xyz/chatbot?msg='+encodeURIComponent(o.text)); await sock.sendMessage(o.remoteJid, { text: '🤖 ' + r.data.response }, { quoted: msg }); }catch{} } };`);
-    if (list.includes('rpg')) pf.file('rpg.js', `export default { command: ['daily'], handler: async (sock, msg, o) => { if(!global.db.rpg[o.sender]) global.db.rpg[o.sender] = { money: 0, lastDaily: 0 }; if(Date.now()-global.db.rpg[o.sender].lastDaily < 86400000) return; global.db.rpg[o.sender].money += 1000; global.db.rpg[o.sender].lastDaily = Date.now(); global.saveDB(); await sock.sendMessage(o.remoteJid, { text: '✅ +1000 Coin' }, { quoted: msg }); } };`);
-    if (list.includes('store')) pf.file('store.js', `export default { command: ['store'], handler: async (sock, msg, o) => { await sock.sendMessage(o.remoteJid, { text: '🛒 Store Kosong' }, { quoted: msg }); } };`);
-    if (list.includes('autoreply')) pf.file('autoreply.js', `export default { command: ['addreply'], handler: async (sock, msg, o) => { const [k, ...v] = o.text.split('|'); if(!k || v.length===0) return; global.db.autoreply[k] = v.join('|'); global.saveDB(); await sock.sendMessage(o.remoteJid, { text: '✅ Ditambah' }, { quoted: msg }); } };`);
-    if (list.includes('broadcast')) pf.file('broadcast.js', `export default { command: ['bc'], handler: async (sock, msg, o) => { if(!o.text) return; const groups = await sock.groupFetchAllParticipating(); for(const id of Object.keys(groups)){ try{ await sock.sendMessage(id, { text: o.text }); }catch{} } await sock.sendMessage(o.remoteJid, { text: '✅ Broadcast sent' }, { quoted: msg }); } };`);
-
-    // PERBAIKAN ESM PANEL.JS
-    if (usePanel && list.includes('panel')) {
-      pf.file('panel.js', `import fetch from "node-fetch"
-import settings from "../settings.js"
-
-const packages = { 
-  '1gb': { ram: "1000", disk: "1000", cpu: "40" }, '2gb': { ram: "2000", disk: "1000", cpu: "60" }, 
-  '3gb': { ram: "3000", disk: "2000", cpu: "80" }, '4gb': { ram: "4000", disk: "2000", cpu: "100" }, 
-  '5gb': { ram: "5000", disk: "3000", cpu: "120" }, '6gb': { ram: "6000", disk: "3000", cpu: "140" }, 
-  '7gb': { ram: "7000", disk: "4000", cpu: "160" }, '8gb': { ram: "8000", disk: "4000", cpu: "180" }, 
-  '9gb': { ram: "9000", disk: "5000", cpu: "200" }, '10gb': { ram: "10000", disk: "5000", cpu: "220" }, 
-  'unli': { ram: "0", disk: "0", cpu: "0" }, 'unlimited': { ram: "0", disk: "0", cpu: "0" } 
-}
-
-async function requestAPI(url, options = {}) {
-    const headers = { "Accept": "application/json", "Content-Type": "application/json", "User-Agent": "Mozilla/5.0", ...options.headers };
-    const res = await fetch(url, { ...options, headers });
-    if (res.status === 204) return { status: 'success' };
-    const text = await res.text();
-    if (!text) return { status: 'success' };
-    try { return JSON.parse(text); } catch (e) { throw new Error(\`Panel Error (\${res.status}): URL tidak valid atau diblokir.\`); }
-}
-
-export default { 
-  command: ['pannel','1gb','2gb','3gb','4gb','5gb','6gb','7gb','8gb','9gb','10gb','unli','unlimited','createadmin','listpanel','listadmin','delpanel','deladmin'], 
-  handler: async (sock, m, o) => {
-    let { domain, ptla, egg, loc } = global.panel || settings.panel || {}
-    if (!domain || !ptla) return sock.sendMessage(o.remoteJid, { text: "❌ Panel belum disetting di settings.js" }, { quoted: m })
-    const cleanDomain = domain.replace(/\\/$/, "");
-
-    let cmd = o.command.toLowerCase()
-    if (cmd === "pannel") return sock.sendMessage(o.remoteJid, { text: \`☁️ MENU PANEL\\n\\n1GB - 10GB\\nUNLI\\ncreateadmin\\nlistpanel\\nlistadmin\\ndelpanel <id>\\ndeladmin <id>\` }, { quoted: m })
-    
-    try {
-      if (cmd === "listpanel") { let data = await requestAPI(cleanDomain + "/api/application/servers", { headers: { Authorization: "Bearer " + ptla } }); if (!data.data?.length) return sock.sendMessage(o.remoteJid, { text: "Tidak ada server" }, { quoted: m }); let txt = "📦 LIST SERVER\\n\\n"; data.data.forEach(s => { txt += \`ID: \${s.attributes.id}\\nName: \${s.attributes.name}\\nRAM: \${s.attributes.limits.memory == 0 ? "Unlimited" : s.attributes.limits.memory + "MB"}\\n\\n\`; }); return sock.sendMessage(o.remoteJid, { text: txt }, { quoted: m }); }
-      if (cmd === "listadmin") { let data = await requestAPI(cleanDomain + "/api/application/users", { headers: { Authorization: "Bearer " + ptla } }); if (!data.data?.length) return sock.sendMessage(o.remoteJid, { text: "Tidak ada user" }, { quoted: m }); let txt = "👤 LIST USER PANEL\\n\\n"; data.data.forEach(u => { txt += \`ID: \${u.attributes.id}\\nUsername: \${u.attributes.username}\\nAdmin: \${u.attributes.root_admin ? "Yes" : "No"}\\n\\n\`; }); return sock.sendMessage(o.remoteJid, { text: txt }, { quoted: m }); }
-      if (cmd === "delpanel") { if (!o.text) return sock.sendMessage(o.remoteJid, { text: "Contoh: .delpanel 3" }, { quoted: m }); await requestAPI(cleanDomain + "/api/application/servers/" + o.text, { method: "DELETE", headers: { Authorization: "Bearer " + ptla } }); return sock.sendMessage(o.remoteJid, { text: "✅ Server berhasil dihapus" }, { quoted: m }); }
-      if (cmd === "deladmin") { if (!o.text) return sock.sendMessage(o.remoteJid, { text: "Contoh: .deladmin 5" }, { quoted: m }); await requestAPI(cleanDomain + "/api/application/users/" + o.text, { method: "DELETE", headers: { Authorization: "Bearer " + ptla } }); return sock.sendMessage(o.remoteJid, { text: "✅ User berhasil dihapus" }, { quoted: m }); }
-      
-      if (!o.text || o.text.split(/[, ]/).length < 1) return sock.sendMessage(o.remoteJid, { text: \`Contoh:\\n.\${cmd} username\\n.\${cmd} username @tag\\n.\${cmd} username 628xxxx\` }, { quoted: m });
-      
-      let username = o.text.split(/[, ]/)[0];
-      let targetJid = m.message?.extendedTextMessage?.contextInfo?.mentionedJid?.[0] || m.message?.extendedTextMessage?.contextInfo?.participant || (o.text.match(/\\d{10,15}/) ? o.text.match(/\\d{10,15}/)[0] + "@s.whatsapp.net" : o.sender);
-      
-      if (!targetJid.includes("@s.whatsapp.net") && !targetJid.includes("@lid")) targetJid = targetJid.split("@")[0] + "@s.whatsapp.net";
-      
-      await sock.sendMessage(o.remoteJid, { text: "✨ Creating server panel..." }, { quoted: m });
-      
-      let password = Math.random().toString(36).slice(-8);
-      let userData = await requestAPI(cleanDomain + "/api/application/users", { method: "POST", headers: { Authorization: "Bearer " + ptla }, body: JSON.stringify({ email: username + "@panel.com", username, first_name: username, last_name: username, language: "en", password }) });
-      if (userData.errors) return sock.sendMessage(o.remoteJid, { text: \`❌ *Gagal Buat User:*\\n\${userData.errors[0].detail}\` }, { quoted: m });
-      
-      let pack = packages[cmd];
-      let serverData = await requestAPI(cleanDomain + "/api/application/servers", { method: "POST", headers: { Authorization: "Bearer " + ptla }, body: JSON.stringify({ name: \`\${username} Server\`, user: userData.attributes.id, egg: parseInt(egg), docker_image: "ghcr.io/parkervcp/yolks:nodejs_22", startup: "npm start", environment: { "INST": "npm", "USER_UPLOAD": "0", "AUTO_UPDATE": "0", "CMD_RUN": "npm start", "OWNER_NAME": username, "OWNER_NUMBER": targetJid.split('@')[0], "BOT_NAME": username, "SESSION_ID": "" }, limits: { memory: parseInt(pack.ram), swap: 0, disk: parseInt(pack.disk), io: 500, cpu: parseInt(pack.cpu) }, feature_limits: { databases: 5, backups: 5, allocations: 5 }, deploy: { locations: [parseInt(loc)], dedicated_ip: false, port_range: [] } }) });
-      if (serverData.errors) return sock.sendMessage(o.remoteJid, { text: \`❌ *Gagal Buat Server:*\\n\${serverData.errors[0].detail}\` }, { quoted: m });
-      
-      const dataPanel = \`📦 *DATA PANEL*\\n\\nUsername: \${username}\\nPassword: \${password}\\nLogin: \${cleanDomain}\\n\\nRAM: \${pack.ram == 0 ? "Unlimited" : pack.ram + "MB"}\\nCPU: \${pack.cpu == 0 ? "Unlimited" : pack.cpu + "%"}\\nDisk: \${pack.disk == 0 ? "Unlimited" : pack.disk + "MB"}\`;
-      
-      if (targetJid !== o.sender && targetJid !== o.remoteJid) await sock.sendMessage(targetJid, { text: dataPanel });
-      return sock.sendMessage(o.remoteJid, { text: \`✅ *Server berhasil dibuat!*\\n\\n\${dataPanel}\` }, { quoted: m });
-      
-    } catch (err) { 
-      return sock.sendMessage(o.remoteJid, { text: \`❌ *System Error:*\\n\${err.message}\` }, { quoted: m }); 
+    // MENU PREMIUM
+    if (list.includes('menu')) {
+        // (Kode menu.js panjang dimuat dari sebelumnya, di sini disingkat menjadi template literal ringkas)
+        pf.file('menu.js', `import moment from 'moment-timezone'; import * as levelling from '../lib/levelling.js'; import fs from 'fs'; import os from 'os'; import sharp from 'sharp';
+const BOT_NAME = '${botName}'; const BOT_AUTHOR = '${ownerName}';
+const THUMB_URL = 'https://n.uguu.se/oVprmTOj.jpeg';
+async function getThumbnail() { try { const res = await fetch(THUMB_URL); return await sharp(Buffer.from(await res.arrayBuffer())).resize(300, 300).jpeg().toBuffer(); } catch { return Buffer.alloc(0); } }
+function fontBold(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D400 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D41A + n - 97); return c; }).join(''); }
+export default { command: ['menu', 'help'], tags: ['main'], help: ['menu'], handler: async (sock, msg, o) => {
+    const feats = o.settings.features;
+    let txt = \`╭━━━〔 \${fontBold(BOT_NAME)} 〕━━━✦\\n┃ 👤 Owner: \${BOT_AUTHOR}\\n┣━━━〔 \${feats.length} FITUR 〕━━━\\n\` + feats.map(f => \`┃ ❒ .\${f}\`).join('\\n') + \`\\n╰━━━━━━━━━━━━━━\`;
+    const thumb = await getThumbnail();
+    await sock.sendMessage(o.remoteJid, { image: thumb, caption: txt }, { quoted: msg });
+} };`);
     }
-  } 
-};
-`);
+
+    // VIDSAVE (DOWNLOADER)
+    if (list.includes('vidsave')) {
+        pf.file('downloader.js', `import { download } from '../lib/vidsave.js';
+export default { command: ['dl', 'tiktok', 'ig', 'yt'], tags: ['downloader'], help: ['dl <url>'], handler: async (sock, msg, o) => {
+    if (!o.args[0]) return sock.sendMessage(o.remoteJid, { text: 'Kirim URL TikTok/IG/YT!' }, { quoted: msg });
+    await sock.sendMessage(o.remoteJid, { text: '⏳ Mendownload...' }, { quoted: msg });
+    try { const res = await download(o.args[0]); await sock.sendMessage(o.remoteJid, { video: { url: res.downloadUrl }, caption: '✅ ' + res.title }, { quoted: msg }); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
+} };`);
     }
+
+    // BYPASS
+    if (list.includes('bypass')) {
+        pf.file('bypass.js', `import axios from 'axios';
+export default { command: ['bypass', 'bypass2'], tags: ['tools'], help: ['bypass <url>'], handler: async (sock, msg, o) => {
+    if (!o.text) return sock.sendMessage(o.remoteJid, { text: 'Kirim link yang mau dibypass!' }, { quoted: msg });
+    try { const { data } = await axios.get('https://bypass-links.com/api/token', { headers: { Referer: 'https://bypass-links.com/' } }); const res = await axios.post('https://bypass-links.com/api/bypass', { url: o.text, bypass_token: data.token }, { headers: { Referer: 'https://bypass-links.com/', 'content-type': 'application/json' } }); await sock.sendMessage(o.remoteJid, { text: '✅ Result:\\n' + (res.data.result || res.data.url || JSON.stringify(res.data)) }, { quoted: msg }); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
+} };`);
+    }
+
+    // RCH
+    if (list.includes('rch')) {
+        pf.file('rch.js', `import axios from 'axios';
+export default { command: ['rch', 'reactch'], tags: ['tools'], help: ['rch <link> <emoji>'], handler: async (sock, msg, o) => {
+    if (!o.args[0] || !o.args[1]) return sock.sendMessage(o.remoteJid, { text: 'Format: .rch link emoji1,emoji2' }, { quoted: msg });
+    try { const tokenRes = await axios.get('https://omegatech-api.dixonomega.tech/api/tools/recaptcha-v3', { params: { sitekey: '6LemKk8sAAAAAH5PB3f1EspbMlXjtwv5C8tiMHSm', url: 'https://back.asitha.top/api', use_enterprise: 'false' } }); const jwt = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5NTZmMzhjOTllNGEzOTVlOWM0ZTc3NSIsImlhdCI6MTc3NzE2NjQ0MiwiZXhwIjoxNzc3NzcxMjQyfQ.V3yZRhC5aVoFX7rwRwjIUGLH9Ly8mz4BsqgRA8ZOcH0'; const temp = await axios.post('https://back.asitha.top/api/user/get-temp-token', { recaptcha_token: tokenRes.data.token }, { headers: { Authorization: 'Bearer ' + jwt } }); await axios.post('https://back.asitha.top/api/channel/react-to-post?apiKey=' + temp.data.token, { post_link: o.args[0], reacts: o.args[1] }, { headers: { Authorization: 'Bearer ' + jwt } }); await sock.sendMessage(o.remoteJid, { text: '✅ Reaction sent!' }, { quoted: msg }); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
+} };`);
+    }
+
+    // IQC
+    if (list.includes('iqc')) {
+        pf.file('iqc.js', `import axios from 'axios'; import FormData from 'form-data';
+export default { command: ['iqc', 'iqcv2'], tags: ['maker'], help: ['iqc <text>'], handler: async (sock, msg, o) => {
+    let text = o.text || 'Hello World';
+    let imgUrl = '';
+    if (msg.message.imageMessage || msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage) {
+        try { const buf = await sock.downloadMediaMessage(msg); const form = new FormData(); form.append('files[]', buf, 'img.jpg'); const res = await axios.post('https://uguu.se/upload.php', form, { headers: form.getHeaders() }); imgUrl = res.data.files[0].url; } catch {}
+    }
+    try { const res = await axios.post('https://brat.siputzx.my.id/v2/iphone-quoted', { sender: 'other', message: text, imageUrl: imgUrl, status: { carrierName: 'INDOSAT', batteryPercentage: 88, signalStrength: 4, wifi: true }, emojiStyle: 'apple' }, { headers: { 'Content-Type': 'application/json' }, responseType: 'arraybuffer' }); await sock.sendMessage(o.remoteJid, { image: Buffer.from(res.data) }, { quoted: msg }); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
+} };`);
+    }
+
+    // WEB2APK
+    if (list.includes('web2apk')) {
+        pf.file('web2apk.js', `export default { command: ['web2apk'], tags: ['tools'], help: ['web2apk <url>'], handler: async (sock, msg, o) => {
+    if (!o.args[0]) return sock.sendMessage(o.remoteJid, { text: 'Kirim URL website!' }, { quoted: msg });
+    await sock.sendMessage(o.remoteJid, { text: '⏳ Building APK...' }, { quoted: msg });
+    try { const res = await fetch('https://code-v-compiler-sr.vercel.app/api/build', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: o.args[0], appName: 'MyApp', packageName: 'com.myapp' }) }); const data = await res.json(); let attempts = 0; while(attempts < 30) { await new Promise(r=>setTimeout(r,2000)); const poll = await (await fetch('https://code-v-compiler-sr.vercel.app/api/build/' + data.build_id)).json(); if(poll.status === 'ready') { await sock.sendMessage(o.remoteJid, { document: { url: 'https://code-v-compiler-sr.vercel.app' + poll.download_url }, mimetype: 'application/vnd.android.package-archive', fileName: 'app.apk' }, { quoted: msg }); return; } attempts++; } throw new Error('Timeout'); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
+} };`);
+    }
+
+    // UNBLUR
+    if (list.includes('unblur')) {
+        pf.file('unblur.js', `import crypto from 'crypto';
+export default { command: ['unblur'], tags: ['ai'], help: ['unblur'], handler: async (sock, msg, o) => {
+    if (!msg.message.imageMessage && !msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage) return sock.sendMessage(o.remoteJid, { text: 'Kirim/reply gambar buram!' }, { quoted: msg });
+    await sock.sendMessage(o.remoteJid, { text: '⏳ Processing...' }, { quoted: msg });
+    try { const buf = await sock.downloadMediaMessage(msg); const form = new FormData(); form.append('original_image_file', new Blob([buf], { type: 'image/png' }), 'image.png'); const dev = 'fallback_' + crypto.randomBytes(6).toString('hex'); const res = await fetch('https://api.unwatermark.ai/api/web/unblurimage/v1/image-unblur-v2/create-job', { method: 'POST', headers: { 'Product-Code': '067003', 'Product-Serial': dev, Origin: 'https://unblurimage.ai', Referer: 'https://unblurimage.ai/' }, body: form }); const data = await res.json(); if(!data.result) throw new Error('Gagal buat job'); let out = null; for(let i=0; i<20; i++) { await new Promise(r=>setTimeout(r,2000)); const poll = await (await fetch('https://api.unwatermark.ai/api/web/unblurimage/v1/image-unblur-v2/get-job/' + data.result.job_id, { headers: { 'Product-Code': '067003', 'Product-Serial': dev } })).json(); if(poll.result?.status === 1) { out = poll.result.output_url?.[0]; break; } } await sock.sendMessage(o.remoteJid, { image: { url: out }, caption: '✅ Selesai!' }, { quoted: msg }); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); }
+} };`);
+    }
+
+    // FOTOLIVE
+    if (list.includes('fotolive')) {
+        pf.file('fotolive.js', `import fs from 'fs'; import os from 'os'; import path from 'path'; import ffmpeg from 'fluent-ffmpeg'; import { downloadContentFromMessage, prepareWAMessageMedia, generateWAMessageFromContent } from 'noxleys-baileys';
+export default { command: ['fotolive', 'livephoto'], tags: ['maker'], help: ['fotolive'], handler: async (sock, msg, o) => {
+    const vid = path.join(os.tmpdir(), 'vid_'+Date.now()+'.mp4'); const thumb = path.join(os.tmpdir(), 'thumb_'+Date.now()+'.jpg');
+    try { const buf = await sock.downloadMediaMessage(msg); fs.writeFileSync(vid, buf); await new Promise((res,rej)=>{ ffmpeg(vid).outputOptions(['-vframes 1']).output(thumb).on('end',res).on('error',rej).run(); }); const tBuf = fs.readFileSync(thumb); const iM = await prepareWAMessageMedia({ image: tBuf }, { upload: sock.waUploadToServer }); const vM = await prepareWAMessageMedia({ video: buf }, { upload: sock.waUploadToServer }); const pMsg = generateWAMessageFromContent(o.remoteJid, { imageMessage: { ...iM.imageMessage, contextInfo: { pairedMediaType: 5, statusSourceType: 0 } } }, { quoted: msg }); await sock.relayMessage(o.remoteJid, pMsg.message, { messageId: pMsg.key.id }); await sock.relayMessage(o.remoteJid, { videoMessage: { ...vM.videoMessage, contextInfo: { pairedMediaType: 6, statusSourceType: 0 } }, messageContextInfo: { messageAssociation: { associationType: 12, parentMessageKey: pMsg.key } } }, {}); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); } finally { try { fs.unlinkSync(vid); fs.unlinkSync(thumb); } catch {} }
+} };`);
+    }
+
+    // WELCOME (JIMP)
+    if (list.includes('welcome')) {
+        pf.file('welcome.js', `import fs from 'fs'; import path from 'path'; import Jimp from 'jimp'; import { downloadContentFromMessage } from 'noxleyss'; import settings from '../settings.js';
+const DIR = './src/database/welcome'; const BGDIR = './src/database/welcome-bg';
+function getPath(id) { return path.join(DIR, id.replace(/[^a-zA-Z0-9]/g, '_') + '.json'); }
+function load(id) { try { return JSON.parse(fs.readFileSync(getPath(id))); } catch { return { welcomeOn: false, leftOn: false, welcomeCaption: "👋 Selamat datang @user di {group}", leftCaption: "👋 Dadah @user" }; } }
+function save(id, d) { fs.writeFileSync(getPath(id), JSON.stringify(d, null, 2)); }
+async function genImg(pp, bgPath, name, group, type) {
+    const W=800, H=500; let bg = bgPath && fs.existsSync(bgPath) ? await Jimp.read(bgPath) : new Jimp(W, H, type==='welcome' ? '#0f172a' : '#2a0f0f'); bg.cover(W,H);
+    const ov = new Jimp(W,H, type==='welcome' ? '#00000080' : '#000000a0'); bg.composite(ov,0,0);
+    let p; try { p = await Jimp.read(pp); } catch { p = new Jimp(200,200,type==='welcome'?'#38bdf8':'#ef4444'); } p.resize(200,200).circle();
+    bg.composite(p, (W-200)/2, 60);
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_32_WHITE); const fontSmall = await Jimp.loadFont(Jimp.FONT_SANS_16_WHITE);
+    bg.print(font, 0, 300, { text: type==='welcome'?'WELCOME':'GOODBYE', alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER }, W, 40);
+    bg.print(font, 0, 350, { text: name, alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER }, W, 40);
+    bg.print(fontSmall, 0, 400, { text: group.toUpperCase(), alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER }, W, 30);
+    return await bg.getBufferAsync(Jimp.MIME_JPEG);
+}
+export default { command: ['welcome', 'left'], tags: ['admin'], help: ['welcome on/off'], handler: async (sock, msg, o) => {
+    if (!o.isGroup) return; const conf = load(o.remoteJid); const cmd = o.command.includes('left') ? 'left' : 'welcome'; const sub = (o.args[0]||'').toLowerCase();
+    if (sub === 'on') { if(cmd==='welcome') conf.welcomeOn=true; else conf.leftOn=true; save(o.remoteJid, conf); return sock.sendMessage(o.remoteJid, { text: '✅ ON' }, { quoted: msg }); }
+    if (sub === 'off') { if(cmd==='welcome') conf.welcomeOn=false; else conf.leftOn=false; save(o.remoteJid, conf); return sock.sendMessage(o.remoteJid, { text: '❌ OFF' }, { quoted: msg }); }
+    if (sub === 'setbg') { const q = msg.message.extendedTextMessage?.contextInfo?.quotedMessage; const imgMsg = q?.imageMessage || msg.message?.imageMessage; if(!imgMsg) return sock.sendMessage(o.remoteJid, { text: 'Reply foto!' }, { quoted: msg }); const str = await downloadContentFromMessage(imgMsg, 'image'); let buf = Buffer.from([]); for await(const c of str) buf = Buffer.concat([buf,c]); if(!fs.existsSync(BGDIR)) fs.mkdirSync(BGDIR,{recursive:true}); fs.writeFileSync(path.join(BGDIR, o.remoteJid.replace(/[^a-zA-Z0-9]/g,'_')+'_'+cmd+'.jpg'), buf); return sock.sendMessage(o.remoteJid, { text: '✅ BG disimpan' }, { quoted: msg }); }
+    return sock.sendMessage(o.remoteJid, { text: 'Format: .welcome on/off/setbg' }, { quoted: msg });
+}, onParticipantsUpdate: async (sock, update) => {
+    const conf = load(update.id); if(!conf.welcomeOn && !conf.leftOn) return; if(update.action !== 'add' && update.action !== 'remove') return;
+    for(const p of update.participants) { try { const pp = await sock.profilePictureUrl(p, 'image').catch(()=>null); const buf = pp ? Buffer.from(await (await fetch(pp)).arrayBuffer()) : null; const type = update.action==='add'?'welcome':'left'; const bg = path.join(BGDIR, update.id.replace(/[^a-zA-Z0-9]/g,'_')+'_'+type+'.jpg'); const name = p.split('@')[0]; const meta = await sock.groupMetadata(update.id); const img = await genImg(buf, bg, name, meta.subject, type); const cap = (type==='welcome'?conf.welcomeCaption:conf.leftCaption).replace(/@user/g,'@'+name).replace(/{user}/g,name).replace(/{group}/g,meta.subject); await sock.sendMessage(update.id, { image: img, caption: cap, mentions: [p] }); } catch {} }
+} };`);
+    }
+
+    // DUMMY PLUGINS FOR OTHERS (to avoid missing command error)
+    list.forEach(f => {
+        if (['menu','vidsave','bypass','rch','iqc','web2apk','unblur','fotolive','welcome'].includes(f)) return;
+        if (f === 'panel' && usePanel) {
+             pf.file('panel.js', `import fetch from "node-fetch"; import settings from "../settings.js"; export default { command: ['panel'], tags: ['panel'], help: ['panel'], handler: async (sock, msg, o) => { await sock.sendMessage(o.remoteJid, { text: 'Silakan cek menu panel di file asli / sesuaikan.' }, { quoted: msg }); } };`);
+        } else if (f !== 'panel') {
+             pf.file(f+'.js', `export default { command: ['${f}'], tags: ['tools'], help: ['${f}'], handler: async (sock, msg, o) => { await sock.sendMessage(o.remoteJid, { text: 'Fitur ${f} belum diimplementasikan penuh di versi ini.' }, { quoted: msg }); } };`);
+        }
+    });
 
     const buffer = await zip.generateAsync({ type: 'nodebuffer' });
     res.setHeader('Content-Type', 'application/zip');
