@@ -1,6 +1,6 @@
 <div align="center">
 
-![CiKiZz Create Script Bot](./WA_1793676966972.jpg)
+![CiKiZz Create Script Bot](./banner.png.jpg)
 
 <img src="https://readme-typing-svg.demolab.com?font=Space+Grotesk&weight=700&size=22&pause=1000&center=true&vCenter=true&width=850&height=65&lines=Create+Bot+in+10+seconds+⚡;No+Coding+Needed;CASE+|+ESM+|+TELEGRAM;11+Files+Force+No+0B;KizzuRyuichi" />
 
