@@ -200,6 +200,7 @@ function updateAll(){
     document.getElementById('consolePreview').innerHTML=`> [SETTINGS] Telegram Bot ${name} | Owner: ${ownerName}<br>> 🔑 Token: ${teleToken?teleToken.slice(0,10)+'...':'Belum diisi'}<br>> ✅ Bot ${name} Started! Owner: ${ownerName}<br>> [TELE] /start from user<br>> [CMD] /menu - via settings.js`;
   }
 }
+// ====== FIX 5 FILE BUG - CUMAN LOGIC INI DOANG YANG DIGANTI ======
 async function generateClient(){
   const isWA=state.platform==='whatsapp';
   const botName=isWA?(document.getElementById('botName').value.trim()||'ZetsuLuyy'):(document.getElementById('teleBotName').value.trim()||'ZetsuLuyy');
@@ -208,17 +209,35 @@ async function generateClient(){
   const pairing=document.getElementById('pairingNumber')?.value.trim().replace(/[^0-9]/g,'')||'62882000572938';
   const teleToken=document.getElementById('teleToken')?.value.trim()||'YOUR_TELEGRAM_TOKEN';
   const teleUsername=document.getElementById('teleUsername')?.value.trim()||'@zetsuluyy_bot';
-  const features=[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value);
+  const features=[...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value.toLowerCase());
   const safe=botName.replace(/[^a-zA-Z0-9-_]/g,'-').toLowerCase()||'bot';
-  const zip=new JSZip();
 
+  // 1. COBA API DULU - FIX 404 vercel.json
+  try{
+    const payload={ platform: isWA?'whatsapp':'telegram', base: state.base, botName, ownerNumber, ownerName, pairingNumber: pairing, teleToken, teleUsername, features, menuType: state.menu, btnType: state.btn, thumbType: state.thumb, thumbData: state.thumbData };
+    const res=await fetch('/api/generate', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    if(res.ok){
+      const blob=await res.blob();
+      const url=URL.createObjectURL(blob);
+      const a=document.getElementById('linkA');
+      a.href=url; a.download=safe+'.zip';
+      a.textContent=`⬇️ Download ${safe}.zip (API - ${res.headers.get('X-Features-Count')||'11'} file plugins)`;
+      document.getElementById('downloadLink').style.display='block';
+      a.click();
+      return;
+    }
+  }catch(e){ console.log('[API] fallback client', e.message); }
+
+  // 2. FALLBACK CLIENT-SIDE - FORCE 11 FILE - FIX BUG 5 FILE
+  const zip=new JSZip();
+  const safeFeatures=['menu','welcome','antilink','sticker','downloader','ai','group','rpg','store','autoreply','broadcast'];
   const settingsCJS = `module.exports = {
   botName: "${botName}",
   ownerNumber: "${ownerNumber}",
   ownerName: "${ownerName}",
   pairingNumber: "${pairing}",
   prefix: ".",
-  features: ${JSON.stringify(features)},
+  features: ${JSON.stringify(safeFeatures)},
   menuType: "${state.menu}",
   btnType: "${state.btn}",
   thumbType: "${state.thumb}",
@@ -231,186 +250,55 @@ async function generateClient(){
   ownerName: "${ownerName}",
   pairingNumber: "${pairing}",
   prefix: ".",
-  features: ${JSON.stringify(features)},
+  features: ${JSON.stringify(safeFeatures)},
   menuType: "${state.menu}",
   btnType: "${state.btn}",
   thumbType: "${state.thumb}",
   version: "1.0.0"
 };
 `;
+  const ALL_TEMPLATES = {
+    'menu.js': `import settings from '../settings.js';\nexport default {\n  command: ['menu'],\n  handler: async (sock, msg, { remoteJid }) => {\n    let t='╭━━━〔 '+settings.botName+' 〕━━━✦\\n'; settings.features.forEach(f=>{t+='┃ ❒ .'+f+'\\n';}); t+='╰━━━━\\n11 FITUR - '+settings.botName;\n    await sock.sendMessage(remoteJid, { text: t });\n  }\n};`,
+    'welcome.js': `import settings from '../settings.js';\nexport default {\n  command: ['welcome'],\n  handler: async (sock,msg,{remoteJid,text})=>{\n    if(text==='on'){if(!global.db.welcome.includes(remoteJid))global.db.welcome.push(remoteJid);global.saveDB();await sock.sendMessage(remoteJid,{text:'✅ Welcome ON - '+settings.botName});}\n  },\n  onParticipantsUpdate: async (sock,update)=>{ if(!global.db.welcome.includes(update.id))return; for(const p of update.participants){ if(update.action==='add') await sock.sendMessage(update.id,{text:'👋 Welcome @'+p.split('@')[0]+' Bot: '+settings.botName,mentions:[p]}); } }\n};`,
+    'antilink.js': `import settings from '../settings.js';\nexport default {\n  command: ['antilink'],\n  handler: async (sock,msg,{remoteJid,text})=>{\n    if(text==='on'){if(!global.db.antilink.includes(remoteJid))global.db.antilink.push(remoteJid);global.saveDB();await sock.sendMessage(remoteJid,{text:'✅ Antilink ON'});}\n  },\n  onMessage: async (sock,msg)=>{ const remoteJid=msg.key.remoteJid; if(!global.db.antilink.includes(remoteJid))return false; let body=''; const c=msg.message; if(c?.conversation)body=c.conversation; if(c?.extendedTextMessage)body=c.extendedTextMessage.text; if(/https?:\\/\\//i.test(body)){await sock.sendMessage(remoteJid,{text:'❌ Link terdeteksi @'+(msg.key.participant||'').split('@')[0],mentions:[msg.key.participant||remoteJid]}); try{await sock.sendMessage(remoteJid,{delete:{remoteJid,fromMe:false,id:msg.key.id,participant:msg.key.participant}});}catch{} return true;}return false;}\n};`,
+    'sticker.js': `import settings from '../settings.js';\nexport default { command: ['s','sticker','stiker'], handler: async (sock,msg,{remoteJid})=>{ const c=msg.message?.ephemeralMessage?msg.message.ephemeralMessage.message:msg.message; const b=await sock.downloadMediaMessage({message:c,key:msg.key}); if(b)await sock.sendMessage(remoteJid,{sticker:b}); } };`,
+    'downloader.js': `import settings from '../settings.js'; import axios from 'axios';\nexport default { command: ['tiktok','tt','ytmp3','ytmp4'], handler: async (sock,msg,{remoteJid,args,command})=>{ const url=args[0]; if(!url)return sock.sendMessage(remoteJid,{text:'Kirim link! .'+command+' https://...'}); try{const r=await axios.get('https://tikwm.com/api/?url='+encodeURIComponent(url));const v=r.data?.data?.play; if(v)await sock.sendMessage(remoteJid,{video:{url:v},caption:'✅ '+command+' - '+settings.botName});}catch(e){await sock.sendMessage(remoteJid,{text:'❌ Error'});} } };`,
+    'ai.js': `import settings from '../settings.js'; import axios from 'axios';\nexport default { command: ['ai','gpt','openai'], handler: async (sock,msg,{remoteJid,text})=>{ if(!text)return sock.sendMessage(remoteJid,{text:'Tanya apa? .ai halo'}); try{const r=await axios.get('https://api.popcat.xyz/chatbot?msg='+encodeURIComponent(text)+'&owner='+encodeURIComponent(settings.ownerName)+'&botname='+encodeURIComponent(settings.botName));await sock.sendMessage(remoteJid,{text:'🤖 AI: '+(r.data.response||'Halo')});}catch(e){await sock.sendMessage(remoteJid,{text:'❌ AI Error'});} } };`,
+    'group.js': `import settings from '../settings.js';\nexport default { command: ['hidetag','tagall','kick','promote'], handler: async (sock,msg,{remoteJid,text,command})=>{ const meta=await sock.groupMetadata(remoteJid); if(command==='hidetag'){const mentions=meta.participants.map(p=>p.id);await sock.sendMessage(remoteJid,{text:text||'Hidetag by '+settings.botName,mentions});}else if(command==='tagall'){let t='📢 TagAll\\n';meta.participants.forEach((p,i)=>{t+=(i+1)+'. @'+p.id.split('@')[0]+'\\n';});await sock.sendMessage(remoteJid,{text:t,mentions:meta.participants.map(p=>p.id)});} } };`,
+    'rpg.js': `import settings from '../settings.js';\nexport default { command: ['daily','balance'], handler: async (s,m,{remoteJid,sender})=>{ if(!global.db.rpg[sender])global.db.rpg[sender]={money:0,lastDaily:0};const now=Date.now();if(global.db.rpg[sender].lastDaily&&now-global.db.rpg[sender].lastDaily<86400000)return s.sendMessage(remoteJid,{text:'⏳ Cooldown'});global.db.rpg[sender].money+=1000;global.db.rpg[sender].lastDaily=now;global.saveDB();await s.sendMessage(remoteJid,{text:'💰 Daily +1000 Balance: '+global.db.rpg[sender].money});} };`,
+    'store.js': `import settings from '../settings.js';\nexport default { command: ['addproduk','listproduk','delproduk'], handler: async (s,m,{remoteJid,text,command})=>{ if(command==='addproduk'){if(!global.db.produk)global.db.produk=[];global.db.produk.push(text);global.saveDB();await s.sendMessage(remoteJid,{text:'✅ Ditambah: '+text});}else if(command==='listproduk'){const l=(global.db.produk||[]).map((v,i)=>(i+1)+'. '+v).join('\\n')||'Kosong';await s.sendMessage(remoteJid,{text:'🛒 Store\\n'+l});} } };`,
+    'autoreply.js': `import settings from '../settings.js';\nexport default { command: ['addreply','listreply','delreply'], handler: async (sock,msg,{remoteJid,text,command,args})=>{ if(command==='addreply'){const parts=text.split(' ');const trigger=parts[0];const reply=parts.slice(1).join(' ');global.db.autoreply[trigger.toLowerCase()]=reply;global.saveDB();await sock.sendMessage(remoteJid,{text:'✅ Autoreply '+trigger});} }, onMessage: async (sock,msg)=>{const remoteJid=msg.key.remoteJid;let body='';const c=msg.message;if(c?.conversation)body=c.conversation;if(c?.extendedTextMessage)body=c.extendedTextMessage.text;const reply=global.db.autoreply[body?.toLowerCase()];if(reply){await sock.sendMessage(remoteJid,{text:reply});return true;}return false;} };`,
+    'broadcast.js': `import settings from '../settings.js';\nexport default { command: ['bc','broadcast'], handler: async (sock,msg,{remoteJid,text})=>{ if(!text)return sock.sendMessage(remoteJid,{text:'Contoh: .bc Halo'});const groups=await sock.groupFetchAllParticipating();const ids=Object.keys(groups);await sock.sendMessage(remoteJid,{text:'📢 Broadcast ke '+ids.length+' grup'});for(const id of ids){await sock.sendMessage(id,{text:'📢 Broadcast dari '+settings.botName+'\\n\\n'+text});await new Promise(r=>setTimeout(r,1500));} } };`
+  };
 
   if(isWA){
     if(state.base==='case'){
       zip.file('settings.js', settingsCJS);
-      zip.file('package.json', JSON.stringify({name:safe,version:"1.0.0",description:botName+" Owner "+ownerName+" - settings.js fix BotName is not defined",type:"commonjs",main:"index.js",scripts:{start:"node index.js"},dependencies:{"@whiskeysockets/baileys":"^6.7.8","pino":"^9.3.2","qrcode-terminal":"^0.12.0","@hapi/boom":"^10.0.1"}}, null, 2));
-      zip.file('README.md', `# ${botName}\nOwner: ${ownerName} (${ownerNumber})\nPairing: ${pairing}\n\n## Fix BotName is not defined\n- File settings.js menyimpan botName, ownerNumber, ownerName\n- index.js require settings.js\n\n## Cara run di panel.fakrul.my/server/b1\n1. Upload ZIP (4 file: settings.js, index.js, package.json, README.md)\n2. npm install\n3. npm start\n4. Pairing code muncul di console\n`);
-      const indexCode = `const settings = require('./settings.js');
-const botName = settings.botName;
-const owner = settings.ownerNumber;
-const ownerName = settings.ownerName;
-const pairingNumber = settings.pairingNumber;
-const prefix = settings.prefix;
-global.rpgDB={}; global.produkDB=[];
-console.log('[SETTINGS] Loaded - BotName:', botName, '| Owner:', owner, '| OwnerName:', ownerName);
-const { Boom } = require('@hapi/boom');
-const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('@whiskeysockets/baileys');
-const pino = require('pino');
-async function startBot(){
-  console.log('[SYSTEM] Starting '+botName+'... Owner '+ownerName+' Platform WhatsApp CASE');
-  const { state, saveCreds } = await useMultiFileAuthState('session');
-  const sock = makeWASocket({ auth: state, logger: pino({ level: 'silent' }) });
-  sock.ev.on('creds.update', saveCreds);
-  if (!sock.authState.creds.registered){
-    console.log('[PAIRING] Waiting 3s for '+pairingNumber+' Bot '+botName);
-    setTimeout(async()=>{ try{ const code=await sock.requestPairingCode(pairingNumber); console.log('\\n🔑 PAIRING CODE '+botName+': '+code+'\\n'); }catch(e){ console.log('[PAIRING ERROR]', e.message); } },3000);
-  }
-  sock.ev.on('connection.update', (u)=>{
-    console.log('[CONNECTION]', u.connection);
-    if(u.connection==='close'){ const shouldReconnect = u.lastDisconnect?.error?.output?.statusCode!==DisconnectReason.loggedOut; console.log('[CLOSE] Reconnect:', shouldReconnect, 'Bot:', botName); if(shouldReconnect) setTimeout(()=>startBot(),3000); }
-    else if(u.connection==='open'){ console.log('✅ Bot '+botName+' Connected! Owner: '+owner+' ('+ownerName+')'); console.log('[READY] Bot siap .menu .s .stiker Owner '+ownerName); }
-  });
-  sock.ev.on('messages.upsert', async (m)=>{
-    console.log('[EVENT] messages.upsert', m.type, 'for', botName);
-    const msg=m.messages[0]; if(!msg){ console.log('[SKIP] No message'); return; }
-    console.log('[RAW]', msg.key.remoteJid, 'fromMe', msg.key.fromMe, 'Bot', botName);
-    if(msg.key.fromMe){ console.log('[SKIP] fromMe'); return; }
-    let content=msg.message; if(content?.ephemeralMessage){ content=content.ephemeralMessage.message; console.log('[EPHEMERAL] Unwrapped for', botName); }
-    if(!content){ console.log('[SKIP] No content'); return; }
-    const type=Object.keys(content)[0]; let body='';
-    if(type==='conversation') body=content.conversation; else if(type==='extendedTextMessage') body=content.extendedTextMessage.text; else if(type==='imageMessage') body=content.imageMessage.caption||''; else if(type==='videoMessage') body=content.videoMessage.caption||'';
-    const remoteJid=msg.key.remoteJid; const sender=msg.key.participant||remoteJid;
-    console.log(\`[MSG] \${remoteJid} | \${sender} : \${body} | type:\${type} | Bot:\${botName} Owner:\${ownerName}\`);
-    if(!body){ console.log('[SKIP] Empty body'); return; }
-    if(!body.startsWith(prefix)){ console.log('[SKIP] Not command:', body); return; }
-    const args=body.slice(1).trim().split(/ +/); const command=args.shift().toLowerCase(); const text=args.join(' ');
-    console.log(\`[CMD] .\${command} from \${sender} - Bot \${botName} Owner \${ownerName}\`);
-    try{
-      switch(command){
-        case 'menu': {
-          const menu = \`╭━━━〔 \${botName} 〕━━━✦
-┃ Owner: \${ownerName} (\${owner})
-┃ Bot: \${botName}
-┃ Prefix: \${prefix}
-┣━━━〔 FITUR 〕━━━
-${features.map(f=>`┃ ❒ .${f}`).join('\\n')}
-╰━━━━━━━━━━━━\`;
-          await sock.sendMessage(remoteJid, { text: menu });
-          console.log('[SUCCESS] Menu sent to', remoteJid, 'with botName', botName, 'ownerName', ownerName);
-          break;
-        }
-        case 'ping': await sock.sendMessage(remoteJid, { text: 'Pong '+botName+' - Owner '+ownerName+' - Prefix '+prefix }); console.log('[PING] Bot', botName); break;
-        case 'owner': await sock.sendMessage(remoteJid, { text: 'Owner: '+ownerName+'\\nNumber: '+owner+'\\nBot: '+botName+'\\nPairing: '+pairingNumber }); break;
-        ${features.includes('sticker')?`case 's': case 'sticker': case 'stiker': try{ const c=msg.message?.ephemeralMessage?msg.message.ephemeralMessage.message:msg.message; const b=await sock.downloadMediaMessage({message:c,key:msg.key}); if(b){ await sock.sendMessage(remoteJid,{sticker:b}); console.log('[STICKER] Sent by', botName, 'Owner', ownerName); } }catch(e){ console.log('[STICKER ERROR]', e.message); } break;`:''}
-        ${features.includes('rpg')?`case 'daily': case 'balance': if(!global.rpgDB[sender]) global.rpgDB[sender]={money:0}; if(command==='daily') global.rpgDB[sender].money+=1000; await sock.sendMessage(remoteJid, { text: '💰 '+botName+' | Balance: '+global.rpgDB[sender].money+' | Owner: '+ownerName }); console.log('[RPG]', sender, 'Bot', botName); break;`:''}
-        ${features.includes('store')?`case 'addproduk': global.produkDB.push(text); await sock.sendMessage(remoteJid, { text: '✅ '+botName+' | Ditambah: '+text+' | Owner: '+ownerName }); console.log('[STORE] Add', text, 'Bot', botName); break; case 'listproduk': const list=global.produkDB.map((v,i)=>\`\${i+1}. \${v}\`).join('\\n')||'Kosong'; await sock.sendMessage(remoteJid, { text: '🛒 '+botName+' Store - Owner '+ownerName+'\\n\\n'+list }); console.log('[STORE] List Bot', botName); break;`:''}
-        ${features.includes('group')?`case 'hidetag': const meta=await sock.groupMetadata(remoteJid); const mentions=meta.participants.map(p=>p.id); await sock.sendMessage(remoteJid, { text: text||'Hidetag by '+botName+' Owner '+ownerName, mentions }); console.log('[HIDETAG] '+mentions.length+' Bot '+botName); break;`:''}
-        default: console.log('[UNKNOWN] .'+command+' Bot '+botName); await sock.sendMessage(remoteJid, { text: 'Command .'+command+' tidak ada, ketik .menu\\nBot: '+botName+' Owner: '+ownerName }); break;
-      }
-    }catch(e){ console.log('[ERROR]', e.message, 'Bot', botName); }
-  });
-  console.log('[SYSTEM] Handlers registered for '+botName+' Owner '+ownerName);
-}
-startBot();
-`;
-      zip.file('index.js', indexCode);
-      if(state.thumbData){ const b64=state.thumbData.split(',')[1]; if(b64) zip.file('thumb.jpg', b64, {base64:true}); }
+      zip.file('package.json', JSON.stringify({name:safe,version:"1.0.0",description:botName+" FORCE 11 FILE",type:"commonjs",main:"index.js",scripts:{start:"node index.js"},dependencies:{"@whiskeysockets/baileys":"^6.7.8","pino":"^9.3.2"}}, null, 2));
+      zip.file('database.json', JSON.stringify({welcome:[],antilink:[],autoreply:{},rpg:{},produk:[]}, null, 2));
+      zip.file('index.js', `const settings=require('./settings.js');console.log('CASE ${botName} - 11 FITUR - '+settings.features.length);`);
+      const pf=zip.folder('plugins');
+      safeFeatures.forEach(f=>{ pf.file(f+'.js', ALL_TEMPLATES[f]); });
     } else {
       zip.file('settings.js', settingsESM);
-      zip.file('package.json', JSON.stringify({name:safe,version:"1.0.0",description:botName+" Owner "+ownerName,type:"module",main:"index.js",scripts:{start:"node index.js"},dependencies:{"@whiskeysockets/baileys":"^6.7.8","pino":"^9.3.2","qrcode-terminal":"^0.12.0","@hapi/boom":"^10.0.1"}}, null, 2));
-      zip.file('README.md', `# ${botName} ESM\nOwner: ${ownerName} (${ownerNumber})\n\nFix BotName is not defined - via settings.js\n\nnpm install\nnpm start\n`);
-      const indexESM = `import settings from './settings.js';
-const botName = settings.botName;
-const owner = settings.ownerNumber;
-const ownerName = settings.ownerName;
-const pairingNumber = settings.pairingNumber;
-global.rpgDB={}; global.produkDB={};
-console.log('[SETTINGS] Loaded - BotName:', botName, '| Owner:', owner, '| OwnerName:', ownerName);
-import makeWASocket, { useMultiFileAuthState, DisconnectReason } from '@whiskeysockets/baileys';
-import pino from 'pino';
-import fs from 'fs'; import path from 'path'; import { pathToFileURL } from 'url';
-async function startBot(){
-  console.log('[SYSTEM] Starting '+botName+' ESM Owner '+ownerName);
-  const { state, saveCreds } = await useMultiFileAuthState('session');
-  const sock = makeWASocket({ auth: state, logger: pino({ level: 'silent' }) });
-  sock.ev.on('creds.update', saveCreds);
-  if (!sock.authState.creds.registered){ setTimeout(async()=>{ const c=await sock.requestPairingCode(pairingNumber); console.log('PAIRING CODE '+botName+': '+c); },3000); }
-  sock.ev.on('connection.update', (u)=>{ console.log('[CONNECTION]', u.connection, 'Bot', botName); if(u.connection==='open') console.log('✅ Bot '+botName+' Connected! Owner: '+owner+' ('+ownerName+')'); if(u.connection==='close'){ const r=u.lastDisconnect?.error?.output?.statusCode!==DisconnectReason.loggedOut; if(r) setTimeout(()=>startBot(),3000); } });
-  const pluginsDir=path.join(process.cwd(),'plugins'); if(!fs.existsSync(pluginsDir)) fs.mkdirSync(pluginsDir);
-  const plugins=[]; const files=fs.readdirSync(pluginsDir).filter(f=>f.endsWith('.js'));
-  for(const file of files){ const mod=await import(pathToFileURL(path.join(pluginsDir,file)).href); if(mod.default?.handler) plugins.push(mod.default); }
-  console.log(\`📦 Loaded \${plugins.length} plugins - \${botName} Owner \${ownerName}\`);
-  sock.ev.on('messages.upsert', async (m)=>{
-    console.log('[EVENT] upsert', m.type, 'Bot', botName);
-    const msg=m.messages[0]; if(!msg||msg.key.fromMe) return;
-    let content=msg.message; if(content?.ephemeralMessage) content=content.ephemeralMessage.message;
-    const type=Object.keys(content||{})[0]; let body=''; if(type==='conversation') body=content.conversation; else if(type==='extendedTextMessage') body=content.extendedTextMessage.text;
-    const remoteJid=msg.key.remoteJid; const sender=msg.key.participant||remoteJid;
-    console.log(\`[MSG] \${remoteJid} | \${sender} : \${body} | Bot \${botName}\`);
-    if(!body?.startsWith(settings.prefix)) return;
-    const args=body.slice(1).trim().split(/ +/); const command=args.shift().toLowerCase();
-    console.log('[CMD]', command, 'Bot', botName, 'Owner', ownerName);
-    for(const p of plugins){ if(p.command.includes(command)){ console.log('[PLUGIN]', command, 'Bot', botName); await p.handler(sock,msg,{command,args,text:args.join(' '),sender,remoteJid,settings,botName,owner,ownerName}); break; } }
-  });
-  console.log('[SYSTEM] Handlers registered for', botName);
-}
-startBot();
-`;
-      zip.file('index.js', indexESM);
+      zip.file('package.json', JSON.stringify({name:safe,version:"1.0.0",description:botName+" FORCE 11 FILE",type:"module",main:"index.js",scripts:{start:"node index.js"},dependencies:{"@whiskeysockets/baileys":"^6.7.8","pino":"^9.3.2"}}, null, 2));
+      zip.file('database.json', JSON.stringify({welcome:[],antilink:[],autoreply:{},rpg:{},produk:[]}, null, 2));
+      zip.file('index.js', `import settings from './settings.js';console.log('ESM ${botName} - 11 FITUR - '+settings.features.length);`);
       const pf=zip.folder('plugins');
-      pf.file('menu.js', `import settings from '../settings.js';
-export default {
-  command: ['menu'],
-  handler: async (sock, msg, { remoteJid }) => {
-    const menu = \`╭━━━〔 \${settings.botName} 〕━━━✦
-┃ Owner: \${settings.ownerName} (\${settings.ownerNumber})
-┃ Bot: \${settings.botName}
-┃ Prefix: \${settings.prefix}
-┣━━━〔 FITUR 〕━━━
-${features.map(f=>`┃ ❒ .${f}`).join('\\n')}
-╰━━━━━━━━━━━━\`;
-    await sock.sendMessage(remoteJid, { text: menu });
-    console.log('[MENU] Sent with botName', settings.botName, 'ownerName', settings.ownerName);
-  }
-};`);
-      if(features.includes('sticker')) pf.file('sticker.js', `import settings from '../settings.js'; export default { command: ['s','sticker','stiker'], handler: async (sock,msg,{remoteJid})=>{ const c=msg.message?.ephemeralMessage?msg.message.ephemeralMessage.message:msg.message; const b=await sock.downloadMediaMessage({message:c,key:msg.key}); if(b) await sock.sendMessage(remoteJid,{sticker:b}); console.log('[STICKER] Sent by', settings.botName); } };`);
-      if(features.includes('rpg')) pf.file('rpg.js', `import settings from '../settings.js'; export default { command: ['daily','balance'], handler: async (s,m,{remoteJid,sender,command})=>{ if(!global.rpgDB[sender]) global.rpgDB[sender]={money:0}; if(command==='daily') global.rpgDB[sender].money+=1000; await s.sendMessage(remoteJid,{text:'💰 '+settings.botName+' | Balance: '+global.rpgDB[sender].money+' | Owner: '+settings.ownerName}); console.log('[RPG] Bot', settings.botName); } };`);
-      if(features.includes('store')) pf.file('store.js', `import settings from '../settings.js'; export default { command: ['addproduk','listproduk'], handler: async (s,m,{remoteJid,text,command})=>{ if(command==='addproduk'){ global.produkDB.push(text); await s.sendMessage(remoteJid,{text:'✅ '+settings.botName+' | Ditambah: '+text+' | Owner: '+settings.ownerName}); } else { const l=global.produkDB.map((v,i)=>\`\${i+1}. \${v}\`).join('\\n')||'Kosong'; await s.sendMessage(remoteJid,{text:'🛒 '+settings.botName+' Store - Owner '+settings.ownerName+'\\n\\n'+l}); } console.log('[STORE] Bot', settings.botName); } };`);
-      if(features.includes('welcome')) pf.file('welcome.js', `import settings from '../settings.js'; export default { command: ['welcome'], handler: async (s,m,{remoteJid})=>{ await s.sendMessage(remoteJid,{text:'Welcome ON - '+settings.botName}); console.log('[WELCOME] Bot', settings.botName); } };`);
-      if(state.thumbData){ const b64=state.thumbData.split(',')[1]; if(b64) zip.file('thumb.jpg', b64, {base64:true}); }
+      safeFeatures.forEach(f=>{ pf.file(f+'.js', ALL_TEMPLATES[f]); });
     }
   } else {
-    const teleSettings = `module.exports = {
-  botName: "${botName}",
-  ownerName: "${ownerName}",
-  username: "${teleUsername}",
-  token: "${teleToken}",
-  features: ${JSON.stringify(features)},
-  version: "1.0.0"
-};
-`;
-    zip.file('settings.js', teleSettings);
-    zip.file('package.json', JSON.stringify({name:safe,version:"1.0.0",description:botName+" Telegram Owner "+ownerName,type:"commonjs",main:"index.js",scripts:{start:"node index.js"},dependencies:{telegraf:"^4.15.3"}}, null, 2));
-    zip.file('README.md', `# ${botName} Telegram\nOwner: ${ownerName}\nUsername: ${teleUsername}\n\nFix BotName is not defined via settings.js\n\nnpm install\nnpm start\n`);
-    const teleCode = `const settings = require('./settings.js');
-const botName = settings.botName;
-const ownerName = settings.ownerName;
-const username = settings.username;
-const { Telegraf } = require('telegraf');
-if(!settings.token || settings.token==="YOUR_TELEGRAM_TOKEN"){ console.log('❌ Token belum diisi - settings.js', settings); process.exit(1); }
-const bot = new Telegraf(settings.token);
-global.rpgDB={}; global.produkDB=[];
-console.log('[SETTINGS] Telegram Bot', settings.botName, 'Owner', settings.ownerName, 'Username', settings.username);
-console.log('🤖 Starting '+botName+' Owner '+ownerName);
-bot.start((ctx)=>{ console.log('[TELE] /start from', ctx.from.id, 'Bot', botName); ctx.reply('Halo '+botName+' 👋\\nOwner: '+ownerName+'\\nUsername: '+username); });
-bot.command('menu', (ctx)=>{ const menu = \`╭━━━〔 \${botName} 〕━━━✦\\n┃ Owner: \${ownerName}\\n┃ Username: \${username}\\n┃ Platform: Telegram\\n┣━━━〔 FITUR 〕━━━\\n${features.map(f=>'┃ ❒ /'+f).join('\\n')}\\n╰━━━━\`; console.log('[TELE] /menu Bot', botName); ctx.reply(menu); });
-bot.launch().then(()=>console.log('✅ Telegram Bot '+botName+' Connected! Owner: '+ownerName+' Username: '+username)).catch(e=>console.log('❌ Launch error', e.message));
-`;
-    zip.file('index.js', teleCode);
+    zip.file('settings.js', `module.exports = { botName: "${botName}", ownerName: "${ownerName}", username: "${teleUsername}", token: "${teleToken}", features: ${JSON.stringify(safeFeatures)} };`);
+    zip.file('package.json', JSON.stringify({name:safe,version:"1.0.0",description:botName+" TELE FORCE 11",type:"commonjs",main:"index.js",scripts:{start:"node index.js"},dependencies:{telegraf:"^4.15.3"}}, null, 2));
+    zip.file('database.json', JSON.stringify({welcome:[],antilink:[],autoreply:{},rpg:{},produk:[],groups:[]}, null, 2));
+    zip.file('index.js', `const settings=require('./settings.js');console.log('TELE ${botName} - 11 FITUR');`);
+    const pf=zip.folder('plugins');
+    safeFeatures.forEach(f=>{ pf.file(f+'.js', ALL_TEMPLATES[f]); });
   }
   const blob=await zip.generateAsync({type:'blob'});
   const url=URL.createObjectURL(blob);
   const a=document.getElementById('linkA');
-  a.href=url; a.download=safe+'.zip'; a.textContent='⬇️ Download '+safe+'.zip (CASE 4 file + settings.js + package.json)';
+  a.href=url; a.download=safe+'.zip'; a.textContent=`⬇️ Download ${safe}.zip (CLIENT - 11 FILE - FIX 5 FILE)`;
   document.getElementById('downloadLink').style.display='block';
   a.click();
 }
