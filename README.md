@@ -11,7 +11,7 @@
 Auto generator script bot WhatsApp (Baileys) & Telegram (Telegraf) dengan 3 jalur code terpisah - **CASE / ESM / TELEGRAM** - bukan disamain biar gak error 0B.
 
 ### ✨ Demo Live
-**https://domain-lu.vercel.app**
+**https://cikizz-create-script-bot-eta.vercel.app**
 
 Isi identitas bot di web → Generate → Download ZIP → `npm install` → `node index.js`
 
