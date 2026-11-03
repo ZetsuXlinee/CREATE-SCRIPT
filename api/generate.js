@@ -1,4 +1,4 @@
-// api/generate.js - ULTIMATE FULL INTEGRATION (CASE / ESM / TELE)
+// api/generate.js - ULTIMATE FULL INTEGRATION (DYNAMIC MENU & ALL FEATURES)
 import JSZip from 'jszip';
 
 export default async function handler(req, res) {
@@ -49,19 +49,26 @@ export default async function handler(req, res) {
     if(base === 'case'){
       const settingsCase = `module.exports = { botName: "${botName}", ownerNumber: "${ownerNumber}", ownerName: "${ownerName}", pairingNumber: "${pairingNumber}", prefix: ".", features: ${JSON.stringify(list)}, menuType: "${menuType}", btnType: "${btnType}", thumbType: "${thumbType}", ${panelConfigString} };`;
       
+      // CASE dengan Menu Dinamis & Fitur Dasar
       const indexCase = `const settings = require('./settings.js');
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, downloadMediaMessage } = require('noxleys-baileys');
-const pino = require('pino'); const fs = require('fs'); const path = require('path'); const axios = require('axios');
+const pino = require('pino'); const fs = require('fs'); const path = require('path'); const axios = require('axios'); const os = require('os');
+const moment = require('moment-timezone');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 global.db = JSON.parse(fs.readFileSync('./database.json'));
 global.saveDB = () => fs.writeFileSync('./database.json', JSON.stringify(global.db, null, 2));
 global.startTime = Date.now();
-${usePanel ? `global.panel = settings.panel;` : ''}
 global.plugins = {};
+${usePanel ? `global.panel = settings.panel;` : ''}
 
-// Auto-create folders for Welcome
 ['./src/database/welcome', './src/database/welcome-bg'].forEach(d => { if(!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
+
+function fontBold(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D400 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D41A + n - 97); if (n >= 48 && n <= 57) return String.fromCodePoint(0x1D7CE + n - 48); return c; }).join(''); }
+function fontSmallCaps(str) { const map = { 'a': 'ᴀ', 'b': 'ʙ', 'c': 'ᴄ', 'd': 'ᴅ', 'e': 'ᴇ', 'f': 'ғ', 'g': 'ɢ', 'h': 'ʜ', 'i': 'ɪ', 'j': 'ᴊ', 'k': 'ᴋ', 'l': 'ʟ', 'm': 'ᴍ', 'n': 'ɴ', 'o': 'ᴏ', 'p': 'ᴘ', 'q': 'ǫ', 'r': 'ʀ', 's': 's', 't': 'ᴛ', 'u': 'ᴜ', 'v': 'ᴠ', 'w': 'ᴡ', 'x': 'x', 'y': 'ʏ', 'z': 'ᴢ' }; return [...String(str).toLowerCase()].map(c => map[c] || c).join(''); }
+function fontItalic(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D608 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D622 + n - 97); return c; }).join(''); }
+function runtime() { const s = process.uptime(); const d = Math.floor(s/86400); const h = Math.floor((s%86400)/3600); const m = Math.floor((s%3600)/60); return [d?d+'d':'', h?h+'h':'', m?m+'m':'', Math.floor(s%60)+'s'].filter(Boolean).join(' '); }
+function ucapan() { const h = moment.tz('Asia/Jakarta').hour(); if(h<4)return'Good Night'; if(h<11)return'Good Morning'; if(h<15)return'Good Afternoon'; if(h<18)return'Good Evening'; return 'Good Night'; }
 
 async function startBot(){
   const { state, saveCreds } = await useMultiFileAuthState('session');
@@ -76,7 +83,6 @@ async function startBot(){
   });
 
   sock.ev.on('group-participants.update', async (update) => {
-      // Handler Welcome di Case (Sederhana, karena complex Jimp butuh file terpisah)
       if(!global.db.welcome.includes(update.id)) return;
       if(update.action === 'add'){
         for(const p of update.participants){
@@ -91,31 +97,43 @@ async function startBot(){
     let body = msg.message?.conversation || msg.message?.extendedTextMessage?.text || msg.message?.imageMessage?.caption || '';
     
     if(msg.key.fromMe && !body.startsWith('.')) return;
-    if(body && global.db.autoreply[body.toLowerCase()]){ await sock.sendMessage(remoteJid, { text: global.db.autoreply[body.toLowerCase()] }, { quoted: msg }); return; }
-    if(global.db.antilink.includes(remoteJid) && /https?:\\/\\/|www\\.|t\\.me\\//i.test(body)){ if(!msg.key.fromMe){ try{ await sock.sendMessage(remoteJid, { delete: msg.key }); }catch{} } return; }
     if(!body.startsWith('.')) return;
     
     const args = body.slice(1).trim().split(/ +/); const command = args.shift().toLowerCase(); const text = args.join(' ');
 
-    // MENU
+    // MENU DINAMIS (CASE)
     if(command === 'menu' || command === 'help') {
-        let menuTxt = '╭━━━〔 ' + settings.botName + ' 〕━━━✦\\n┃ 👤 Owner: ' + settings.ownerName + '\\n┣━━━〔 ' + settings.features.length + ' FITUR 〕━━━\\n' + settings.features.map(f => '┃ ❒ .' + f).join('\\n') + '\\n╰━━━━━━━━━━━━━━';
-        return await sock.sendMessage(remoteJid, { text: menuTxt }, { quoted: msg });
+        let textMenu = '';
+        const d = { greeting: ucapan(), user: sender.split('@')[0], role: 'Beginner', level: 0, limit: 'Unlimited', runtime: runtime(), commands: settings.features.length, categories: 1 };
+        const sys = { platform: os.platform(), node: process.version, ram: (process.memoryUsage().rss / 1024 / 1024).toFixed(2) + ' MB' };
+
+        if (settings.menuType === '1') {
+            textMenu = \`╭─── ⟡ \${fontBold(settings.botName)} ⟡ ───\\n│ \${d.greeting}, \${fontItalic(d.user)}\\n│\\n├ ⊛ \${fontSmallCaps('Role')}     : \${fontItalic(d.role)}\\n├ ⊛ \${fontSmallCaps('Level')}    : \${d.level}\\n├ ⊛ \${fontSmallCaps('Limit')}    : \${fontItalic(d.limit)}\\n│\\n├ ⊛ \${fontSmallCaps('Runtime')}  : \${d.runtime}\\n├ ⊛ \${fontSmallCaps('Commands')} : \${d.commands}\\n├ ⊛ \${fontSmallCaps('Category')} : \${d.categories}\\n│\\n╰── ■■■■■■■■■■ 100%\`;
+        } else if (settings.menuType === '2') {
+            textMenu = \`⟪ \${fontBold('EDEN ACADEMY')} ⟫\\n═══════════════════════\\n✧ \${fontSmallCaps('Student')}  : \${fontItalic(d.user)}\\n✧ \${fontSmallCaps('Rank')}     : \${fontItalic(d.role)}\\n✧ \${fontSmallCaps('Level')}    : \${d.level}\\n✧ \${fontSmallCaps('Limit')}    : \${fontItalic(d.limit)}\\n\\n✧ \${fontSmallCaps('Runtime')}  : \${d.runtime}\\n✧ \${fontSmallCaps('Commands')} : \${d.commands}\\n✧ \${fontSmallCaps('Category')} : \${d.categories}\\n\\n  ■■■■■■■■■■ 100%\\n═══════════════════════\\n⟡ \${fontSmallCaps('Status')} : \${fontItalic('Imperial Scholar')}\`;
+        } else if (settings.menuType === '3') {
+            textMenu = \`[ \${fontBold(settings.botName.toUpperCase())} CORE_ ]\\n-----------------------\\n> \${fontBold('PROFILE')}\\n  \${fontSmallCaps('User')}      : \${fontItalic(d.user)}\\n  \${fontSmallCaps('Role')}      : \${fontItalic(d.role)}\\n  \${fontSmallCaps('Level')}     : \${d.level}\\n  \${fontSmallCaps('Limit')}     : \${fontItalic(d.limit)}\\n\\n> \${fontBold('SYSTEM')}\\n  \${fontSmallCaps('Status')}    : ᴏɴʟɪɴᴇ\\n  \${fontSmallCaps('Runtime')}   : \${d.runtime}\\n  \${fontSmallCaps('Platform')}  : \${sys.platform}\\n  \${fontSmallCaps('Node')}      : \${sys.node}\\n\\n> \${fontBold('STATISTICS')}\\n  \${fontSmallCaps('Commands')}  : \${d.commands}\\n  \${fontSmallCaps('Category')}  : \${d.categories}\\n\\n  ■■■■■■■■■■ 100%\\n-----------------------\`;
+        } else {
+            textMenu = \`┌─✦ \${fontBold(settings.botName + ' SYSTEM')} ✦─┐\\n│\\n├ ⊛ \${fontSmallCaps('Mode')}     : PUBLIC\\n├ ⊛ \${fontSmallCaps('Runtime')}  : \${d.runtime}\\n├ ⊛ \${fontSmallCaps('Commands')} : \${d.commands}\\n├ ⊛ \${fontSmallCaps('Platform')} : \${sys.platform}\\n├ ⊛ \${fontSmallCaps('RAM')}      : \${sys.ram}\\n├ ⊛ \${fontSmallCaps('Status')}   : ᴏɴʟɪɴᴇ\\n│\\n└─ ■■■■■■■■■■ 100%\`;
+        }
+
+        // Tambahkan list fitur di bawah
+        textMenu += \`\\n\\n╭━━━〔 \${settings.features.length} FITUR 〕━━━\\n\` + settings.features.map(f => '┃ ❒ .' + f).join('\\n') + \`\\n╰━━━━━━━━━━━━━━\`;
+
+        return await sock.sendMessage(remoteJid, { text: textMenu }, { quoted: msg });
     }
 
-    // CONTOH FITUR SIMPEL DI CASE
     if(command === 'ping') return await sock.sendMessage(remoteJid, { text: '🏓 Pong!' }, { quoted: msg });
     if(command === 'owner') return await sock.sendMessage(remoteJid, { text: '👑 Owner: ' + settings.ownerName }, { quoted: msg });
-
-    // (Fitur kompleks seperti VidSave, Web2APK, Unblur sangat panjang jika dimasukkan ke switch-case. 
-    // Agar bot tidak timeout, disarankan menggunakan base ESM untuk fitur-fitur ini).
+    
+    // Note: Fitur kompleks seperti VidSave, Jimp, dll hanya tersedia di ESM karena butuh import module.
   });
 }
 startBot();
 `;
 
       zip.file('settings.js', settingsCase);
-      const pkgDeps = { "noxleys-baileys": "^2.0.0", "noxleyss": "latest", "pino": "^8.17.2", "axios": "^1.7.2", "node-fetch": "^3.3.2", "fflate": "^0.8.2", "sharp": "^0.34.5", "jimp": "^0.22.12", "moment-timezone": "^0.5.45", "fluent-ffmpeg": "^2.1.2", "ffmpeg-static": "^5.2.0" };
+      const pkgDeps = { "noxleys-baileys": "^2.0.0", "noxleyss": "latest", "pino": "^8.17.2", "axios": "^1.7.2", "node-fetch": "^3.3.2", "fflate": "^0.8.2", "sharp": "^0.34.5", "jimp": "^0.22.12", "moment-timezone": "^0.5.45" };
       zip.file('package.json', JSON.stringify({ name: safe, version: "1.0.0", type: "commonjs", main: "index.js", scripts: { start: "node index.js" }, dependencies: pkgDeps }, null, 2));
       zip.file('database.json', JSON.stringify({ data: { users: {}, chats: {}, settings: {} }, welcome:[], antilink:[], autoreply:{} }, null, 2));
       zip.file('index.js', indexCase);
@@ -129,12 +147,13 @@ startBot();
       return res.send(buffer);
     }
 
-    // ================= 3. ESM (FULL FITUR) =================
+    // ================= 3. ESM (FULL FITUR DINAMIS) =================
     const settingsESM = `export default { botName: "${botName}", ownerNumber: "${ownerNumber}", ownerName: "${ownerName}", pairingNumber: "${pairingNumber}", prefix: ".", features: ${JSON.stringify(list)}, menuType: "${menuType}", btnType: "${btnType}", thumbType: "${thumbType}", ${panelConfigString} };`;
     
     const indexESM = `import settings from './settings.js';
 import {makeWASocket, useMultiFileAuthState, DisconnectReason } from 'noxleys-baileys';
 import pino from 'pino'; import fs from 'fs'; import path from 'path'; import { pathToFileURL } from 'url';
+import os from 'os'; import moment from 'moment-timezone';
 
 global.db = JSON.parse(fs.readFileSync('./database.json'));
 global.saveDB = () => fs.writeFileSync('./database.json', JSON.stringify(global.db, null, 2));
@@ -142,7 +161,6 @@ global.startTime = Date.now();
 global.plugins = {};
 ${usePanel ? `global.panel = settings.panel;` : ''}
 
-// Auto-create folders for Jimp
 ['./src/database/welcome', './src/database/welcome-bg'].forEach(d => { if(!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true }); });
 
 console.log('Starting ESM ' + settings.botName);
@@ -202,19 +220,37 @@ startBot();
     // ================= PLUGINS =================
     const pf = zip.folder('plugins');
 
-    // MENU PREMIUM
+    // MENU DINAMIS (ESM)
     if (list.includes('menu')) {
-        // (Kode menu.js panjang dimuat dari sebelumnya, di sini disingkat menjadi template literal ringkas)
-        pf.file('menu.js', `import moment from 'moment-timezone'; import * as levelling from '../lib/levelling.js'; import fs from 'fs'; import os from 'os'; import sharp from 'sharp';
+        pf.file('menu.js', `import moment from 'moment-timezone'; import fs from 'fs'; import os from 'os'; import sharp from 'sharp';
 const BOT_NAME = '${botName}'; const BOT_AUTHOR = '${ownerName}';
 const THUMB_URL = 'https://n.uguu.se/oVprmTOj.jpeg';
 async function getThumbnail() { try { const res = await fetch(THUMB_URL); return await sharp(Buffer.from(await res.arrayBuffer())).resize(300, 300).jpeg().toBuffer(); } catch { return Buffer.alloc(0); } }
-function fontBold(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D400 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D41A + n - 97); return c; }).join(''); }
+function fontBold(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D400 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D41A + n - 97); if (n >= 48 && n <= 57) return String.fromCodePoint(0x1D7CE + n - 48); return c; }).join(''); }
+function fontSmallCaps(str) { const map = { 'a': 'ᴀ', 'b': 'ʙ', 'c': 'ᴄ', 'd': 'ᴅ', 'e': 'ᴇ', 'f': 'ғ', 'g': 'ɢ', 'h': 'ʜ', 'i': 'ɪ', 'j': 'ᴊ', 'k': 'ᴋ', 'l': 'ʟ', 'm': 'ᴍ', 'n': 'ɴ', 'o': 'ᴏ', 'p': 'ᴘ', 'q': 'ǫ', 'r': 'ʀ', 's': 's', 't': 'ᴛ', 'u': 'ᴜ', 'v': 'ᴠ', 'w': 'ᴡ', 'x': 'x', 'y': 'ʏ', 'z': 'ᴢ' }; return [...String(str).toLowerCase()].map(c => map[c] || c).join(''); }
+function fontItalic(str) { return [...String(str)].map(c => { const n = c.codePointAt(0); if (n >= 65 && n <= 90) return String.fromCodePoint(0x1D608 + n - 65); if (n >= 97 && n <= 122) return String.fromCodePoint(0x1D622 + n - 97); return c; }).join(''); }
+function runtime() { const s = process.uptime(); const d = Math.floor(s/86400); const h = Math.floor((s%86400)/3600); const m = Math.floor((s%3600)/60); return [d?d+'d':'', h?h+'h':'', m?m+'m':'', Math.floor(s%60)+'s'].filter(Boolean).join(' '); }
+function ucapan() { const h = moment.tz('Asia/Jakarta').hour(); if(h<4)return'Good Night'; if(h<11)return'Good Morning'; if(h<15)return'Good Afternoon'; if(h<18)return'Good Evening'; return 'Good Night'; }
+
 export default { command: ['menu', 'help'], tags: ['main'], help: ['menu'], handler: async (sock, msg, o) => {
     const feats = o.settings.features;
-    let txt = \`╭━━━〔 \${fontBold(BOT_NAME)} 〕━━━✦\\n┃ 👤 Owner: \${BOT_AUTHOR}\\n┣━━━〔 \${feats.length} FITUR 〕━━━\\n\` + feats.map(f => \`┃ ❒ .\${f}\`).join('\\n') + \`\\n╰━━━━━━━━━━━━━━\`;
+    const d = { greeting: ucapan(), user: o.sender.split('@')[0], role: 'Beginner', level: 0, limit: 'Unlimited', runtime: runtime(), commands: feats.length, categories: 1 };
+    const sys = { platform: os.platform(), node: process.version, ram: (process.memoryUsage().rss / 1024 / 1024).toFixed(2) + ' MB' };
+    let textMenu = '';
+    
+    if (o.settings.menuType === '1') {
+        textMenu = \`╭─── ⟡ \${fontBold(BOT_NAME)} ⟡ ───\\n│ \${d.greeting}, \${fontItalic(d.user)}\\n│\\n├ ⊛ \${fontSmallCaps('Role')}     : \${fontItalic(d.role)}\\n├ ⊛ \${fontSmallCaps('Level')}    : \${d.level}\\n├ ⊛ \${fontSmallCaps('Limit')}    : \${fontItalic(d.limit)}\\n│\\n├ ⊛ \${fontSmallCaps('Runtime')}  : \${d.runtime}\\n├ ⊛ \${fontSmallCaps('Commands')} : \${d.commands}\\n├ ⊛ \${fontSmallCaps('Category')} : \${d.categories}\\n│\\n╰── ■■■■■■■■■■ 100%\`;
+    } else if (o.settings.menuType === '2') {
+        textMenu = \`⟪ \${fontBold('EDEN ACADEMY')} ⟫\\n═══════════════════════\\n✧ \${fontSmallCaps('Student')}  : \${fontItalic(d.user)}\\n✧ \${fontSmallCaps('Rank')}     : \${fontItalic(d.role)}\\n✧ \${fontSmallCaps('Level')}    : \${d.level}\\n✧ \${fontSmallCaps('Limit')}    : \${fontItalic(d.limit)}\\n\\n✧ \${fontSmallCaps('Runtime')}  : \${d.runtime}\\n✧ \${fontSmallCaps('Commands')} : \${d.commands}\\n✧ \${fontSmallCaps('Category')} : \${d.categories}\\n\\n  ■■■■■■■■■■ 100%\\n═══════════════════════\\n⟡ \${fontSmallCaps('Status')} : \${fontItalic('Imperial Scholar')}\`;
+    } else if (o.settings.menuType === '3') {
+        textMenu = \`[ \${fontBold(BOT_NAME.toUpperCase())} CORE_ ]\\n-----------------------\\n> \${fontBold('PROFILE')}\\n  \${fontSmallCaps('User')}      : \${fontItalic(d.user)}\\n  \${fontSmallCaps('Role')}      : \${fontItalic(d.role)}\\n  \${fontSmallCaps('Level')}     : \${d.level}\\n  \${fontSmallCaps('Limit')}     : \${fontItalic(d.limit)}\\n\\n> \${fontBold('SYSTEM')}\\n  \${fontSmallCaps('Status')}    : ᴏɴʟɪɴᴇ\\n  \${fontSmallCaps('Runtime')}   : \${d.runtime}\\n  \${fontSmallCaps('Platform')}  : \${sys.platform}\\n  \${fontSmallCaps('Node')}      : \${sys.node}\\n\\n> \${fontBold('STATISTICS')}\\n  \${fontSmallCaps('Commands')}  : \${d.commands}\\n  \${fontSmallCaps('Category')}  : \${d.categories}\\n\\n  ■■■■■■■■■■ 100%\\n-----------------------\`;
+    } else {
+        textMenu = \`┌─✦ \${fontBold(BOT_NAME + ' SYSTEM')} ✦─┐\\n│\\n├ ⊛ \${fontSmallCaps('Mode')}     : PUBLIC\\n├ ⊛ \${fontSmallCaps('Runtime')}  : \${d.runtime}\\n├ ⊛ \${fontSmallCaps('Commands')} : \${d.commands}\\n├ ⊛ \${fontSmallCaps('Platform')} : \${sys.platform}\\n├ ⊛ \${fontSmallCaps('RAM')}      : \${sys.ram}\\n├ ⊛ \${fontSmallCaps('Status')}   : ᴏɴʟɪɴᴇ\\n│\\n└─ ■■■■■■■■■■ 100%\`;
+    }
+
+    textMenu += \`\\n\\n╭━━━〔 \${feats.length} FITUR 〕━━━\\n\` + feats.map(f => '┃ ❒ .' + f).join('\\n') + \`\\n╰━━━━━━━━━━━━━━\`;
     const thumb = await getThumbnail();
-    await sock.sendMessage(o.remoteJid, { image: thumb, caption: txt }, { quoted: msg });
+    await sock.sendMessage(o.remoteJid, { image: thumb, caption: textMenu }, { quoted: msg });
 } };`);
     }
 
@@ -317,7 +353,7 @@ export default { command: ['welcome', 'left'], tags: ['admin'], help: ['welcome 
 } };`);
     }
 
-    // DUMMY PLUGINS FOR OTHERS (to avoid missing command error)
+    // DUMMY PLUGINS
     list.forEach(f => {
         if (['menu','vidsave','bypass','rch','iqc','web2apk','unblur','fotolive','welcome'].includes(f)) return;
         if (f === 'panel' && usePanel) {
