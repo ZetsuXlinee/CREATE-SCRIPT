@@ -168,13 +168,13 @@ function updateAll(){
   document.getElementById('prevSub').textContent=baseLabel + ' • 11 File • ' + (state.btn==='btn'?'Button':'Teks');
   let menuTxt='';
   if(isWA){
-    if(state.menu==='simple') menuTxt='MENU '+name+'\\n'+feats.map(f=>'.'+f).join('\\n')+'\\n\\nOwner: '+ownerName;
-    else if(state.menu==='image') menuTxt='╭━━━〔 '+name+' 〕━━━\\n'+feats.map(f=>'┃ • .'+f).join('\\n')+'\\n╰━━━\\nOwner: '+ownerName+' ('+ownerNum+')';
-    else menuTxt='╭━━━〔 '+name+' 〕━━━✦\\n┃ Owner: '+ownerName+' ('+ownerNum+')\\n┃ Bot: '+name+'\\n┃ Base: '+state.base.toUpperCase()+'\\n┣━━━〔 FITUR 11 〕━━━\\n'+feats.map(f=>'┃ ❒ .'+f).join('\\n')+'\\n╰━━━━━━━━━━━━';
+    if(state.menu==='simple') menuTxt='MENU '+name+'\n'+feats.map(f=>'.'+f).join('\n')+'\n\nOwner: '+ownerName;
+    else if(state.menu==='image') menuTxt='╭━━━〔 '+name+' 〕━━━\n'+feats.map(f=>'┃ • .'+f).join('\n')+'\n╰━━━\nOwner: '+ownerName+' ('+ownerNum+')';
+    else menuTxt='╭━━━〔 '+name+' 〕━━━✦\n┃ Owner: '+ownerName+' ('+ownerNum+')\n┃ Bot: '+name+'\n┃ Base: '+state.base.toUpperCase()+'\n┣━━━〔 FITUR 11 〕━━━\n'+feats.map(f=>'┃ ❒ .'+f).join('\n')+'\n╰━━━━━━━━━━━━';
   } else {
-    menuTxt='🤖 '+name+' (Telegram)\\n\\n/'+feats.map(f=>f).join(' /')+'\\n\\nOwner: '+ownerName+'\\nUsername: '+ownerNum+'\\nToken: '+(teleToken?teleToken.slice(0,12)+'...':'Belum diisi')+'\\n\\nBase: TELEGRAF';
+    menuTxt='🤖 '+name+' (Telegram)\n\n/'+feats.map(f=>f).join(' /')+'\n\nOwner: '+ownerName+'\nUsername: '+ownerNum+'\nToken: '+(teleToken?teleToken.slice(0,12)+'...':'Belum diisi')+'\n\nBase: TELEGRAF';
   }
-  document.getElementById('waBubble').innerHTML=menuTxt.replace(/\\n/g,'<br>')+'<div class="time"><span>'+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+'</span> <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>';
+  document.getElementById('waBubble').innerHTML=menuTxt.replace(/\n/g,'<br>')+'<div class="time"><span>'+new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})+'</span> <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>';
   const imgWrap=document.getElementById('imgPreviewWrap');
   const img=document.getElementById('imgPreview');
   if(state.thumb==='thumb' && state.thumbData){ imgWrap.style.display='block'; img.src=state.thumbData; }
@@ -188,24 +188,33 @@ function updateAll(){
 
 async function generateClient(){
   const isWA=state.platform==='whatsapp';
-  const botName=isWA?(document.getElementById('botName').value.trim()||'ZetsuLuyy'):(document.getElementById('teleBotName').value.trim()||'ZetsuLuyy');
-  const ownerNumber=isWA?(document.getElementById('owner').value.trim()||'62882000572938'):(document.getElementById('teleUsername').value.trim()||'@zetsuluyy_bot');
-  const ownerName=isWA?(document.getElementById('ownerName').value.trim()||'Pahri'):(document.getElementById('teleOwner').value.trim()||'Pahri');
-  const pairing=document.getElementById('pairingNumber')?.value.trim().replace(/[^0-9]/g,'')||'62882000572938';
-  const teleToken=document.getElementById('teleToken')?.value.trim()||'';
-  const teleUsername=document.getElementById('teleUsername')?.value.trim()||'@zetsuluyy_bot';
-  const safe=botName.replace(/[^a-zA-Z0-9-_]/g,'-').toLowerCase()||'bot';
-
-  if(!botName || botName==='ZetsuLuyy' && !document.getElementById(isWA?'botName':'teleBotName').value.trim()){
+  const botNameInput=document.getElementById(isWA?'botName':'teleBotName').value.trim();
+  
+  if(!botNameInput){
     alert('Isi Nama Bot dulu di BOT IDENTITY');
     return;
   }
+  
   if(isWA && !document.getElementById('owner').value.trim()){
     alert('Isi Owner Number dulu');
     return;
   }
+  
+  const teleToken=document.getElementById('teleToken')?.value.trim()||'';
   if(!isWA && !teleToken){
     alert('Isi Token Telegram dulu dari @BotFather');
+    return;
+  }
+
+  const botName=botNameInput;
+  const ownerNumber=isWA?(document.getElementById('owner').value.trim()||'62882000572938'):(document.getElementById('teleUsername').value.trim()||'@zetsuluyy_bot');
+  const ownerName=isWA?(document.getElementById('ownerName').value.trim()||'Pahri'):(document.getElementById('teleOwner').value.trim()||'Pahri');
+  const pairing=document.getElementById('pairingNumber')?.value.trim().replace(/[^0-9]/g,'')||'62882000572938';
+  const teleUsername=document.getElementById('teleUsername')?.value.trim()||'@zetsuluyy_bot';
+  const safe=botName.replace(/[^a-zA-Z0-9-_]/g,'-').toLowerCase()||'bot';
+
+  if(location.protocol === 'file:') {
+    alert('⚠️ PERHATIAN:\nKamu membuka file ini menggunakan "file://" (klik dua kali).\n\nAPI Generate tidak akan berfungsi!\n\nSolusi:\n1. Upload ke Vercel/Netlify agar API /api/generate jalan.\n2. Atau jalankan lewat localhost (npm run dev).');
     return;
   }
 
@@ -226,15 +235,23 @@ async function generateClient(){
       thumbType: state.thumb,
       features: [...document.querySelectorAll('#featGrid input:checked')].map(i=>i.value)
     };
+    
     const res=await fetch('/api/generate', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify(payload)
     });
+    
     if(!res.ok){
-      const txt = await res.text();
-      throw new Error(txt || 'Server tidak merespon');
+      let errMsg = 'Server error (' + res.status + ')';
+      try {
+        const errData = await res.json();
+        if(errData.error) errMsg = errData.error;
+        else if(errData.message) errMsg = errData.message;
+      } catch(_) {}
+      throw new Error(errMsg);
     }
+    
     const blob=await res.blob();
     const url=URL.createObjectURL(blob);
     const a=document.getElementById('linkA');
