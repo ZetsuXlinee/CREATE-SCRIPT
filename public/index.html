@@ -6,141 +6,151 @@
 <title>CiKiZz - Script Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #020205;
-  --surface: rgba(18, 18, 24, 0.7);
-  --border: rgba(255, 255, 255, 0.08);
-  --primary: #00f0ff;
-  --secondary: #8b5cf6;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --wa: #25D366;
-  --tele: #229ED9;
-  --text: #f8fafc;
-  --muted: #94a3b8;
-  --font: 'Inter', sans-serif;
-  --mono: 'JetBrains Mono', monospace;
-}
+  /* ================= RESET & VARIABLES ================= */
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface-hover: #334155;
+    --border: #334155;
+    --border-focus: #3b82f6;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --wa: #25D366;
+    --tele: #229ED9;
+    --font-main: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
 
-* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  
+  body {
+    background-color: var(--bg);
+    color: var(--text-main);
+    font-family: var(--font-main);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
 
-body {
-  background-color: var(--bg);
-  color: var(--text);
-  font-family: var(--font);
-  min-height: 100vh;
-  overflow-x: hidden;
-  background-image: 
-    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    radial-gradient(circle at 15% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 85% 0%, rgba(0, 240, 255, 0.15) 0%, transparent 40%);
-  background-size: 50px 50px, 50px 50px, 100% 100%, 100% 100%;
-  background-attachment: fixed;
-}
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px 16px; }
 
-.container { max-width: 1400px; margin: 0 auto; padding: 30px 20px 60px; }
+  /* ================= HEADER ================= */
+  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-icon { width: 40px; height: 40px; background: var(--primary); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+  .brand-text h1 { font-size: 20px; font-weight: 700; }
+  .brand-text p { font-size: 12px; color: var(--text-muted); }
+  .status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; color: var(--success); background: rgba(16, 185, 129, 0.1); padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(16, 185, 129, 0.2); }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
 
-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px; }
-.brand { display: flex; align-items: center; gap: 16px; }
-.logo-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary), var(--secondary)); border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3); }
-.brand-text h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; }
-.badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.2); color: var(--primary); font-weight: 700; }
-.brand-text p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  /* ================= LAYOUT ================= */
+  .layout { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
+  @media (max-width: 1024px) { .layout { grid-template-columns: 1fr; } }
 
-.status-pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 20px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: var(--success); font-size: 12px; font-weight: 600; }
-.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 10px var(--success); animation: pulse 2s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
+  /* ================= CARDS & SECTIONS ================= */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+  .section-title { font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .section-title .num { background: var(--border); width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text-muted); }
 
-.layout { display: grid; grid-template-columns: 1fr 420px; gap: 24px; align-items: start; }
-@media (max-width: 1024px) { .layout { grid-template-columns: 1fr; } }
+  /* ================= GRID & OPTIONS ================= */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  @media (max-width: 640px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
 
-.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 30px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); }
+  .option-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.2s; }
+  .option-card:hover { border-color: var(--text-muted); }
+  .option-card.active { border-color: var(--primary); background: rgba(59, 130, 246, 0.1); }
+  .option-card .icon { width: 32px; height: 32px; border-radius: 8px; background: var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .option-card.active .icon { background: var(--primary); }
+  .option-card .icon svg { width: 18px; height: 18px; stroke: var(--text-muted); }
+  .option-card.active .icon svg { stroke: #fff; }
+  .option-card h4 { font-size: 13px; font-weight: 600; }
+  .option-card p { font-size: 11px; color: var(--text-muted); }
 
-.section-title { display: flex; align-items: center; gap: 12px; margin: 30px 0 16px; font-size: 13px; font-weight: 700; color: var(--text); text-transform: uppercase; }
-.section-title:first-child { margin-top: 0; }
-.section-title .num { width: 24px; height: 24px; border-radius: 50%; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--muted); }
+  .option-card.wa.active { border-color: var(--wa); background: rgba(37, 211, 102, 0.1); }
+  .option-card.wa.active .icon { background: var(--wa); }
+  .option-card.tele.active { border-color: var(--tele); background: rgba(34, 158, 217, 0.1); }
+  .option-card.tele.active .icon { background: var(--tele); }
 
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-@media (max-width: 600px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+  /* ================= INPUTS ================= */
+  .input-group { display: flex; flex-direction: column; gap: 6px; }
+  .input-group label { font-size: 12px; font-weight: 500; color: var(--text-muted); }
+  .input-field { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; color: var(--text-main); font-family: var(--font-mono); font-size: 13px; outline: none; transition: border 0.2s; }
+  .input-field:focus { border-color: var(--primary); }
+  .input-field::placeholder { color: #475569; }
 
-.select-card { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 16px; padding: 16px; cursor: pointer; display: flex; align-items: center; gap: 14px; transition: all 0.3s; position: relative; }
-.select-card:hover { background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
-.select-card.active { background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(0, 240, 255, 0.05)); border-color: var(--primary); box-shadow: 0 0 20px rgba(0, 240, 255, 0.1); }
-.select-card.active::after { content: ''; position: absolute; inset: 0; border-radius: 16px; padding: 1px; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; pointer-events: none; }
-.select-card .icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
-.select-card.active .icon { background: linear-gradient(135deg, var(--primary), var(--secondary)); border-color: transparent; }
-.select-card .icon svg { width: 20px; height: 20px; stroke: var(--muted); transition: stroke 0.3s; }
-.select-card.active .icon svg { stroke: #fff; }
-.select-card.wa.active { border-color: var(--wa); } .select-card.wa.active .icon { background: linear-gradient(135deg, var(--wa), #128C7E); }
-.select-card.tele.active { border-color: var(--tele); } .select-card.tele.active .icon { background: linear-gradient(135deg, var(--tele), #0e7abf); }
-.select-card h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-.select-card p { font-size: 11px; color: var(--muted); }
+  /* ================= FEATURES ================= */
+  .feature-category { margin-bottom: 16px; }
+  .feature-category h5 { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
+  .feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+  .feature-item { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; cursor: pointer; user-select: none; transition: 0.2s; }
+  .feature-item:hover { border-color: var(--text-muted); }
+  .feature-item.active { border-color: var(--primary); background: rgba(59, 130, 246, 0.1); }
+  .feature-item .box { width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--text-muted); display: flex; align-items: center; justify-content: center; }
+  .feature-item.active .box { background: var(--primary); border-color: var(--primary); }
+  .feature-item .box svg { display: none; stroke: #fff; }
+  .feature-item.active .box svg { display: block; }
 
-.input-group { display: flex; flex-direction: column; gap: 6px; }
-.input-group label { font-size: 11px; font-weight: 600; color: var(--muted); margin-left: 4px; }
-.input-field { width: 100%; background: #08080c; border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; color: var(--text); font-family: var(--mono); font-size: 13px; outline: none; transition: all 0.3s; }
-.input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1); background: #0a0a10; }
+  /* ================= WARNING BOX ================= */
+  .warning-box {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 24px;
+    margin-bottom: 20px;
+  }
+  .warning-box h4 { color: var(--warning); font-size: 13px; font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .warning-box p { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+  .warning-code { display: flex; justify-content: space-between; background: var(--bg); padding: 10px 14px; border-radius: 6px; font-family: var(--font-mono); font-size: 13px; color: var(--primary); margin-bottom: 8px; border: 1px solid var(--border); }
+  .btn-copy { background: var(--border); border: none; color: var(--text-main); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; }
+  .btn-copy:hover { background: var(--text-muted); color: var(--bg); }
 
-.feature-category { background: rgba(255, 255, 255, 0.015); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 12px; }
-.feature-category h5 { font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-.feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
-.feature-item { background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 500; cursor: pointer; user-select: none; }
-.feature-item:hover { background: rgba(255, 255, 255, 0.05); }
-.feature-item.active { border-color: var(--primary); background: rgba(0, 240, 255, 0.05); }
-.feature-item .box { width: 16px; height: 16px; border-radius: 4px; border: 1.5px solid var(--muted); display: flex; align-items: center; justify-content: center; }
-.feature-item.active .box { background: var(--primary); border-color: var(--primary); }
-.feature-item .box svg { display: none; } .feature-item.active .box svg { display: block; stroke: #000; }
+  /* ================= GENERATE BUTTON ================= */
+  .btn-generate { width: 100%; padding: 16px; background: var(--primary); color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; font-family: var(--font-main); }
+  .btn-generate:hover { background: var(--primary-hover); }
+  .btn-generate:disabled { opacity: 0.7; cursor: not-allowed; }
 
-.upload-box { border: 2px dashed rgba(139, 92, 246, 0.3); border-radius: 16px; padding: 30px; text-align: center; background: rgba(139, 92, 246, 0.02); cursor: pointer; margin-top: 12px; display: none; }
-.upload-box:hover { background: rgba(139, 92, 246, 0.05); border-color: var(--secondary); }
-.upload-box img { max-width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-top: 12px; display: none; }
+  /* ================= PREVIEW SIDEBAR ================= */
+  .sidebar { position: sticky; top: 24px; }
+  .wa-mockup { background: #0b141a; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+  .wa-header { background: #202c33; padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+  .wa-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .wa-info h4 { font-size: 14px; font-weight: 600; }
+  .wa-info p { font-size: 11px; color: #8696a0; }
+  .wa-body { padding: 16px; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: 300px; min-height: 400px; max-height: 500px; overflow-y: auto; }
+  .chat-bubble { background: #202c33; padding: 12px; border-radius: 0 10px 10px 10px; font-family: var(--font-mono); font-size: 12px; color: #e9edef; line-height: 1.5; max-width: 95%; margin-bottom: 8px; white-space: pre-wrap; word-wrap: break-word; box-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+  .chat-bubble .time { font-size: 10px; color: #8696a0; text-align: right; margin-top: 4px; }
+  .chat-image { padding: 4px; border-radius: 0 10px 10px 10px; background: #202c33; margin-bottom: 4px; display: none; }
+  .chat-image img { width: 100%; border-radius: 6px; display: block; }
+  .chat-buttons { display: none; flex-direction: column; gap: 6px; margin-top: 6px; }
+  .chat-btn { background: #00a884; color: #fff; padding: 8px; border-radius: 6px; text-align: center; font-size: 12px; font-weight: 600; }
 
-.btn-generate { width: 100%; padding: 18px; border-radius: 16px; border: none; background: linear-gradient(90deg, var(--secondary), var(--primary)); color: #fff; font-size: 16px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; margin-top: 30px; box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3); transition: all 0.3s; }
-.btn-generate:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5); }
-.btn-generate:disabled { opacity: 0.7; cursor: not-allowed; }
+  /* CONSOLE */
+  .console-box { margin-top: 16px; background: #000; border: 1px solid var(--border); border-radius: 8px; padding: 12px; font-family: var(--font-mono); font-size: 11px; color: var(--success); line-height: 1.6; max-height: 120px; overflow-y: auto; }
+  .console-box span { color: var(--text-muted); }
 
-/* WARNING BOX INSTALL */
-.warn-install {
-  display: none; margin-top: 20px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.4);
-  border-radius: 16px; padding: 20px; text-align: left; animation: fadeIn 0.5s;
-}
-.warn-install h4 { font-size: 14px; font-weight: 800; color: var(--warning); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-.warn-install p { font-size: 13px; color: var(--text); line-height: 1.6; margin-bottom: 12px; }
-.warn-code { display: flex; justify-content: space-between; align-items: center; background: #000; padding: 12px 16px; border-radius: 8px; font-family: var(--mono); font-size: 14px; color: var(--primary); margin-bottom: 8px; border: 1px solid var(--border); }
-.copy-btn { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-family: var(--font); transition: 0.2s; }
-.copy-btn:hover { background: rgba(255,255,255,0.2); }
+  /* ================= MODAL (POPUP) ================= */
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 999; padding: 16px; backdrop-filter: blur(4px); }
+  .modal-content { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; width: 100%; max-width: 500px; padding: 24px; text-align: center; }
+  .modal-icon { width: 60px; height: 60px; background: rgba(16, 185, 129, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+  .modal-content h2 { font-size: 20px; margin-bottom: 8px; }
+  .modal-content p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+  .modal-warning { background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 16px; text-align: left; margin-bottom: 20px; }
+  .modal-warning h4 { color: var(--warning); font-size: 13px; margin-bottom: 8px; }
+  .modal-warning code { display: block; background: var(--bg); padding: 8px; border-radius: 4px; font-family: var(--font-mono); font-size: 12px; margin-bottom: 6px; color: var(--primary); }
+  .btn-modal { width: 100%; padding: 14px; background: var(--success); color: #fff; border: none; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; text-decoration: none; display: inline-block; }
+  .btn-modal:hover { background: #059669; }
 
-.download-area { display: none; margin-top: 20px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 20px; border-radius: 16px; text-align: center; }
-.btn-download { display: inline-flex; align-items: center; gap: 10px; background: var(--success); color: #fff; text-decoration: none; padding: 14px 28px; border-radius: 12px; font-weight: 700; font-size: 14px; margin-top: 10px; }
-
-/* PREVIEW SIDEBAR */
-.preview-panel { position: sticky; top: 24px; }
-.preview-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-.wa-mockup { background: #0b141a; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-.wa-top { background: #202c33; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
-.wa-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--secondary), var(--primary)); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: #fff; }
-.wa-info h4 { font-size: 14px; font-weight: 600; }
-.wa-info p { font-size: 11px; color: #8696a0; }
-.wa-chat { padding: 20px 16px; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: 300px; min-height: 450px; max-height: 550px; overflow-y: auto; }
-.chat-bubble { background: #202c33; padding: 12px 14px; border-radius: 0 12px 12px 12px; font-family: var(--mono); font-size: 12px; color: #e9edef; line-height: 1.5; max-width: 95%; margin-bottom: 12px; white-space: pre-wrap; word-wrap: break-word; }
-.chat-bubble .time { font-size: 10px; color: #8696a0; text-align: right; margin-top: 6px; display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
-.chat-image { padding: 4px; border-radius: 0 12px 12px 12px; background: #202c33; margin-bottom: 4px; display: none; }
-.chat-image img { width: 100%; border-radius: 8px; display: block; }
-.chat-buttons { display: none; flex-direction: column; gap: 8px; margin-top: 8px; }
-.chat-btn { background: #00a884; color: #fff; padding: 10px; border-radius: 8px; text-align: center; font-size: 12px; font-weight: 600; }
-
-.console-box { margin-top: 20px; background: #000; border: 1px solid var(--border); border-radius: 12px; padding: 16px; font-family: var(--mono); font-size: 11px; color: var(--success); line-height: 1.6; max-height: 150px; overflow-y: auto; }
-.console-box span.prompt { color: var(--primary); }
-
-.tips-box { margin-top: 20px; background: rgba(0, 240, 255, 0.05); border: 1px solid rgba(0, 240, 255, 0.15); border-radius: 12px; padding: 16px; }
-.tips-box h5 { font-size: 11px; font-weight: 700; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-.tips-box p { font-size: 11px; color: var(--muted); line-height: 1.6; font-family: var(--mono); }
-
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  /* ================= UPLOAD THUMBNAIL ================= */
+  .upload-area { border: 2px dashed var(--border); border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; margin-top: 10px; display: none; transition: 0.2s; }
+  .upload-area:hover { border-color: var(--primary); }
+  .upload-area img { max-width: 100%; height: 100px; object-fit: cover; border-radius: 6px; margin-top: 10px; display: none; }
 </style>
 </head>
 <body>
@@ -148,82 +158,95 @@ header { display: flex; justify-content: space-between; align-items: center; mar
 <div class="container">
   <header>
     <div class="brand">
-      <div class="logo-icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2l7 4v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-4z"/><path d="M9 12l2 2 4-4"/></svg>
+      <div class="brand-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2l7 4v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-4z"/><path d="M9 12l2 2 4-4"/></svg>
       </div>
       <div class="brand-text">
-        <h1>CiKiZz <span class="badge">V4.1 PREMIUM</span></h1>
-        <p>Noxleys Baileys • Telegraf 4.15 • Panel Support</p>
+        <h1>CiKiZz Generator</h1>
+        <p>Noxleys Baileys & Telegraf Script Maker</p>
       </div>
     </div>
-    <div class="status-pill"><div class="dot"></div> System Ready</div>
+    <div class="status"><div class="status-dot"></div> System Ready</div>
   </header>
 
   <div class="layout">
-    <div class="panel">
+    <!-- KOLOM KIRI (FORM) -->
+    <div class="main-content">
       
-      <!-- 1. Platform -->
-      <div class="section-title"><div class="num">1</div> Platform</div>
-      <div class="grid-2">
-        <div class="select-card wa active" data-platform="whatsapp" onclick="setPlatform('whatsapp',this)">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
-          <div><h4>WhatsApp</h4><p>Noxleys Engine</p></div>
-        </div>
-        <div class="select-card tele" data-platform="telegram" onclick="setPlatform('telegram',this)">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
-          <div><h4>Telegram</h4><p>Telegraf Engine</p></div>
+      <!-- 1. PLATFORM -->
+      <div class="card">
+        <div class="section-title"><span class="num">1</span> Pilih Platform</div>
+        <div class="grid-2">
+          <div class="option-card wa active" data-platform="whatsapp" onclick="setPlatform('whatsapp',this)">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+            <div><h4>WhatsApp</h4><p>Noxleys Engine</p></div>
+          </div>
+          <div class="option-card tele" data-platform="telegram" onclick="setPlatform('telegram',this)">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
+            <div><h4>Telegram</h4><p>Telegraf Engine</p></div>
+          </div>
         </div>
       </div>
 
-      <!-- 2. Identity -->
-      <div id="wa-config">
-        <div class="section-title"><div class="num">2</div> Bot Identity (WA)</div>
-        <div class="grid-2">
-          <div class="input-group"><label>Nama Bot</label><input id="botName" class="input-field" placeholder="Cth: Zetsu" oninput="updatePreview()"></div>
-          <div class="input-group"><label>Owner Number</label><input id="owner" class="input-field" placeholder="628xx" oninput="updatePreview()"></div>
-          <div class="input-group"><label>Nama Owner</label><input id="ownerName" class="input-field" placeholder="Cth: Anton" oninput="updatePreview()"></div>
-          <div class="input-group"><label>Pairing Number</label><input id="pairingNumber" class="input-field" placeholder="628xx" oninput="updatePreview()"></div>
+      <!-- 2. IDENTITY -->
+      <div class="card">
+        <div class="section-title"><span class="num">2</span> Bot Identity</div>
+        <div id="wa-config" class="grid-2">
+          <div class="input-group"><label>Nama Bot</label><input id="botName" class="input-field" placeholder="Contoh: Zetsu" oninput="updatePreview()"></div>
+          <div class="input-group"><label>Owner Number</label><input id="owner" class="input-field" placeholder="628xxx" oninput="updatePreview()"></div>
+          <div class="input-group"><label>Nama Owner</label><input id="ownerName" class="input-field" placeholder="Contoh: Anton" oninput="updatePreview()"></div>
+          <div class="input-group"><label>Pairing Number</label><input id="pairingNumber" class="input-field" placeholder="628xxx" oninput="updatePreview()"></div>
         </div>
-      </div>
-
-      <div id="tele-config" style="display:none">
-        <div class="section-title"><div class="num">2</div> Bot Identity (Tele)</div>
-        <div class="grid-2">
-          <div class="input-group"><label>Nama Bot</label><input id="teleBotName" class="input-field" placeholder="Cth: Zetsu" oninput="updatePreview()"></div>
+        <div id="tele-config" class="grid-2" style="display:none">
+          <div class="input-group"><label>Nama Bot</label><input id="teleBotName" class="input-field" placeholder="Zetsu Bot" oninput="updatePreview()"></div>
           <div class="input-group"><label>Username Bot</label><input id="teleUsername" class="input-field" placeholder="@zetsu_bot" oninput="updatePreview()"></div>
-          <div class="input-group"><label>Nama Owner</label><input id="teleOwner" class="input-field" placeholder="Cth: Anton" oninput="updatePreview()"></div>
+          <div class="input-group"><label>Nama Owner</label><input id="teleOwner" class="input-field" placeholder="Anton" oninput="updatePreview()"></div>
           <div class="input-group"><label>Token BotFather</label><input id="teleToken" class="input-field" placeholder="12345:ABC..." oninput="updatePreview()"></div>
         </div>
       </div>
 
-      <!-- 3. Base Code -->
-      <div id="base-config">
-        <div class="section-title"><div class="num">3</div> Base Code</div>
+      <!-- 3. BASE CODE & MENU -->
+      <div class="card" id="base-config">
+        <div class="section-title"><span class="num">3</span> Base Code & Tampilan</div>
         <div class="grid-2">
-          <div class="select-card active" data-base="esm" onclick="setBase('esm',this)">
-            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
-            <div><h4>ESM Plugin</h4><p>Modern JavaScript</p></div>
-          </div>
-          <div class="select-card" data-base="case" onclick="setBase('case',this)">
-            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-            <div><h4>CASE</h4><p>Switch Case</p></div>
-          </div>
+          <div class="option-card active" data-base="esm" onclick="setBase('esm',this)"><div><h4>ESM Plugin</h4><p>Modern (import/export)</p></div></div>
+          <div class="option-card" data-base="case" onclick="setBase('case',this)"><div><h4>CASE</h4><p>Classic (switch case)</p></div></div>
+        </div>
+        <div class="grid-3" style="margin-top:12px">
+          <div class="option-card active" data-menu="premium" onclick="setMenu('premium',this)"><div><h4>Premium</h4><p>Box Menu</p></div></div>
+          <div class="option-card" data-menu="simple" onclick="setMenu('simple',this)"><div><h4>Simple</h4><p>Teks Polos</p></div></div>
+          <div class="option-card" data-menu="image" onclick="setMenu('image',this)"><div><h4>Image</h4><p>Dengan Gambar</p></div></div>
         </div>
       </div>
 
-      <!-- 3b. Panel Pterodactyl -->
-      <div class="section-title"><div class="num">3b</div> Panel Pterodactyl</div>
-      <div class="select-card" id="panelToggle" onclick="togglePanel()" style="margin-bottom: 12px;">
-        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 7h20M2 17h20"/></svg></div>
-        <div style="flex:1;">
-          <h4>Aktifkan Fitur Panel</h4>
-          <p>Otomatis generate script Create Panel</p>
+      <!-- 4. BUTTON & THUMBNAIL -->
+      <div class="card">
+        <div class="section-title"><span class="num">4</span> Tombol & Thumbnail</div>
+        <div class="grid-2">
+          <div class="option-card active" data-btn="nobtn" onclick="setBtn('nobtn',this)"><div><h4>Teks Biasa</h4><p>Tanpa tombol</p></div></div>
+          <div class="option-card" data-btn="btn" onclick="setBtn('btn',this)"><div><h4>Interactive</h4><p>WhatsApp Button</p></div></div>
         </div>
-        <div class="box" id="panelCheck" style="width:20px; height:20px; border-radius:5px; border:1.5px solid var(--muted); display:flex; align-items:center; justify-content:center;"></div>
+        <div class="grid-2" style="margin-top:12px">
+          <div class="option-card active" data-thumb="nothumb" onclick="setThumb('nothumb',this)"><div><h4>Tanpa Thumbnail</h4></div></div>
+          <div class="option-card" data-thumb="thumb" onclick="setThumb('thumb',this)"><div><h4>Pakai Thumbnail</h4></div></div>
+        </div>
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p style="font-size:12px; margin-top:8px; color:var(--text-muted)">Upload gambar (JPG/PNG)</p>
+          <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleImage(this)">
+          <img id="imgPreview" src="">
+        </div>
       </div>
 
-      <div id="panelConfig" style="display:none; background:rgba(0,240,255,0.05); border:1px solid rgba(0,240,255,0.2); border-radius:16px; padding:16px; margin-bottom:20px;">
-        <div class="grid-2">
+      <!-- 5. PANEL PTERODACTYL -->
+      <div class="card">
+        <div class="section-title"><span class="num">5</span> Panel Pterodactyl (Opsional)</div>
+        <div class="option-card" id="panelToggle" onclick="togglePanel()" style="margin-bottom:12px">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 7h20M2 17h20"/></svg></div>
+          <div style="flex:1"><h4>Aktifkan Fitur Panel</h4><p>Script Create Panel Pterodactyl</p></div>
+          <div class="box" id="panelCheck" style="width:20px; height:20px; border-radius:4px; border:1px solid var(--border); display:flex; align-items:center; justify-content:center;"></div>
+        </div>
+        <div id="panelConfig" class="grid-2" style="display:none; background:var(--bg); padding:12px; border-radius:8px; border:1px solid var(--border)">
           <div class="input-group"><label>Panel Domain</label><input id="panelDomain" class="input-field" placeholder="https://panel.domain.com" oninput="updatePreview()"></div>
           <div class="input-group"><label>PTLA API Key</label><input id="panelPtla" class="input-field" placeholder="ptla_xxxxxx" oninput="updatePreview()"></div>
           <div class="input-group"><label>Egg ID</label><input id="panelEgg" class="input-field" placeholder="15" oninput="updatePreview()"></div>
@@ -231,65 +254,55 @@ header { display: flex; justify-content: space-between; align-items: center; mar
         </div>
       </div>
 
-      <!-- 4. Menu & Buttons -->
-      <div class="section-title"><div class="num">4</div> Tampilan Menu</div>
-      <div class="grid-3">
-        <div class="select-card active" data-menu="premium" onclick="setMenu('premium',this)"><div><h4>Premium</h4><p>Box Menu</p></div></div>
-        <div class="select-card" data-menu="simple" onclick="setMenu('simple',this)"><div><h4>Simple</h4><p>Teks Polos</p></div></div>
-        <div class="select-card" data-menu="image" onclick="setMenu('image',this)"><div><h4>Image</h4><p>Dengan Gambar</p></div></div>
-      </div>
-
-      <div class="section-title" style="margin-top: 20px;"><div class="num">5</div> Gaya Tombol & Thumbnail</div>
-      <div class="grid-2">
-        <div class="select-card active" data-btn="nobtn" onclick="setBtn('nobtn',this)"><div><h4>Teks Biasa</h4><p>Tanpa tombol</p></div></div>
-        <div class="select-card" data-btn="btn" onclick="setBtn('btn',this)"><div><h4>Interactive</h4><p>WhatsApp Button</p></div></div>
-      </div>
-
-      <div class="grid-2" style="margin-top: 12px;">
-        <div class="select-card active" data-thumb="nothumb" onclick="setThumb('nothumb',this)"><div><h4>Tanpa Thumbnail</h4></div></div>
-        <div class="select-card" data-thumb="thumb" onclick="setThumb('thumb',this)"><div><h4>Pakai Thumbnail</h4></div></div>
-      </div>
-
-      <div class="upload-box" id="uploadBox" onclick="document.getElementById('fileInput').click()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <p style="font-size:12px; margin-top:8px; color:var(--muted);">Klik untuk upload gambar</p>
-        <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleImage(this)">
-        <img id="imgPreview" src="">
-      </div>
-
-      <!-- 6. Features -->
-      <div class="section-title" style="margin-top: 30px;"><div class="num">6</div> Fitur Bot <span id="featCount" style="color:var(--primary); margin-left: 6px;">20</span></div>
-      
-      <div id="featureContainer">
-        <div class="feature-category">
-          <h5>INFORMASI</h5>
-          <div class="feature-grid">
-            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="menu" checked hidden>Menu</div>
-            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ping" checked hidden>Ping</div>
-            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="owner" checked hidden>Owner</div>
-            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="info" checked hidden>Info Bot</div>
+      <!-- 6. FITUR BOT -->
+      <div class="card">
+        <div class="section-title"><span class="num">6</span> Pilih Fitur Bot (<span id="featCount">0</span>)</div>
+        <div id="featureContainer">
+          <div class="feature-category">
+            <h5>INFORMASI</h5>
+            <div class="feature-grid">
+              <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="menu" checked hidden>Menu</div>
+              <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ping" checked hidden>Ping</div>
+              <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="owner" checked hidden>Owner</div>
+              <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="info" checked hidden>Info Bot</div>
+            </div>
+          </div>
+          <div class="feature-category">
+            <h5>ADMIN GROUP</h5>
+            <div class="feature-grid">
+              <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="welcome" checked hidden>Welcome</div>
+              <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="antilink" checked hidden>Antilink</div>
+              <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="hidetag" checked hidden>Hidetag</div>
+            </div>
+          </div>
+          <div class="feature-category">
+            <h5>MEDIA & UTILITY</h5>
+            <div class="feature-grid">
+              <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="sticker" checked hidden>Sticker</div>
+              <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="tiktok" checked hidden>TikTok DL</div>
+              <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ai" checked hidden>AI Chat</div>
+              <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="rpg" checked hidden>RPG Daily</div>
+              <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="store" checked hidden>Store</div>
+              <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="broadcast" checked hidden>Broadcast</div>
+            </div>
           </div>
         </div>
-        
-        <div class="feature-category">
-          <h5>ADMIN GROUP</h5>
-          <div class="feature-grid">
-            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="welcome" checked hidden>Welcome</div>
-            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="antilink" checked hidden>Antilink</div>
-            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="hidetag" checked hidden>Hidetag</div>
-          </div>
-        </div>
+      </div>
 
-        <div class="feature-category">
-          <h5>MEDIA & UTILITY</h5>
-          <div class="feature-grid">
-            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="sticker" checked hidden>Sticker</div>
-            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="tiktok" checked hidden>TikTok DL</div>
-            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ai" checked hidden>AI Chat</div>
-            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="rpg" checked hidden>RPG Daily</div>
-            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="store" checked hidden>Store</div>
-            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="broadcast" checked hidden>Broadcast</div>
-          </div>
+      <!-- PERINGATAN INSTALASI -->
+      <div class="warning-box">
+        <h4>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          PERINGATAN INSTALASI WAJIB
+        </h4>
+        <p>Setelah meng-extract ZIP, jalankan perintah ini di console panel:</p>
+        <div class="warning-code">
+          <span>npm install</span>
+          <button class="btn-copy" onclick="copyText('npm install')">Copy</button>
+        </div>
+        <div class="warning-code">
+          <span>npm install fflate</span>
+          <button class="btn-copy" onclick="copyText('npm install fflate')">Copy</button>
         </div>
       </div>
 
@@ -297,109 +310,83 @@ header { display: flex; justify-content: space-between; align-items: center; mar
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         <span id="btnText">Generate Script</span>
       </button>
-
-      <!-- PERINGATAN INSTALL (MUNCUL SETELAH KLIK GENERATE) -->
-      <div class="warn-install" id="warnInstall">
-        <h4>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-          PERINGATAN INSTALASI WAJIB
-        </h4>
-        <p>Setelah kamu meng-extract file ZIP, buka terminal / console panel Pterodactyl dan jalankan perintah ini secara berurutan:</p>
-        
-        <div class="warn-code">
-          <span>1. npm install</span>
-          <button class="copy-btn" onclick="copyText('npm install')">Copy</button>
-        </div>
-        <div class="warn-code">
-          <span>2. npm install fflate</span>
-          <button class="copy-btn" onclick="copyText('npm install fflate')">Copy</button>
-        </div>
-      </div>
-
-      <div class="download-area" id="downloadArea">
-        <div style="font-size:13px; font-weight:600; color:var(--success); margin-bottom:10px;">Script berhasil dibuat!</div>
-        <a id="downloadLink" class="btn-download" download>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Download ZIP
-        </a>
-      </div>
     </div>
 
-    <!-- Sidebar Preview -->
-    <div class="preview-panel">
-      <div class="panel" style="padding: 20px;">
-        <div class="preview-header">
-          <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Live Preview</h3>
-          <div style="font-size:10px; color:var(--success); font-weight:700; display:flex; align-items:center; gap:6px;"><div class="dot" style="width:6px; height:6px;"></div> LIVE</div>
+    <!-- KOLOM KANAN (PREVIEW) -->
+    <div class="sidebar">
+      <div class="card">
+        <div class="section-title" style="margin-bottom:16px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> 
+          Live Preview
         </div>
-
         <div class="wa-mockup">
-          <div class="wa-top">
+          <div class="wa-header">
             <div class="wa-avatar" id="waAv">B</div>
             <div class="wa-info">
               <h4 id="waName">Nama Bot</h4>
               <p id="waSub">Premium • ESM</p>
             </div>
           </div>
-          <div class="wa-chat" id="waChat">
+          <div class="wa-body" id="waChat">
             <div class="chat-image" id="chatImgWrap"><img id="chatImg" src=""></div>
             <div class="chat-bubble" id="chatBubble">
-              Isi identitas bot dulu untuk melihat preview.
+              Isi identitas bot untuk melihat preview.
               <div class="time">12:00 <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>
             </div>
             <div class="chat-buttons" id="chatBtns"></div>
           </div>
         </div>
-
         <div class="console-box" id="consoleBox">
-          <div><span class="prompt">></span> System ready...</div>
-          <div><span class="prompt">></span> Waiting for configuration...</div>
-        </div>
-
-        <div class="tips-box">
-          <h5><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Cara Pakai</h5>
-          <p>
-            1. Isi Nama Bot & Nomor<br>
-            2. Pilih fitur yang diinginkan<br>
-            3. Klik Generate Script<br>
-            4. Ikuti perintah instalasi
-          </p>
+          <div><span>></span> System ready...</div>
         </div>
       </div>
     </div>
+  </div>
+</div>
 
+<!-- MODAL POPUP (Muncul setelah generate) -->
+<div class="modal-overlay" id="modalSuccess">
+  <div class="modal-content">
+    <div class="modal-icon">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h2>Script Berhasil Dibuat!</h2>
+    <p>File ZIP kamu sedang di-download. Jangan lupa ikuti langkah di bawah ini.</p>
+    
+    <div class="modal-warning">
+      <h4>Langkah Instalasi:</h4>
+      <code>1. extract file .zip</code>
+      <code>2. npm install</code>
+      <code>3. npm install fflate</code>
+      <code>4. npm start</code>
+    </div>
+    
+    <button class="btn-modal" onclick="closeModal()">Mengerti & Tutup</button>
   </div>
 </div>
 
 <script>
-let state = {
-  platform: 'whatsapp',
-  base: 'esm',
-  menu: 'premium',
-  btn: 'nobtn',
-  thumb: 'nothumb',
-  thumbData: null,
-  usePanel: false
-};
+let state = { platform: 'whatsapp', base: 'esm', menu: 'premium', btn: 'nobtn', thumb: 'nothumb', thumbData: null, usePanel: false };
 
+// Copy to clipboard
 function copyText(text) {
   navigator.clipboard.writeText(text).then(() => {
-    alert('Berhasil di-copy: ' + text);
-  }).catch(() => {
-    alert('Gagal copy, silakan salin manual.');
-  });
+    alert('Berhasil dicopy: ' + text);
+  }).catch(() => alert('Gagal copy'));
 }
 
+// Set Platform
 function setPlatform(val, el) {
   state.platform = val;
   document.querySelectorAll('[data-platform]').forEach(e => e.classList.remove('active'));
   el.classList.add('active');
-  document.getElementById('wa-config').style.display = val === 'whatsapp' ? 'block' : 'none';
-  document.getElementById('tele-config').style.display = val === 'telegram' ? 'block' : 'none';
+  document.getElementById('wa-config').style.display = val === 'whatsapp' ? 'grid' : 'none';
+  document.getElementById('tele-config').style.display = val === 'telegram' ? 'grid' : 'none';
   document.getElementById('base-config').style.display = val === 'whatsapp' ? 'block' : 'none';
   updatePreview();
 }
 
+// Set Base
 function setBase(val, el) {
   state.base = val;
   document.querySelectorAll('[data-base]').forEach(e => e.classList.remove('active'));
@@ -407,6 +394,7 @@ function setBase(val, el) {
   updatePreview();
 }
 
+// Set Menu
 function setMenu(val, el) {
   state.menu = val;
   document.querySelectorAll('[data-menu]').forEach(e => e.classList.remove('active'));
@@ -414,6 +402,7 @@ function setMenu(val, el) {
   updatePreview();
 }
 
+// Set Button
 function setBtn(val, el) {
   state.btn = val;
   document.querySelectorAll('[data-btn]').forEach(e => e.classList.remove('active'));
@@ -421,31 +410,31 @@ function setBtn(val, el) {
   updatePreview();
 }
 
+// Set Thumbnail
 function setThumb(val, el) {
   state.thumb = val;
   document.querySelectorAll('[data-thumb]').forEach(e => e.classList.remove('active'));
   el.classList.add('active');
-  document.getElementById('uploadBox').style.display = val === 'thumb' ? 'block' : 'none';
+  document.getElementById('uploadArea').style.display = val === 'thumb' ? 'block' : 'none';
   updatePreview();
 }
 
+// Toggle Panel
 function togglePanel() {
   state.usePanel = !state.usePanel;
-  document.getElementById('panelConfig').style.display = state.usePanel ? 'block' : 'none';
+  document.getElementById('panelConfig').style.display = state.usePanel ? 'grid' : 'none';
+  document.getElementById('panelCheck').style.background = state.usePanel ? 'var(--primary)' : 'transparent';
+  document.getElementById('panelCheck').style.borderColor = state.usePanel ? 'var(--primary)' : 'var(--border)';
   document.getElementById('panelCheck').innerHTML = state.usePanel 
-    ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' 
+    ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' 
     : '';
-  document.getElementById('panelCheck').style.borderColor = state.usePanel ? 'var(--primary)' : 'var(--muted)';
-  document.getElementById('panelCheck').style.background = state.usePanel ? 'rgba(0,240,255,0.1)' : 'transparent';
   
-  if (state.usePanel) {
-    document.getElementById('featCount').textContent = parseInt(document.getElementById('featCount').textContent) + 1;
-  } else {
-    document.getElementById('featCount').textContent = parseInt(document.getElementById('featCount').textContent) - 1;
-  }
+  if (state.usePanel) document.getElementById('featCount').textContent = parseInt(document.getElementById('featCount').textContent) + 1;
+  else document.getElementById('featCount').textContent = parseInt(document.getElementById('featCount').textContent) - 1;
   updatePreview();
 }
 
+// Handle Image
 function handleImage(input) {
   if (input.files && input.files[0]) {
     const reader = new FileReader();
@@ -460,6 +449,7 @@ function handleImage(input) {
   }
 }
 
+// Toggle Feature
 function toggleFeat(el) {
   const cb = el.querySelector('input');
   cb.checked = !cb.checked;
@@ -469,6 +459,7 @@ function toggleFeat(el) {
   updatePreview();
 }
 
+// Update Live Preview
 function updatePreview() {
   const isWA = state.platform === 'whatsapp';
   const botName = isWA ? document.getElementById('botName').value.trim() : document.getElementById('teleBotName').value.trim();
@@ -483,22 +474,18 @@ function updatePreview() {
   document.getElementById('waSub').textContent = `${state.menu.toUpperCase()} • ${baseLabel} • ${feats.length} Fitur`;
 
   if (!botName) {
-    document.getElementById('chatBubble').innerHTML = `Isi identitas bot dulu untuk melihat preview.<div class="time">12:00 <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>`;
+    document.getElementById('chatBubble').innerHTML = `Isi identitas bot untuk melihat preview.<div class="time">12:00 <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>`;
     document.getElementById('chatBtns').style.display = 'none';
     document.getElementById('chatImgWrap').style.display = 'none';
-    document.getElementById('consoleBox').innerHTML = `<div><span class="prompt">></span> Waiting for configuration...</div>`;
+    document.getElementById('consoleBox').innerHTML = `<div><span>></span> Waiting for configuration...</div>`;
     return;
   }
 
   let text = '';
   if (isWA) {
-    if (state.menu === 'simple') {
-      text = `MENU ${name}\n\n${feats.map(f => '❒ .' + f).join('\n')}\n\nOwner: ${ownerName}`;
-    } else if (state.menu === 'image') {
-      text = `╭━━━〔 ${name} 〕━━━\n${feats.map(f => '┃ ❒ .' + f).join('\n')}\n╰━━━\nOwner: ${ownerName}`;
-    } else {
-      text = `╭━━━〔 ${name} 〕━━━✦\n┃ Owner: ${ownerName}\n┃ Nomor: ${ownerNum}\n┣━━━〔 ${feats.length} FITUR 〕━━━\n${feats.map(f => '┃ ❒ .' + f).join('\n')}\n╰━━━━━━━━━━━━━━`;
-    }
+    if (state.menu === 'simple') text = `MENU ${name}\n\n${feats.map(f => '❒ .' + f).join('\n')}\n\nOwner: ${ownerName}`;
+    else if (state.menu === 'image') text = `╭━━━〔 ${name} 〕━━━\n${feats.map(f => '┃ ❒ .' + f).join('\n')}\n╰━━━\nOwner: ${ownerName}`;
+    else text = `╭━━━〔 ${name} 〕━━━✦\n┃ Owner: ${ownerName}\n┃ Nomor: ${ownerNum}\n┣━━━〔 ${feats.length} FITUR 〕━━━\n${feats.map(f => '┃ ❒ .' + f).join('\n')}\n╰━━━━━━━━━━━━━━`;
   } else {
     text = `🤖 ${name}\n\n${feats.map(f => '❒ /' + f).join('\n')}\n\nOwner: ${ownerName}\nUsername: ${ownerNum}`;
   }
@@ -528,14 +515,20 @@ function updatePreview() {
   }
 
   document.getElementById('consoleBox').innerHTML = `
-    <div><span class="prompt">></span> Starting ${name} - ${baseLabel}</div>
-    <div><span class="prompt">></span> Owner: ${ownerName} (${ownerNum})</div>
-    <div><span class="prompt">></span> Loaded ${feats.length} plugins</div>
-    <div><span class="prompt">></span> Panel System: ${state.usePanel ? 'Enabled' : 'Disabled'}</div>
-    <div style="color:var(--primary)">> Ready to generate!</div>
+    <div><span>></span> Starting ${name} - ${baseLabel}</div>
+    <div><span>></span> Owner: ${ownerName}</div>
+    <div><span>></span> Plugins: ${feats.length} loaded</div>
+    <div><span>></span> Panel: ${state.usePanel ? 'ON' : 'OFF'}</div>
+    <div style="color:var(--primary)">> Ready!</div>
   `;
 }
 
+// Close Modal
+function closeModal() {
+  document.getElementById('modalSuccess').style.display = 'none';
+}
+
+// Generate Script
 async function generateScript() {
   const isWA = state.platform === 'whatsapp';
   const botNameInput = document.getElementById(isWA ? 'botName' : 'teleBotName').value.trim();
@@ -559,8 +552,6 @@ async function generateScript() {
     const pairing = document.getElementById('pairingNumber')?.value.trim().replace(/[^0-9]/g, '') || '628xx';
     const teleUsername = document.getElementById('teleUsername')?.value.trim() || '@bot';
     const safe = botName.replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase() || 'bot';
-    
-    // Hanya ambil fitur yang dicentang
     const features = [...document.querySelectorAll('#featureContainer input:checked')].map(i => i.value);
 
     const payload = {
@@ -568,7 +559,7 @@ async function generateScript() {
       teleToken, teleUsername, platform: isWA ? 'whatsapp' : 'telegram',
       base: state.base, menuType: state.menu, btnType: state.btn,
       thumbType: state.thumb, thumbData: state.thumbData, 
-      features: features, // Dikirim ke backend
+      features: features, 
       usePanel: state.usePanel,
       panelDomain: document.getElementById('panelDomain')?.value.trim() || '',
       panelPtla: document.getElementById('panelPtla')?.value.trim() || '',
@@ -590,15 +581,14 @@ async function generateScript() {
     
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
-    const a = document.getElementById('downloadLink');
+    const a = document.createElement('a');
     a.href = url;
     a.download = safe + '.zip';
-    document.getElementById('downloadArea').style.display = 'block';
-    
-    // Tampilkan peringatan install
-    document.getElementById('warnInstall').style.display = 'block';
-    
     a.click();
+    
+    // Tampilkan Popup Modal Peringatan
+    document.getElementById('modalSuccess').style.display = 'flex';
+    
   } catch(e) {
     alert('Gagal generate:\n' + e.message);
   } finally {
@@ -607,6 +597,7 @@ async function generateScript() {
   }
 }
 
+// Init
 updatePreview();
 </script>
 </body>
