@@ -3,538 +3,824 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>CiKiZz - Bot Script Generator</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<title>CiKiZz - Premium Script Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #030305;
-  --card: rgba(15, 17, 26, 0.7);
+  --bg: #020205;
+  --surface: rgba(18, 18, 24, 0.6);
   --border: rgba(255, 255, 255, 0.08);
-  --cyan: #06b6d4;
-  --purple: #8b5cf6;
-  --green: #10b981;
+  --primary: #00f0ff;
+  --secondary: #8b5cf6;
+  --accent: #f43f5e;
+  --success: #10b981;
   --wa: #25D366;
   --tele: #229ED9;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --font-main: 'Plus Jakarta Sans', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --text: #f8fafc;
+  --muted: #94a3b8;
+  --font: 'Inter', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 body {
-  background: var(--bg);
-  color: var(--text-main);
-  font-family: var(--font-main);
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
   min-height: 100vh;
   overflow-x: hidden;
+  /* Efek Grid & Glow di Background */
   background-image: 
-    radial-gradient(circle at 0% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
-    radial-gradient(circle at 100% 0%, rgba(6, 182, 212, 0.15) 0%, transparent 40%);
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    radial-gradient(circle at 15% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 85% 0%, rgba(0, 240, 255, 0.15) 0%, transparent 40%);
+  background-size: 50px 50px, 50px 50px, 100% 100%, 100% 100%;
   background-attachment: fixed;
 }
 
-/* HEADER */
-.top {
-  max-width: 1400px; margin: 0 auto; padding: 24px 20px;
-  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+/* Container */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 30px 20px 60px;
 }
-.brand { display: flex; gap: 16px; align-items: center; }
-.lg {
-  width: 48px; height: 48px; border-radius: 14px;
-  background: linear-gradient(135deg, var(--cyan), var(--purple));
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+
+/* Header */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  gap: 20px;
 }
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+}
+
+.brand-text h1 {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .badge {
-  font-size: 11px; padding: 6px 12px; border-radius: 20px;
-  background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3);
-  color: var(--cyan); font-weight: 700; letter-spacing: 0.5px;
-  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: rgba(0, 240, 255, 0.1);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  color: var(--primary);
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
-.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 10px var(--green); animation: pulse 1.5s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(1.2); } }
 
-/* MAIN LAYOUT */
-.wrap {
-  max-width: 1400px; margin: 0 auto; padding: 0 20px 60px;
-  display: grid; grid-template-columns: 1fr 400px; gap: 24px; align-items: start;
+.brand-text p {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
 }
-@media (max-width: 1024px) { .wrap { grid-template-columns: 1fr; } }
 
-/* CARDS */
-.card {
-  background: var(--card); border: 1px solid var(--border); border-radius: 24px;
-  padding: 28px; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: var(--success);
+  font-size: 12px;
+  font-weight: 600;
 }
-.sec { font-size: 12px; letter-spacing: 1px; color: var(--text-muted); font-weight: 800; margin: 28px 0 16px; display: flex; gap: 10px; align-items: center; text-transform: uppercase; }
-.sec:first-child { margin-top: 0; }
-.sec-num { background: linear-gradient(135deg, var(--cyan), var(--purple)); width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; font-weight: 800; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 10px var(--success); animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.2); } }
 
-/* GRID BUTTONS */
-.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-@media (max-width: 600px) { .grid, .grid-3 { grid-template-columns: 1fr; } }
-
-.plat {
-  padding: 16px; border-radius: 16px; background: rgba(255,255,255,0.02);
-  border: 1px solid var(--border); cursor: pointer; display: flex; gap: 14px; align-items: center;
-  font-size: 13px; font-weight: 600; transition: all 0.2s; position: relative; overflow: hidden;
+/* Layout Grid */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  gap: 24px;
+  align-items: start;
 }
-.plat:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.15); transform: translateY(-2px); }
-.plat.active { border-color: var(--cyan); background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1)); box-shadow: 0 8px 24px rgba(6, 182, 212, 0.15); }
-.plat.wa.active { border-color: var(--wa); background: linear-gradient(135deg, rgba(37, 211, 102, 0.15), rgba(6, 182, 212, 0.1)); }
-.plat.tele.active { border-color: var(--tele); background: linear-gradient(135deg, rgba(34, 158, 217, 0.15), rgba(139, 92, 246, 0.1)); }
-
-.plat .ic { width: 42px; height: 42px; border-radius: 12px; background: rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
-.plat.active .ic { background: linear-gradient(135deg, var(--cyan), var(--purple)); }
-.plat.wa.active .ic { background: linear-gradient(135deg, var(--wa), #128C7E); }
-.plat.tele.active .ic { background: linear-gradient(135deg, var(--tele), #0e7abf); }
-.plat small { display: block; font-size: 11px; color: var(--text-muted); font-weight: 400; margin-top: 2px; }
-
-/* INPUTS */
-.inp {
-  width: 100%; padding: 16px; border-radius: 14px; background: #09090e;
-  border: 1px solid var(--border); color: #fff; font-family: var(--font-mono); font-size: 13px;
-  outline: none; transition: all 0.2s;
+@media (max-width: 1024px) {
+  .layout { grid-template-columns: 1fr; }
 }
-.inp:focus { border-color: var(--cyan); box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1); background: #0c0c14; }
-.inp::placeholder { color: #475569; }
 
-/* FEATURES */
-.feat-cat { background: rgba(255,255,255,0.015); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
-.feat-cat-title { font-size: 11px; color: var(--text-muted); font-weight: 700; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-.feat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
-.feat {
-  padding: 12px 14px; border-radius: 10px; background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-  display: flex; gap: 10px; align-items: center; font-size: 12px; font-weight: 600; cursor: pointer;
+/* Card Panel */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 30px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Section Title */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 30px 0 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.section-title:first-child { margin-top: 0; }
+.section-title .num {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: var(--muted);
+}
+
+/* Grids */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 600px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+/* Selectable Cards */
+.select-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+.select-card:hover { background: rgba(255, 255, 255, 0.04); border-color: rgba(255, 255, 255, 0.15); transform: translateY(-2px); }
+.select-card.active {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(0, 240, 255, 0.05));
+  border-color: var(--primary);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+}
+.select-card.active::after {
+  content: ''; position: absolute; inset: 0; border-radius: 16px; padding: 1px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+}
+
+.select-card .icon {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.3s;
+}
+.select-card.active .icon {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-color: transparent;
+}
+.select-card .icon svg { width: 20px; height: 20px; stroke: var(--muted); transition: stroke 0.3s; }
+.select-card.active .icon svg { stroke: #fff; }
+
+.select-card.wa.active { border-color: var(--wa); box-shadow: 0 0 20px rgba(37, 211, 102, 0.1); }
+.select-card.wa.active::after { background: linear-gradient(135deg, var(--wa), #128C7E); }
+.select-card.wa.active .icon { background: linear-gradient(135deg, var(--wa), #128C7E); }
+
+.select-card.tele.active { border-color: var(--tele); box-shadow: 0 0 20px rgba(34, 158, 217, 0.1); }
+.select-card.tele.active::after { background: linear-gradient(135deg, var(--tele), #0e7abf); }
+.select-card.tele.active .icon { background: linear-gradient(135deg, var(--tele), #0e7abf); }
+
+.select-card div h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.select-card div p { font-size: 11px; color: var(--muted); }
+
+/* Inputs */
+.input-group { display: flex; flex-direction: column; gap: 6px; }
+.input-group label { font-size: 11px; font-weight: 600; color: var(--muted); margin-left: 4px; }
+.input-field {
+  width: 100%;
+  background: #08080c;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 13px;
+  outline: none;
+  transition: all 0.3s;
+}
+.input-field:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1);
+  background: #0a0a10;
+}
+.input-field::placeholder { color: #334155; }
+
+/* Features Grid */
+.feature-category {
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.feature-category h5 {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+}
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+.feature-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: 12px; font-weight: 500; cursor: pointer;
   transition: all 0.2s; user-select: none;
 }
-.feat:hover { background: rgba(255,255,255,0.06); }
-.feat.active { border-color: var(--cyan); background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(139, 92, 246, 0.15)); }
-.feat .chk { width: 18px; height: 18px; border-radius: 6px; border: 1.5px solid rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
-.feat.active .chk { background: var(--cyan); border-color: var(--cyan); }
+.feature-item:hover { background: rgba(255, 255, 255, 0.05); }
+.feature-item.active { border-color: var(--primary); background: rgba(0, 240, 255, 0.05); }
+.feature-item .box {
+  width: 16px; height: 16px; border-radius: 4px;
+  border: 1.5px solid var(--muted);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.feature-item.active .box { background: var(--primary); border-color: var(--primary); }
+.feature-item .box svg { display: none; }
+.feature-item.active .box svg { display: block; stroke: #000; }
 
-/* UPLOAD THUMB */
+/* Upload Box */
 .upload-box {
-  border: 2px dashed rgba(139, 92, 246, 0.4); border-radius: 16px; padding: 24px;
-  text-align: center; background: rgba(139, 92, 246, 0.05); cursor: pointer; transition: all 0.2s;
+  border: 2px dashed rgba(139, 92, 246, 0.3);
+  border-radius: 16px;
+  padding: 30px;
+  text-align: center;
+  background: rgba(139, 92, 246, 0.02);
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 12px;
   display: none;
 }
-.upload-box:hover { background: rgba(139, 92, 246, 0.1); border-color: var(--purple); }
-.thumb-preview { width: 100%; max-height: 200px; object-fit: cover; border-radius: 12px; display: none; margin-top: 12px; border: 1px solid var(--border); }
+.upload-box:hover { background: rgba(139, 92, 246, 0.05); border-color: var(--secondary); }
+.upload-box img { max-width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-top: 12px; display: none; }
 
-/* GENERATE BUTTON */
-.btn-gen {
-  width: 100%; margin-top: 32px; padding: 20px; border: none; border-radius: 16px;
-  background: linear-gradient(90deg, var(--cyan), var(--purple)); color: #fff;
-  font-weight: 800; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 12px;
-  cursor: pointer; box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3); transition: all 0.3s; font-family: var(--font-main);
+/* Generate Button */
+.btn-generate {
+  width: 100%;
+  padding: 18px;
+  border-radius: 16px;
+  border: none;
+  background: linear-gradient(90deg, var(--secondary), var(--primary));
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  font-family: var(--font);
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  cursor: pointer;
+  margin-top: 30px;
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.3);
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
 }
-.btn-gen:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5); }
-.btn-gen:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+.btn-generate:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(139, 92, 246, 0.5); }
+.btn-generate:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+.btn-generate::before {
+  content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+.btn-generate:hover::before { left: 100%; }
 
-/* DOWNLOAD LINK */
-.dl-box { display: none; margin-top: 20px; padding: 20px; border-radius: 16px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); text-align: center; }
-.dl-btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; color: #fff; text-decoration: none; font-weight: 700; background: linear-gradient(90deg, #10b981, #059669); padding: 14px 28px; border-radius: 12px; transition: all 0.2s; }
-.dl-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3); }
+/* Download Area */
+.download-area {
+  display: none;
+  margin-top: 20px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 20px;
+  border-radius: 16px;
+  text-align: center;
+}
+.btn-download {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: var(--success); color: #fff;
+  text-decoration: none; padding: 14px 28px;
+  border-radius: 12px; font-weight: 700; font-size: 14px;
+  transition: all 0.2s;
+}
+.btn-download:hover { filter: brightness(1.1); transform: translateY(-2px); }
 
-/* PREVIEW SIDEBAR (WHATSAPP SIMULATION) */
-.sidebar { position: sticky; top: 24px; }
-.wa-box { border-radius: 24px; overflow: hidden; border: 1px solid var(--border); background: #0b141a; box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
-.wa-head { padding: 16px; background: #202c33; display: flex; gap: 12px; align-items: center; }
-.wa-av { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--cyan)); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px; flex-shrink: 0; }
-.wa-body { padding: 20px 16px; background: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: 300px; min-height: 480px; max-height: 600px; overflow-y: auto; }
+/* PREVIEW PANEL (SIDEBAR) */
+.preview-panel {
+  position: sticky;
+  top: 24px;
+}
+.preview-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+}
+.preview-header h3 { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
 
-/* BUBBLE CHAT */
-.bub { background: #202c33; padding: 14px 16px; border-radius: 0 12px 12px 12px; font-family: var(--font-mono); font-size: 12px; white-space: pre-wrap; max-width: 95%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); line-height: 1.6; margin-bottom: 12px; position: relative; }
-.bub-time { font-size: 10px; color: #8696a0; margin-top: 8px; text-align: right; display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
-.bub-img { padding: 4px; border-radius: 0 12px 12px 12px; background: #202c33; margin-bottom: 4px; }
-.bub-img img { width: 100%; border-radius: 8px; display: block; }
+/* WhatsApp UI */
+.wa-mockup {
+  background: #0b141a;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+.wa-top {
+  background: #202c33;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.wa-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 16px; color: #fff;
+}
+.wa-info h4 { font-size: 14px; font-weight: 600; }
+.wa-info p { font-size: 11px; color: #8696a0; }
+.wa-chat {
+  padding: 20px 16px;
+  background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png');
+  background-size: 300px;
+  min-height: 450px;
+  max-height: 550px;
+  overflow-y: auto;
+}
+.chat-bubble {
+  background: #202c33;
+  padding: 12px 14px;
+  border-radius: 0 12px 12px 12px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: #e9edef;
+  line-height: 1.5;
+  max-width: 95%;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.chat-bubble .time {
+  font-size: 10px; color: #8696a0; text-align: right;
+  margin-top: 6px; display: flex; justify-content: flex-end; align-items: center; gap: 4px;
+}
+.chat-image {
+  padding: 4px; border-radius: 0 12px 12px 12px;
+  background: #202c33; margin-bottom: 4px; display: none;
+}
+.chat-image img { width: 100%; border-radius: 8px; display: block; }
 
-/* FAKE BUTTONS IN CHAT */
-.fake-btns { display: none; flex-direction: column; gap: 8px; margin-top: 8px; }
-.fake-btn { background: #00a884; padding: 12px; border-radius: 8px; text-align: center; font-size: 12px; font-weight: 700; color: #fff; }
+/* Fake Buttons */
+.chat-buttons {
+  display: none; flex-direction: column; gap: 8px; margin-top: 8px;
+}
+.chat-btn {
+  background: #00a884; color: #fff;
+  padding: 10px; border-radius: 8px;
+  text-align: center; font-size: 12px; font-weight: 600;
+}
 
-/* CONSOLE */
-.console-box { margin-top: 20px; padding: 16px; background: #000; border-radius: 14px; border: 1px solid var(--border); font-family: var(--font-mono); font-size: 11px; color: #10b981; line-height: 1.8; max-height: 180px; overflow-y: auto; }
-.console-box .cmd { color: var(--cyan); }
-.console-box .err { color: #ef4444; }
+/* Console Area */
+.console-box {
+  margin-top: 20px;
+  background: #000;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--success);
+  line-height: 1.6;
+  max-height: 150px;
+  overflow-y: auto;
+}
+.console-box span.prompt { color: var(--primary); }
 
-/* SIDEBAR TIPS */
-.tips-box { margin-top: 20px; padding: 16px; background: rgba(6, 182, 212, 0.05); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 14px; }
-.tips-box h4 { font-size: 11px; color: var(--cyan); font-weight: 800; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; letter-spacing: 0.5px; }
-.tips-box p { font-size: 11px; color: var(--text-muted); line-height: 1.7; font-family: var(--font-mono); }
-
+/* Tips */
+.tips-box {
+  margin-top: 20px;
+  background: rgba(0, 240, 255, 0.05);
+  border: 1px solid rgba(0, 240, 255, 0.15);
+  border-radius: 12px;
+  padding: 16px;
+}
+.tips-box h5 { font-size: 11px; font-weight: 700; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.tips-box p { font-size: 11px; color: var(--muted); line-height: 1.6; font-family: var(--mono); }
 </style>
 </head>
 <body>
 
-<div class="top">
-  <div class="brand">
-    <div class="lg">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M12 2l7 4v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-4z"/><path d="M9 12l2 2 4-4"/></svg>
-    </div>
-    <div>
-      <div style="font-weight:800;font-size:18px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;letter-spacing:-0.5px">
-        CiKiZz <span class="badge"><span class="dot"></span> SCRIPT GENERATOR v3.0</span>
+<div class="container">
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <div class="logo-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2l7 4v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-4z"/><path d="M9 12l2 2 4-4"/></svg>
       </div>
-      <div style="font-size:12px;color:var(--text-muted);margin-top:4px">Baileys 6.7.8 • Telegraf 4.15 • 20 Fitur Nyata</div>
+      <div class="brand-text">
+        <h1>CiKiZz <span class="badge">V4.0 PREMIUM</span></h1>
+        <p>Baileys 6.7.8 • Telegraf 4.15 • 20 Fitur Nyata</p>
+      </div>
     </div>
-  </div>
-</div>
+    <div class="status-pill">
+      <div class="dot"></div> System Ready
+    </div>
+  </header>
 
-<div class="wrap">
-  <div>
-    <div class="card">
+  <!-- Main Layout -->
+  <div class="layout">
+    
+    <!-- Controls -->
+    <div class="panel">
       
-      <!-- 1. PLATFORM -->
-      <div class="sec"><span class="sec-num">1</span> Pilih Platform</div>
-      <div class="grid">
-        <div class="plat wa active" data-platform="whatsapp" onclick="setPlatform('whatsapp',this)">
-          <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M19.05 4.91A9.82 9.82 0 0 0 12.03 2C6.49 2 2.05 6.44 2.05 10.98c0 1.58.41 3.12 1.19 4.48L2 22l6.7-1.76a9.84 9.84 0 0 0 4.7 1.2h.02c5.54 0 10.02-4.48 10.02-10.02 0-2.67-1.04-5.18-2.69-7.51zm-7.02 15.35h-.02a8.3 8.3 0 0 1-4.2-1.15l-.3-.18-4 .96.85-3.9-.2-.32A8.19 8.19 0 0 1 3.8 10.98C3.8 6.39 7.5 2.64 12.06 2.64a8.22 8.22 0 0 1 5.81 2.42 8.16 8.16 0 0 1 2.41 5.81c0 4.55-3.73 8.29-8.23 8.29zm4.49-6.2c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12s-.62.78-.76.94c-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.43-1.34-1.67-.14-.24-.02-.37.1-.49.1-.1.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.42-.54-.42h-.46c-.16 0-.42.06-.64.3s-.84.82-.84 2 .86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.1.16 1.52.1.46-.07 1.43-.58 1.63-1.15.2-.56.2-1.04.14-1.15-.06-.1-.22-.16-.46-.28z"/></svg></div>
-          <div><div>WhatsApp</div><small>Baileys 6.7.8</small></div>
+      <!-- 1. Platform -->
+      <div class="section-title"><div class="num">1</div> Platform</div>
+      <div class="grid-2">
+        <div class="select-card wa active" data-platform="whatsapp" onclick="setPlatform('whatsapp',this)">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+          <div><h4>WhatsApp</h4><p>Baileys Engine</p></div>
         </div>
-        <div class="plat tele" data-platform="telegram" onclick="setPlatform('telegram',this)">
-          <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
-          <div><div>Telegram</div><small>Telegraf 4.15</small></div>
-        </div>
-      </div>
-
-      <!-- 2. IDENTITY -->
-      <div id="waConfig">
-        <div class="sec"><span class="sec-num">2</span> Bot Identity (WA)</div>
-        <div class="grid">
-          <input id="botName" class="inp" placeholder="Nama Bot (Cth: Zetsu)" oninput="updateAll()">
-          <input id="owner" class="inp" placeholder="Owner Number (628xx)" oninput="updateAll()">
-        </div>
-        <div class="grid" style="margin-top:12px">
-          <input id="ownerName" class="inp" placeholder="Nama Owner" oninput="updateAll()">
-          <input id="pairingNumber" class="inp" placeholder="Pairing Number (628xx)" oninput="updateAll()">
+        <div class="select-card tele" data-platform="telegram" onclick="setPlatform('telegram',this)">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
+          <div><h4>Telegram</h4><p>Telegraf Engine</p></div>
         </div>
       </div>
 
-      <div id="teleConfig" style="display:none">
-        <div class="sec"><span class="sec-num">2</span> Bot Identity (Tele)</div>
-        <div class="grid">
-          <input id="teleBotName" class="inp" placeholder="Nama Bot Tele" oninput="updateAll()">
-          <input id="teleUsername" class="inp" placeholder="@username_bot" oninput="updateAll()">
-        </div>
-        <div class="grid" style="margin-top:12px">
-          <input id="teleOwner" class="inp" placeholder="Nama Owner" oninput="updateAll()">
-          <input id="teleToken" class="inp" placeholder="Token BotFather" oninput="updateAll()">
+      <!-- 2. Identity -->
+      <div id="wa-config">
+        <div class="section-title"><div class="num">2</div> Bot Identity (WA)</div>
+        <div class="grid-2">
+          <div class="input-group">
+            <label>Nama Bot</label>
+            <input id="botName" class="input-field" placeholder="Cth: Zetsu" oninput="updatePreview()">
+          </div>
+          <div class="input-group">
+            <label>Owner Number</label>
+            <input id="owner" class="input-field" placeholder="628xx" oninput="updatePreview()">
+          </div>
+          <div class="input-group">
+            <label>Nama Owner</label>
+            <input id="ownerName" class="input-field" placeholder="Cth: Anton" oninput="updatePreview()">
+          </div>
+          <div class="input-group">
+            <label>Pairing Number</label>
+            <input id="pairingNumber" class="input-field" placeholder="628xx" oninput="updatePreview()">
+          </div>
         </div>
       </div>
 
-      <!-- 3. BASE CODE -->
-      <div id="baseConfig">
-        <div class="sec"><span class="sec-num">3</span> Base Code</div>
-        <div class="grid">
-          <div class="plat active" data-base="esm" onclick="setBase('esm',this)"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div>ESM Plugin</div><small>import/export</small></div></div>
-          <div class="plat" data-base="case" onclick="setBase('case',this)"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div><div>CASE</div><small>switch case</small></div></div>
+      <div id="tele-config" style="display:none">
+        <div class="section-title"><div class="num">2</div> Bot Identity (Tele)</div>
+        <div class="grid-2">
+          <div class="input-group">
+            <label>Nama Bot</label>
+            <input id="teleBotName" class="input-field" placeholder="Cth: Zetsu" oninput="updatePreview()">
+          </div>
+          <div class="input-group">
+            <label>Username Bot</label>
+            <input id="teleUsername" class="input-field" placeholder="@zetsu_bot" oninput="updatePreview()">
+          </div>
+          <div class="input-group">
+            <label>Nama Owner</label>
+            <input id="teleOwner" class="input-field" placeholder="Cth: Anton" oninput="updatePreview()">
+          </div>
+          <div class="input-group">
+            <label>Token BotFather</label>
+            <input id="teleToken" class="input-field" placeholder="12345:ABC..." oninput="updatePreview()">
+          </div>
         </div>
       </div>
 
-      <!-- 4. MENU TYPE -->
-      <div class="sec"><span class="sec-num">4</span> Tampilan Menu</div>
+      <!-- 3. Base Code -->
+      <div id="base-config">
+        <div class="section-title"><div class="num">3</div> Base Code</div>
+        <div class="grid-2">
+          <div class="select-card active" data-base="esm" onclick="setBase('esm',this)">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div><h4>ESM Plugin</h4><p>Modern JavaScript</p></div>
+          </div>
+          <div class="select-card" data-base="case" onclick="setBase('case',this)">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+            <div><h4>CASE</h4><p>Switch Case</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Menu & Buttons -->
+      <div class="section-title"><div class="num">4</div> Tampilan Menu</div>
       <div class="grid-3">
-        <div class="plat active" data-menu="premium" onclick="setMenu('premium',this)"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div><div>Premium</div></div>
-        <div class="plat" data-menu="simple" onclick="setMenu('simple',this)"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/></svg></div><div>Simple</div></div>
-        <div class="plat" data-menu="image" onclick="setMenu('image',this)"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-3.5-3.5-7 7"/></svg></div><div>Image</div></div>
+        <div class="select-card active" data-menu="premium" onclick="setMenu('premium',this)">
+          <div><h4>Premium</h4><p>Box Menu</p></div>
+        </div>
+        <div class="select-card" data-menu="simple" onclick="setMenu('simple',this)">
+          <div><h4>Simple</h4><p>Teks Polos</p></div>
+        </div>
+        <div class="select-card" data-menu="image" onclick="setMenu('image',this)">
+          <div><h4>Image</h4><p>Dengan Gambar</p></div>
+        </div>
       </div>
 
-      <!-- 5. BUTTON & THUMBNAIL -->
-      <div class="sec"><span class="sec-num">5</span> Tombol & Thumbnail</div>
-      <div class="grid">
-        <div class="plat active" data-btn="nobtn" onclick="setBtn('nobtn',this)"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/></svg></div><div><div>Teks Biasa</div><small>Tanpa tombol</small></div></div>
-        <div class="plat" data-btn="btn" onclick="setBtn('btn',this)"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="8" width="18" height="10" rx="2"/><path d="M7 8V6a5 5 0 0 1 10 0v2"/><circle cx="12" cy="13" r="1"/></svg></div><div><div>Interactive</div><small>Pakai Button</small></div></div>
+      <div class="section-title" style="margin-top: 20px;"><div class="num">5</div> Gaya Tombol & Thumbnail</div>
+      <div class="grid-2">
+        <div class="select-card active" data-btn="nobtn" onclick="setBtn('nobtn',this)">
+          <div><h4>Teks Biasa</h4><p>Tanpa tombol</p></div>
+        </div>
+        <div class="select-card" data-btn="btn" onclick="setBtn('btn',this)">
+          <div><h4>Interactive</h4><p>WhatsApp Button</p></div>
+        </div>
       </div>
 
-      <div class="grid" style="margin-top:12px">
-        <div class="plat active" data-thumb="nothumb" onclick="setThumb('nothumb',this)"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div><div>Tanpa Thumbnail</div></div>
-        <div class="plat" data-thumb="thumb" onclick="setThumb('thumb',this)"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-3.5-3.5-7 7"/></svg></div><div>Pakai Thumbnail</div></div>
+      <div class="grid-2" style="margin-top: 12px;">
+        <div class="select-card active" data-thumb="nothumb" onclick="setThumb('nothumb',this)">
+          <div><h4>Tanpa Thumbnail</h4></div>
+        </div>
+        <div class="select-card" data-thumb="thumb" onclick="setThumb('thumb',this)">
+          <div><h4>Pakai Thumbnail</h4></div>
+        </div>
       </div>
 
-      <div class="upload-box" id="thumbUpload" onclick="document.getElementById('thumbFile').click()">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" style="margin-bottom:8px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <div style="font-size:13px;color:var(--text-muted)">Klik untuk upload gambar (JPG/PNG)</div>
-        <input type="file" id="thumbFile" accept="image/*" style="display:none" onchange="previewThumb(this)">
-        <img id="thumbPrev" class="thumb-preview">
+      <div class="upload-box" id="uploadBox" onclick="document.getElementById('fileInput').click()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <p style="font-size:12px; margin-top:8px; color:var(--muted);">Klik untuk upload gambar</p>
+        <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleImage(this)">
+        <img id="imgPreview" src="">
       </div>
 
-      <!-- 6. FITUR -->
-      <div class="sec"><span class="sec-num">6</span> Pilih Fitur <span id="featCount" style="color:var(--cyan);margin-left:6px">20</span></div>
+      <!-- 6. Features -->
+      <div class="section-title" style="margin-top: 30px;"><div class="num">6</div> Fitur Bot <span id="featCount" style="color:var(--primary); margin-left: 6px;">20</span></div>
       
-      <div id="featGroups">
-        <!-- Kategori 1 -->
-        <div class="feat-cat">
-          <div class="feat-cat-title">INFORMASI</div>
-          <div class="feat-grid">
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="menu" checked style="display:none">Menu</div>
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ping" checked style="display:none">Ping</div>
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="owner" checked style="display:none">Owner</div>
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="info" checked style="display:none">Info Bot</div>
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="runtime" checked style="display:none">Runtime</div>
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="totfitur" checked style="display:none">Total Fitur</div>
+      <div id="featureContainer">
+        <div class="feature-category">
+          <h5>INFORMASI</h5>
+          <div class="feature-grid">
+            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="menu" checked hidden>Menu</div>
+            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ping" checked hidden>Ping</div>
+            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="owner" checked hidden>Owner</div>
+            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="info" checked hidden>Info Bot</div>
           </div>
         </div>
-        <!-- Kategori 2 -->
-        <div class="feat-cat">
-          <div class="feat-cat-title">ADMIN GROUP</div>
-          <div class="feat-grid">
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="welcome" checked style="display:none">Welcome</div>
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="antilink" checked style="display:none">Antilink</div>
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="hidetag" checked style="display:none">Hidetag</div>
+        
+        <div class="feature-category">
+          <h5>ADMIN GROUP</h5>
+          <div class="feature-grid">
+            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="welcome" checked hidden>Welcome</div>
+            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="antilink" checked hidden>Antilink</div>
+            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="hidetag" checked hidden>Hidetag</div>
           </div>
         </div>
-        <!-- Kategori 3 -->
-        <div class="feat-cat">
-          <div class="feat-cat-title">MEDIA & AI</div>
-          <div class="feat-grid">
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="sticker" checked style="display:none">Sticker</div>
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="downloader" checked style="display:none">TikTok DL</div>
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ai" checked style="display:none">AI Chat</div>
-          </div>
-        </div>
-        <!-- Kategori 4 -->
-        <div class="feat-cat">
-          <div class="feat-cat-title">RPG & LAINNYA</div>
-          <div class="feat-grid">
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="rpg" checked style="display:none">RPG Daily</div>
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="store" checked style="display:none">Store</div>
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="autoreply" checked style="display:none">Autoreply</div>
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="broadcast" checked style="display:none">Broadcast</div>
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="speed" checked style="display:none">Speedtest</div>
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="say" checked style="display:none">Say</div>
-            <div class="feat active" onclick="toggleFeat(this)"><div class="chk"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="quote" checked style="display:none">Quote</div>
+
+        <div class="feature-category">
+          <h5>MEDIA & UTILITY</h5>
+          <div class="feature-grid">
+            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="sticker" checked hidden>Sticker</div>
+            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="tiktok" checked hidden>TikTok DL</div>
+            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ai" checked hidden>AI Chat</div>
+            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="rpg" checked hidden>RPG Daily</div>
+            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="store" checked hidden>Store</div>
+            <div class="feature-item active" onclick="toggleFeat(this)"><div class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="broadcast" checked hidden>Broadcast</div>
           </div>
         </div>
       </div>
 
-      <button class="btn-gen" id="generateBtn" onclick="generateClient()">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> 
+      <!-- Generate Button -->
+      <button class="btn-generate" id="btnGen" onclick="generateScript()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         <span id="btnText">Generate Script</span>
       </button>
 
-      <div id="downloadLink" class="dl-box">
-        <div style="font-size:13px;color:#10b981;margin-bottom:12px;font-weight:600">Script berhasil dibuat!</div>
-        <a id="linkA" class="dl-btn" download>
+      <div class="download-area" id="downloadArea">
+        <div style="font-size:13px; font-weight:600; color:var(--success); margin-bottom:10px;">Script berhasil dibuat!</div>
+        <a id="downloadLink" class="btn-download" download>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           Download ZIP
         </a>
       </div>
     </div>
-  </div>
 
-  <!-- SIDEBAR (PREVIEW) -->
-  <div class="sidebar">
-    <div class="card" style="padding:20px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <h3 style="font-size:13px;font-weight:800;color:var(--text-main);display:flex;align-items:center;gap:8px">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          LIVE PREVIEW
-        </h3>
-        <div style="font-size:10px;color:var(--green);font-weight:800;display:flex;align-items:center;gap:6px">
-          <div class="dot" style="width:6px;height:6px"></div> LIVE
+    <!-- Sidebar Preview -->
+    <div class="preview-panel">
+      <div class="panel" style="padding: 20px;">
+        <div class="preview-header">
+          <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Live Preview</h3>
+          <div style="font-size:10px; color:var(--success); font-weight:700; display:flex; align-items:center; gap:6px;"><div class="dot" style="width:6px; height:6px;"></div> LIVE</div>
         </div>
-      </div>
-      
-      <div class="wa-box">
-        <div class="wa-head">
-          <div class="wa-av" id="waAv">B</div>
-          <div style="flex:1;min-width:0">
-            <div id="prevName" style="font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Nama Bot</div>
-            <div id="prevSub" style="font-size:11px;color:#8696a0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Premium • ESM • 20 Fitur</div>
-          </div>
-        </div>
-        <div class="wa-body">
-          <div id="imgPreviewWrap" class="bub-img" style="display:none"><img id="imgPreview" src=""></div>
-          <div class="bub" id="waBubble">
-            <div style="color:#8696a0;text-align:center;padding:30px 10px;font-family:var(--font-main);font-size:12px">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8696a0" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><circle cx="12" cy="16" r="1"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <div style="margin-top:12px">Isi Bot Identity dulu untuk melihat preview</div>
+
+        <div class="wa-mockup">
+          <div class="wa-top">
+            <div class="wa-avatar" id="waAv">B</div>
+            <div class="wa-info">
+              <h4 id="waName">Nama Bot</h4>
+              <p id="waSub">Premium • ESM</p>
             </div>
           </div>
-          <div id="btnPreview" class="fake-btns"></div>
+          <div class="wa-chat" id="waChat">
+            <div class="chat-image" id="chatImgWrap"><img id="chatImg" src=""></div>
+            <div class="chat-bubble" id="chatBubble">
+              Isi identitas bot dulu untuk melihat preview.
+              <div class="time">12:00 <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>
+            </div>
+            <div class="chat-buttons" id="chatBtns"></div>
+          </div>
+        </div>
+
+        <div class="console-box" id="consoleBox">
+          <div><span class="prompt">></span> System ready...</div>
+          <div><span class="prompt">></span> Waiting for configuration...</div>
+        </div>
+
+        <div class="tips-box">
+          <h5><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> Cara Pakai</h5>
+          <p>
+            1. Isi Nama Bot & Nomor<br>
+            2. Pilih fitur yang diinginkan<br>
+            3. Klik Generate Script<br>
+            4. Extract ZIP & jalankan <code style="color:var(--primary)">npm start</code>
+          </p>
         </div>
       </div>
-
-      <div class="console-box" id="consolePreview">
-        <div><span class="cmd">></span> Bot ready...</div>
-        <div><span class="cmd">></span> Pilih platform & isi identitas</div>
-      </div>
-
-      <div class="tips-box">
-        <h4><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> CONTOH COMMAND</h4>
-        <p>
-          .welcome on / off<br>
-          .ai Halo apa kabar<br>
-          .sticker (reply gambar)<br>
-          .daily (klaim reward)
-        </p>
-      </div>
     </div>
+
   </div>
 </div>
 
 <script>
-let state = { platform: 'whatsapp', base: 'esm', menu: 'premium', btn: 'nobtn', thumb: 'nothumb', thumbData: null };
+let state = {
+  platform: 'whatsapp',
+  base: 'esm',
+  menu: 'premium',
+  btn: 'nobtn',
+  thumb: 'nothumb',
+  thumbData: null
+};
 
-function setPlatform(p, el) {
-  state.platform = p;
+// Logic Functions
+function setPlatform(val, el) {
+  state.platform = val;
   document.querySelectorAll('[data-platform]').forEach(e => e.classList.remove('active'));
   el.classList.add('active');
-  document.getElementById('waConfig').style.display = p === 'whatsapp' ? 'block' : 'none';
-  document.getElementById('teleConfig').style.display = p === 'telegram' ? 'block' : 'none';
-  document.getElementById('baseConfig').style.display = p === 'whatsapp' ? 'block' : 'none';
-  updateAll();
+  document.getElementById('wa-config').style.display = val === 'whatsapp' ? 'block' : 'none';
+  document.getElementById('tele-config').style.display = val === 'telegram' ? 'block' : 'none';
+  document.getElementById('base-config').style.display = val === 'whatsapp' ? 'block' : 'none';
+  updatePreview();
 }
 
-function setBase(b, el) {
-  state.base = b;
+function setBase(val, el) {
+  state.base = val;
   document.querySelectorAll('[data-base]').forEach(e => e.classList.remove('active'));
   el.classList.add('active');
-  updateAll();
+  updatePreview();
 }
 
-function setMenu(m, el) {
-  state.menu = m;
+function setMenu(val, el) {
+  state.menu = val;
   document.querySelectorAll('[data-menu]').forEach(e => e.classList.remove('active'));
   el.classList.add('active');
-  updateAll();
+  updatePreview();
 }
 
-function setBtn(b, el) {
-  state.btn = b;
+function setBtn(val, el) {
+  state.btn = val;
   document.querySelectorAll('[data-btn]').forEach(e => e.classList.remove('active'));
   el.classList.add('active');
-  updateAll();
+  updatePreview();
 }
 
-function setThumb(t, el) {
-  state.thumb = t;
+function setThumb(val, el) {
+  state.thumb = val;
   document.querySelectorAll('[data-thumb]').forEach(e => e.classList.remove('active'));
   el.classList.add('active');
-  document.getElementById('thumbUpload').style.display = t === 'thumb' ? 'block' : 'none';
-  updateAll();
+  document.getElementById('uploadBox').style.display = val === 'thumb' ? 'block' : 'none';
+  updatePreview();
 }
 
-function previewThumb(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    state.thumbData = e.target.result;
-    document.getElementById('thumbPrev').src = e.target.result;
-    document.getElementById('thumbPrev').style.display = 'block';
-    updateAll();
-  };
-  reader.readAsDataURL(file);
+function handleImage(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      state.thumbData = e.target.result;
+      const img = document.getElementById('imgPreview');
+      img.src = e.target.result;
+      img.style.display = 'block';
+      updatePreview();
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
 }
 
 function toggleFeat(el) {
   const cb = el.querySelector('input');
   cb.checked = !cb.checked;
   el.classList.toggle('active', cb.checked);
-  el.querySelector('.chk').innerHTML = cb.checked 
-    ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' 
-    : '';
-  document.getElementById('featCount').textContent = document.querySelectorAll('#featGroups input:checked').length;
-  updateAll();
+  document.getElementById('featCount').textContent = document.querySelectorAll('#featureContainer input:checked').length;
+  updatePreview();
 }
 
-function updateAll() {
+function updatePreview() {
   const isWA = state.platform === 'whatsapp';
-  const raw = isWA ? document.getElementById('botName').value.trim() : document.getElementById('teleBotName').value.trim();
-  const name = raw || 'Nama Bot';
-  
-  document.getElementById('prevName').textContent = name;
-  document.getElementById('waAv').textContent = name.charAt(0).toUpperCase();
-  
-  const feats = [...document.querySelectorAll('#featGroups input:checked')].map(i => i.value);
-  const ownerName = isWA 
-    ? (document.getElementById('ownerName').value.trim() || 'Owner') 
-    : (document.getElementById('teleOwner').value.trim() || 'Owner');
-  const ownerNum = isWA 
-    ? (document.getElementById('owner').value.trim() || '628xx') 
-    : (document.getElementById('teleUsername').value.trim() || '@bot');
-  
-  const baseLabel = isWA 
-    ? (state.base === 'case' ? 'CASE' : 'ESM') 
-    : 'TELEGRAF';
+  const botName = isWA ? document.getElementById('botName').value.trim() : document.getElementById('teleBotName').value.trim();
+  const name = botName || 'Nama Bot';
+  const ownerName = isWA ? (document.getElementById('ownerName').value.trim() || 'Owner') : (document.getElementById('teleOwner').value.trim() || 'Owner');
+  const ownerNum = isWA ? (document.getElementById('owner').value.trim() || '628xx') : (document.getElementById('teleUsername').value.trim() || '@bot');
+  const baseLabel = isWA ? (state.base === 'case' ? 'CASE' : 'ESM') : 'TELEGRAF';
+  const feats = [...document.querySelectorAll('#featureContainer input:checked')].map(i => i.value);
 
-  if (!raw) {
-    document.getElementById('waBubble').innerHTML = `
-      <div style="color:#8696a0;text-align:center;padding:30px 10px;font-family:var(--font-main);font-size:12px">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#8696a0" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><circle cx="12" cy="16" r="1"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <div style="margin-top:12px">Isi Bot Identity dulu untuk melihat preview</div>
-      </div>`;
-    document.getElementById('prevSub').textContent = `Isi identitas • ${baseLabel} • ${feats.length} Fitur`;
-    document.getElementById('consolePreview').innerHTML = `<div><span class="cmd">></span> Bot ready...</div><div><span class="cmd">></span> Isi nama bot dulu</div>`;
-    document.getElementById('btnPreview').style.display = 'none';
-    document.getElementById('imgPreviewWrap').style.display = 'none';
+  // Update Header
+  document.getElementById('waName').textContent = name;
+  document.getElementById('waAv').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('waSub').textContent = `${state.menu.toUpperCase()} • ${baseLabel} • ${feats.length} Fitur`;
+
+  if (!botName) {
+    document.getElementById('chatBubble').innerHTML = `Isi identitas bot dulu untuk melihat preview.<div class="time">12:00 <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>`;
+    document.getElementById('chatBtns').style.display = 'none';
+    document.getElementById('chatImgWrap').style.display = 'none';
+    document.getElementById('consoleBox').innerHTML = `<div><span class="prompt">></span> Waiting for configuration...</div>`;
     return;
   }
 
-  document.getElementById('prevSub').textContent = `${state.menu === 'premium' ? 'Premium' : state.menu === 'simple' ? 'Simple' : 'Image'} • ${baseLabel} • ${feats.length} Fitur`;
-  
-  let menuTxt = '';
-  const now = new Date();
-  const time = now.getHours().toString().padStart(2, '0') + '.' + now.getMinutes().toString().padStart(2, '0');
-  
+  // Generate Menu Text
+  let text = '';
   if (isWA) {
     if (state.menu === 'simple') {
-      menuTxt = `MENU ${name}\n\n${feats.map(f => '❒ .' + f).join('\n')}\n\nOwner: ${ownerName}`;
+      text = `MENU ${name}\n\n${feats.map(f => '❒ .' + f).join('\n')}\n\nOwner: ${ownerName}`;
     } else if (state.menu === 'image') {
-      menuTxt = `╭━━━〔 ${name} 〕━━━\n${feats.map(f => '┃ ❒ .' + f).join('\n')}\n╰━━━\nOwner: ${ownerName}`;
+      text = `╭━━━〔 ${name} 〕━━━\n${feats.map(f => '┃ ❒ .' + f).join('\n')}\n╰━━━\nOwner: ${ownerName}`;
     } else {
-      menuTxt = `╭━━━〔 ${name} 〕━━━✦\n┃ Owner: ${ownerName}\n┃ Nomor: ${ownerNum}\n┣━━━〔 ${feats.length} FITUR 〕━━━\n${feats.map(f => '┃ ❒ .' + f).join('\n')}\n╰━━━━━━━━━━━━━━`;
+      text = `╭━━━〔 ${name} 〕━━━✦\n┃ Owner: ${ownerName}\n┃ Nomor: ${ownerNum}\n┣━━━〔 ${feats.length} FITUR 〕━━━\n${feats.map(f => '┃ ❒ .' + f).join('\n')}\n╰━━━━━━━━━━━━━━`;
     }
   } else {
-    menuTxt = `${name}\n\n${feats.map(f => '❒ /' + f).join('\n')}\n\nOwner: ${ownerName}\nUsername: ${ownerNum}`;
+    text = `🤖 ${name}\n\n${feats.map(f => '❒ /' + f).join('\n')}\n\nOwner: ${ownerName}\nUsername: ${ownerNum}`;
   }
-  
-  document.getElementById('waBubble').innerHTML = menuTxt.replace(/\n/g, '<br>') + 
-    `<div class="bub-time"><span>${time}</span> <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>`;
 
-  // THUMBNAIL LOGIC
-  const imgWrap = document.getElementById('imgPreviewWrap');
-  const img = document.getElementById('imgPreview');
+  // Render Chat Bubble
+  const time = new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'}).replace(':','.');
+  document.getElementById('chatBubble').innerHTML = text.replace(/\n/g, '<br>') + 
+    `<div class="time">${time} <svg width="14" height="14" viewBox="0 0 24 24" fill="#53bdeb"><path d="M18 7l-8 8-4-4"/></svg></div>`;
+
+  // Render Thumbnail / Image
+  const imgWrap = document.getElementById('chatImgWrap');
+  const imgEl = document.getElementById('chatImg');
   if (state.thumb === 'thumb') {
     imgWrap.style.display = 'block';
-    // Jika user upload gambar, pakai itu. Jika tidak, pakai dummy.
-    img.src = state.thumbData || 'https://picsum.photos/seed/' + encodeURIComponent(name) + '/400/220';
+    imgEl.src = state.thumbData || 'https://picsum.photos/seed/' + encodeURIComponent(name) + '/400/220';
   } else if (state.menu === 'image') {
     imgWrap.style.display = 'block';
-    img.src = 'https://picsum.photos/seed/' + encodeURIComponent(name) + '/400/220';
+    imgEl.src = 'https://picsum.photos/seed/' + encodeURIComponent(name) + '/400/220';
   } else {
     imgWrap.style.display = 'none';
   }
 
-  // BUTTON LOGIC
-  const btnPrev = document.getElementById('btnPreview');
+  // Render Buttons
+  const btnWrap = document.getElementById('chatBtns');
   if (state.btn === 'btn') {
-    btnPrev.style.display = 'flex';
-    btnPrev.innerHTML = feats.slice(0, 3).map(f => 
-      `<div class="fake-btn">${f.toUpperCase()} - ${name}</div>`
-    ).join('');
+    btnWrap.style.display = 'flex';
+    btnWrap.innerHTML = feats.slice(0, 3).map(f => `<div class="chat-btn">${f.toUpperCase()}</div>`).join('');
   } else {
-    btnPrev.style.display = 'none';
+    btnWrap.style.display = 'none';
   }
 
-  // CONSOLE LOGIC
-  document.getElementById('consolePreview').innerHTML = 
-    `<div><span class="cmd">></span> Starting ${name} - ${baseLabel}</div>
-     <div><span class="cmd">></span> Owner: ${ownerName} (${ownerNum})</div>
-     <div><span class="cmd">></span> Loaded ${feats.length} plugins</div>
-     <div><span class="cmd">></span> Style: ${state.btn === 'btn' ? 'Interactive' : 'Text'}</div>
-     <div><span class="cmd">></span> Thumbnail: ${state.thumb === 'thumb' ? 'Enabled' : 'Disabled'}</div>
-     <div style="color:var(--cyan)">> Ready to generate!</div>`;
+  // Console
+  document.getElementById('consoleBox').innerHTML = `
+    <div><span class="prompt">></span> Starting ${name} - ${baseLabel}</div>
+    <div><span class="prompt">></span> Owner: ${ownerName} (${ownerNum})</div>
+    <div><span class="prompt">></span> Loaded ${feats.length} plugins</div>
+    <div><span class="prompt">></span> Style: ${state.btn === 'btn' ? 'Interactive' : 'Text'}</div>
+    <div><span class="prompt">></span> Thumbnail: ${state.thumb === 'thumb' ? 'Enabled' : 'Disabled'}</div>
+    <div style="color:var(--primary)">> Ready to generate!</div>
+  `;
 }
 
-async function generateClient() {
+async function generateScript() {
   const isWA = state.platform === 'whatsapp';
   const botNameInput = document.getElementById(isWA ? 'botName' : 'teleBotName').value.trim();
   
@@ -542,14 +828,9 @@ async function generateClient() {
   if (isWA && !document.getElementById('owner').value.trim()) return alert('Isi Owner Number dulu!');
   
   const teleToken = document.getElementById('teleToken')?.value.trim() || '';
-  if (!isWA && !teleToken) return alert('Isi Token Telegram dulu dari @BotFather!');
+  if (!isWA && !teleToken) return alert('Isi Token Telegram dulu!');
 
-  if (location.protocol === 'file:') {
-    alert('PERHATIAN:\n\nKamu membuka file ini dengan "file://" (klik dua kali).\n\nAPI tidak akan berfungsi!\n\nSolusi:\n1. Upload ke Vercel/Netlify\n2. Jalankan dengan localhost');
-    return;
-  }
-
-  const btn = document.getElementById('generateBtn');
+  const btn = document.getElementById('btnGen');
   const btnText = document.getElementById('btnText');
   const oldText = btnText.textContent;
   btnText.textContent = 'Generating...';
@@ -562,19 +843,13 @@ async function generateClient() {
     const pairing = document.getElementById('pairingNumber')?.value.trim().replace(/[^0-9]/g, '') || '628xx';
     const teleUsername = document.getElementById('teleUsername')?.value.trim() || '@bot';
     const safe = botName.replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase() || 'bot';
-    
-    const features = [...document.querySelectorAll('#featGroups input:checked')].map(i => i.value);
+    const features = [...document.querySelectorAll('#featureContainer input:checked')].map(i => i.value);
 
     const payload = {
       botName, ownerNumber, ownerName, pairingNumber: pairing,
-      teleToken, teleUsername,
-      platform: isWA ? 'whatsapp' : 'telegram',
-      base: state.base, 
-      menuType: state.menu, 
-      btnType: state.btn,
-      thumbType: state.thumb,
-      thumbData: state.thumbData, // Kirim base64 image jika ada
-      features
+      teleToken, teleUsername, platform: isWA ? 'whatsapp' : 'telegram',
+      base: state.base, menuType: state.menu, btnType: state.btn,
+      thumbType: state.thumb, thumbData: state.thumbData, features
     };
     
     const res = await fetch('/api/generate', {
@@ -591,11 +866,10 @@ async function generateClient() {
     
     const blob = await res.blob();
     const url = URL.createObjectURL(blob);
-    const a = document.getElementById('linkA');
+    const a = document.getElementById('downloadLink');
     a.href = url;
     a.download = safe + '.zip';
-    a.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Download ${safe}.zip`;
-    document.getElementById('downloadLink').style.display = 'block';
+    document.getElementById('downloadArea').style.display = 'block';
     a.click();
   } catch(e) {
     alert('Gagal generate:\n' + e.message);
@@ -605,7 +879,7 @@ async function generateClient() {
   }
 }
 
-updateAll();
+updatePreview();
 </script>
 </body>
 </html>
