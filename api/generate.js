@@ -1,4 +1,4 @@
-// api/generate.js - ULTIMATE FINAL v4 (WA THUMBNAIL + RCH V2 + 8 BUGS FIXED)
+// api/generate.js - ULTIMATE FINAL v5 (ALL BUGS & DEAD APIS FIXED)
 import JSZip from 'jszip';
 
 function esc(str) {
@@ -92,10 +92,10 @@ const plugins = files.map(f => require(path.join(pluginsDir, f)));
 console.log(\`✅ Loaded \${plugins.length} plugins\`);
 
 bot.use(async (ctx, next) => {
-  if (!ctx.message) return next();
+  if (!ctx.message && !ctx.callbackQuery) return next();
   const { isMaintenance } = require('./lib/helper_tg.js');
   if (isMaintenance(ctx)) return;
-  if (ctx.chat.type === 'group' || ctx.chat.type === 'supergroup') {
+  if (ctx.chat && (ctx.chat.type === 'group' || ctx.chat.type === 'supergroup')) {
     const gfilter = plugins.find(p => p.name === 'gfilter');
     if (gfilter && gfilter.onMessage) {
       const blocked = await gfilter.onMessage(bot, ctx);
@@ -109,6 +109,24 @@ plugins.forEach(p => {
   if (p.command) {
     const cmds = Array.isArray(p.command) ? p.command : [p.command];
     cmds.forEach(cmd => bot.command(cmd, (ctx) => p.handler(bot, ctx)));
+  }
+});
+
+bot.on('callback_query', async (ctx) => {
+  const data = ctx.callbackQuery.data;
+  if (!data) return ctx.answerCbQuery();
+  const cmd = data.startsWith('/') ? data.slice(1) : data;
+  let targetPlugin = null;
+  for (const p of plugins) {
+    if (p.command) {
+      const cmds = Array.isArray(p.command) ? p.command : [p.command];
+      if (cmds.includes(cmd)) { targetPlugin = p; break; }
+    }
+  }
+  if (targetPlugin && targetPlugin.handler) {
+    try { await ctx.answerCbQuery().catch(()=>{}); await targetPlugin.handler(bot, ctx); } catch (e) { console.error(e); }
+  } else {
+    await ctx.answerCbQuery('Fitur belum tersedia').catch(()=>{});
   }
 });
 
@@ -237,9 +255,9 @@ module.exports = { command: ['tiktok', 'tt'], handler: async (bot, ctx) => {
   const url = ctx.message.text.split(' ').slice(1)[0]; if (!url) return ctx.reply('⚠️ Contoh:\\n/tiktok https://vt.tiktok.com/xxxxx/');
   const sent = await ctx.reply('🕐 Sedang mengambil video...');
   try {
-    const response = await axios.get(\`https://api.betabotz.eu.org/api/download/tiktok?url=\${encodeURIComponent(url)}&apikey=ISI_APIKEY_KAMU\`);
-    if (!response.data || !response.data.status) throw new Error('Gagal');
-    const data = response.data.result; const videoUrl = data.video?.[0]; const audioUrl = data.audio?.[0];
+    const response = await axios.get(\`https://api.tiklydown.eu.org/api/download?url=\${encodeURIComponent(url)}\`);
+    if (!response.data || !response.data.video) throw new Error('Gagal');
+    const data = response.data; const videoUrl = data.video?.noWatermark; const audioUrl = data.music?.play_url;
     const caption = \`🎵 *TikTok Downloader*\\n📝 Caption: \${data.title || "-"}\\n👑 By \${settings.ownerName}\`;
     if (videoUrl) { try { const v = await axios.get(videoUrl, { responseType: "arraybuffer" }); await ctx.replyWithVideo({ source: Buffer.from(v.data) }, { caption, parse_mode: 'Markdown' }); } catch (e) {} }
     if (audioUrl) { try { const a = await axios.get(audioUrl, { responseType: "arraybuffer" }); await ctx.replyWithAudio({ source: Buffer.from(a.data) }, { caption: \`🎧 Audio By \${settings.botName}\`, parse_mode: 'Markdown' }); } catch (e) {} }
@@ -254,12 +272,12 @@ module.exports = { command: ['tiktokslide', 'ttslide'], handler: async (bot, ctx
   const url = ctx.message.text.split(' ').slice(1)[0]; if (!url) return ctx.reply('⚠️ Contoh:\\n/tiktokslide https://vt.tiktok.com/xxxxx/');
   const sent = await ctx.reply('🕐 Sedang mengambil slide...');
   try {
-    const response = await axios.get(\`https://api.betabotz.eu.org/api/download/ttslide?url=\${encodeURIComponent(url)}&apikey=ISI_APIKEY_KAMU\`);
-    if (!response.data || !response.data.status) throw new Error("Slide gagal");
-    const data = response.data.result; const images = data.images || []; const audioUrl = data.audio?.[0];
+    const response = await axios.get(\`https://api.tiklydown.eu.org/api/download?url=\${encodeURIComponent(url)}\`);
+    if (!response.data || !response.data.images) throw new Error("Slide gagal");
+    const data = response.data; const images = data.images || []; const audioUrl = data.music?.play_url;
     if (images.length === 0) throw new Error("Tidak ada gambar");
     const caption = \`📸 *TikTok Slide*\\n📝 Caption: \${data.title || "-"}\\n👑 By \${settings.ownerName}\`;
-    const mediaGroup = images.slice(0, 10).map((img, i) => ({ type: "photo", media: img, caption: i === 0 ? caption : undefined, parse_mode: "Markdown" }));
+    const mediaGroup = images.slice(0, 10).map((img, i) => ({ type: "photo", media: img.url, caption: i === 0 ? caption : undefined, parse_mode: "Markdown" }));
     await ctx.replyWithMediaGroup(mediaGroup);
     if (audioUrl) await ctx.replyWithAudio({ url: audioUrl }, { caption: \`🎧 Audio Slide\`, parse_mode: "Markdown" });
     await ctx.telegram.deleteMessage(ctx.chat.id, sent.message_id);
@@ -273,7 +291,7 @@ module.exports = { command: ['iqc'], handler: async (bot, ctx) => {
   const text = ctx.message.text.split(' ').slice(1).join(' ').trim(); if (!text) return ctx.reply('⚠️ Contoh:\\n/iqc Angkasa');
   const sent = await ctx.reply('🕐 Membuat IQC...');
   try {
-    const url = \`https://api.betabotz.eu.org/api/maker/iqc?text=\${encodeURIComponent(text)}&apikey=ISI_APIKEY_KAMU\`;
+    const url = \`https://api.siputzx.my.id/api/maker/iqc?text=\${encodeURIComponent(text)}\`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     if (!(response.headers["content-type"] || "").includes("image")) throw new Error('Bukan gambar');
     await ctx.replyWithPhoto({ source: Buffer.from(response.data) }, { caption: \`🧠 *IQC Maker*\\n📝 Text: \${text}\\n👑 By \${settings.ownerName}\`, parse_mode: "Markdown" });
@@ -288,7 +306,7 @@ module.exports = { command: ['brat'], handler: async (bot, ctx) => {
   const text = ctx.message.text.split(' ').slice(1).join(' ').trim(); if (!text) return ctx.reply('⚠️ Contoh:\\n/brat Love');
   const sent = await ctx.reply('🕐 Membuat brat sticker...');
   try {
-    const url = \`https://api.betabotz.eu.org/api/maker/brat?text=\${encodeURIComponent(text)}&apikey=ISI_APIKEY_KAMU\`;
+    const url = \`https://api.siputzx.my.id/api/maker/brat?text=\${encodeURIComponent(text)}\`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     await ctx.replyWithSticker({ source: Buffer.from(response.data) }, { filename: "brat.webp" });
     await ctx.telegram.deleteMessage(ctx.chat.id, sent.message_id);
@@ -304,7 +322,7 @@ module.exports = { command: ['bratvid'], handler: async (bot, ctx) => {
   const tempMp4 = path.join(__dirname, \`brat_\${Date.now()}.mp4\`);
   const tempWebm = path.join(__dirname, \`brat_\${Date.now()}.webm\`);
   try {
-    const url = \`https://api.betabotz.eu.org/api/maker/brat-video?text=\${encodeURIComponent(text)}&apikey=ISI_APIKEY_KAMU\`;
+    const url = \`https://api.siputzx.my.id/api/maker/bratvid?text=\${encodeURIComponent(text)}\`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     fs.writeFileSync(tempMp4, response.data);
     await new Promise((res, rej) => { exec(\`ffmpeg -i "\${tempMp4}" -vf "scale=512:512:force_original_aspect_ratio=decrease" -c:v libvpx-vp9 -b:v 256K -an "\${tempWebm}"\`, (err) => { if (err) rej(err); else res(); }); });
@@ -358,13 +376,16 @@ module.exports = { command: ['cekid'], handler: async (bot, ctx) => {
       if (list.includes('tofigure') || list.includes('hytamkan')) {
         pf.file('image_edit.js', `const axios = require('axios'); const FormData = require('form-data'); const settings = require('../settings.js');
 const pendingToFigure = new Set(); const pendingHitam = new Set();
-async function uploadToCatbox(imageBuffer, filename = 'file.jpg') {
+// Ganti Catbox ke Uguu karena lebih stabil
+async function uploadToUguu(imageBuffer, filename = 'img.jpg') {
   try {
-    const fileSizeMB = imageBuffer.length / (1024 * 1024); if (fileSizeMB > 200) return null;
-    const ext = filename.split('.').pop().toLowerCase(); const mimeMap = { 'jpg': 'image/jpeg', 'jpeg': 'image/jpeg', 'png': 'image/png', 'webp': 'image/webp' };
-    const form = new FormData(); form.append('reqtype', 'fileupload'); form.append('fileToUpload', imageBuffer, { filename, contentType: mimeMap[ext] || 'application/octet-stream' });
-    const response = await axios.post('https://catbox.moe/user/api.php', form, { headers: form.getHeaders(), timeout: 60000 });
-    return response.data.trim();
+    const form = new FormData();
+    form.append('files[]', imageBuffer, filename);
+    const res = await axios.post('https://uguu.se/upload.php', form, { headers: form.getHeaders(), timeout: 60000 });
+    if (res.data && res.data.success && res.data.files && res.data.files[0]) {
+      return res.data.files[0].url;
+    }
+    return null;
   } catch (error) { return null; }
 }
 async function processToFigure(ctx, photoArray) {
@@ -372,7 +393,7 @@ async function processToFigure(ctx, photoArray) {
   try {
     const fileLink = await ctx.telegram.getFileLink(photoArray[photoArray.length - 1].file_id);
     const buffer = Buffer.from((await axios.get(fileLink.href, { responseType: 'arraybuffer' })).data);
-    const publicUrl = await uploadToCatbox(buffer, 'img.jpg'); if (!publicUrl) throw new Error('Gagal upload Catbox');
+    const publicUrl = await uploadToUguu(buffer, 'img.jpg'); if (!publicUrl) throw new Error('Gagal upload');
     const apiUrl = \`https://api.betabotz.eu.org/api/maker/tofigurev2?url=\${encodeURIComponent(publicUrl)}&apikey=ISI_APIKEY_KAMU\`;
     const res = await axios.get(apiUrl, { responseType: "arraybuffer" });
     await ctx.replyWithPhoto({ source: Buffer.from(res.data) }, { caption: \`🖼 Efek: Figure Style\\n👑 By \${settings.ownerName}\`, parse_mode: "Markdown" });
@@ -384,7 +405,7 @@ async function processHitam(ctx, photoArray) {
   try {
     const fileLink = await ctx.telegram.getFileLink(photoArray[photoArray.length - 1].file_id);
     const buffer = Buffer.from((await axios.get(fileLink.href, { responseType: 'arraybuffer' })).data);
-    const publicUrl = await uploadToCatbox(buffer, 'img.jpg'); if (!publicUrl) throw new Error('Gagal upload Catbox');
+    const publicUrl = await uploadToUguu(buffer, 'img.jpg'); if (!publicUrl) throw new Error('Gagal upload');
     const apiUrl = \`https://api.betabotz.eu.org/api/maker/jadihitam?url=\${encodeURIComponent(publicUrl)}&apikey=ISI_APIKEY_KAMU\`;
     const res = await axios.get(apiUrl, { responseType: "arraybuffer" });
     await ctx.replyWithPhoto({ source: Buffer.from(res.data) }, { caption: \`🖤 Efek: Hitam Style\\n👑 By \${settings.ownerName}\`, parse_mode: "Markdown" });
@@ -447,12 +468,19 @@ module.exports = { name: 'gfilter', command: [], handler: async () => {}, onMess
       }
 
       if (list.includes('owner')) {
+        // Ditambahkan command '/owner' agar bot membalas
         pf.file('owner.js', `const { setM, getM, muteUser } = require('../lib/helper_tg.js'); const settings = require('../settings.js');
-module.exports = { command: ['maintenance', 'mt', 'mute'], handler: async (bot, ctx) => {
+module.exports = { command: ['owner', 'maintenance', 'mt', 'mute'], handler: async (bot, ctx) => {
   const senderId = String(ctx.from.id); const chatId = ctx.chat.id;
-  const cmd = ctx.message.text.split(' ')[0].replace('/', '');
+  const cmd = ctx.message.text.split(' ')[0].replace('/', '').split('@')[0];
   const args = ctx.message.text.split(' ').slice(1);
-  if (senderId !== String(settings.ownerNumber)) return ctx.reply('❌ Hanya owner!');
+  
+  if (cmd === 'owner') {
+    return ctx.reply(\`👑 *Owner Info*\\n\\nNama: \${settings.ownerName}\\nID: \${settings.ownerNumber}\\nBot: \${settings.botName}\`, { parse_mode: 'Markdown' });
+  }
+
+  if (senderId !== String(settings.ownerNumber)) return ctx.reply('❌ Hanya owner yang bisa menggunakan perintah ini!');
+  
   if (cmd === 'maintenance' || cmd === 'mt') {
     if (args[0] === 'on') { setM(true); return ctx.reply('✅ Maintenance ON'); }
     else if (args[0] === 'off') { setM(false); return ctx.reply('✅ Maintenance OFF'); }
