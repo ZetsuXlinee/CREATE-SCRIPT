@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<!-- PUTER JS UNTUK UPLOAD GRATIS TANPA API KEY -->
+<script src="https://js.puter.com/v2/"></script>
 <style>
   :root {
     --bg-dark: #020617;
@@ -424,43 +426,19 @@ function togglePanel() { state.usePanel = !state.usePanel; const el = document.g
 function toggleFeat(el) { const cb = el.querySelector('input'); cb.checked = !cb.checked; el.classList.toggle('active', cb.checked); updateFeatCount(); updatePreview(); }
 
 // ============================================================
-// Fungsi Upload ke Pone.rs (Menggunakan XMLHttpRequest untuk Progress)
+// Upload menggunakan PUTER.JS (Gratis & Tanpa CORS)
 // ============================================================
-function uploadToPone(file, onProgress) {
-  return new Promise((resolve, reject) => {
-    const formData = new FormData();
-    formData.append('files[]', file, file.name);
-
-    const xhr = new XMLHttpRequest();
-    
-    xhr.upload.addEventListener('progress', (e) => {
-      if (e.lengthComputable && onProgress) {
-        onProgress(Math.round((e.loaded / e.total) * 100));
-      }
-    });
-
-    xhr.addEventListener('load', () => {
-      try {
-        const res = JSON.parse(xhr.responseText);
-        if (res.success && res.files && res.files[0]) {
-          // Kadang pone.rs mengembalikan string '\/'
-          const finalUrl = res.files[0].url.replaceAll('\\/', '/');
-          resolve(finalUrl);
-        } else {
-          reject(new Error(res.message || 'Gagal upload ke Pone.rs'));
-        }
-      } catch (e) {
-        reject(new Error('Response tidak valid. Mungkin API Pone.rs sedang down atau CORS error.'));
-      }
-    });
-
-    xhr.addEventListener('error', () => reject(new Error('Network error / CORS diblokir browser')));
-    xhr.addEventListener('timeout', () => reject(new Error('Upload timeout')));
-    xhr.timeout = 60000; 
-
-    xhr.open('POST', 'https://pone.rs/upload.php');
-    xhr.send(formData);
-  });
+async function uploadToPuter(file) {
+    try {
+        // Unggah file ke Puter cloud storage
+        const uploadedFile = await puter.fs.upload(file);
+        
+        // Ambil link publik dari file yang diunggah
+        const publicUrl = await puter.fs.getReadURL(uploadedFile.path);
+        return publicUrl;
+    } catch (error) {
+        throw new Error('Gagal upload ke Puter: ' + error.message);
+    }
 }
 
 async function handleMediaUpload(input, platform) {
@@ -480,15 +458,12 @@ async function handleMediaUpload(input, platform) {
     const oldText    = p.textContent;
 
     p.style.color = 'var(--aero-cyan)';
-    p.textContent = '⏳ Menyiapkan upload...';
+    p.textContent = '⏳ Mengupload ke Puter... (Jika muncul popup, silakan login)';
     img.style.display = 'none';
 
     try {
-        let mediaUrl = null;
-
-        mediaUrl = await uploadToPone(file, (percent) => {
-            p.textContent = `⏳ Mengupload ke Pone.rs... ${percent}%`;
-        });
+        // Panggil fungsi Puter
+        let mediaUrl = await uploadToPuter(file);
 
         if (platform === 'wa') {
             state.waMediaUrl  = mediaUrl;
@@ -503,12 +478,12 @@ async function handleMediaUpload(input, platform) {
             img.style.display = 'block';
         }
 
-        p.textContent = `✅ Upload sukses ke Pone.rs! Klik untuk ganti.`;
+        p.textContent = `✅ Upload sukses! Klik untuk ganti.`;
         p.style.color = '#a3e635';
         updatePreview();
 
     } catch (error) {
-        alert('❌ Gagal upload media: ' + error.message + '\n\nJika ini CORS error, artinya API Pone.rs memblokir akses browser. Coba matikan adblocker.');
+        alert('❌ Gagal upload media: ' + error.message);
         p.textContent = oldText;
         p.style.color = 'var(--text-muted)';
     }
