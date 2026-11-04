@@ -14,8 +14,8 @@
     --aero-cyan: #06b6d4;
     --aero-blue: #3b82f6;
     --aero-lime: #a3e635;
-    --glass-bg: rgba(255, 255, 255, 0.04);
-    --glass-border: rgba(255, 255, 255, 0.15);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.12);
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
     --font: 'Outfit', sans-serif;
@@ -30,161 +30,203 @@
     min-height: 100vh;
     overflow-x: hidden;
     background-image: 
-      radial-gradient(circle at 15% 20%, rgba(6, 182, 212, 0.1) 0%, transparent 40%),
-      radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 40%);
+      radial-gradient(circle at 10% 10%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 90% 90%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
     background-attachment: fixed;
   }
-  .container { max-width: 1300px; margin: 0 auto; padding: 20px 16px; position: relative; z-index: 1; width: 100%; }
+  
+  /* Container fluid untuk semua layar */
+  .container { max-width: 1400px; margin: 0 auto; padding: 24px 20px; position: relative; z-index: 1; width: 100%; }
 
   /* HEADER */
-  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+  header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap; gap: 16px; }
   .brand { display: flex; align-items: center; gap: 16px; flex: 1; min-width: 200px; }
-  .brand-icon { width: 50px; height: 50px; background: linear-gradient(135deg, var(--aero-cyan), var(--aero-blue)); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3); flex-shrink: 0; }
-  .brand-text h1 { font-size: 24px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1; }
-  .brand-text p { font-size: 12px; color: var(--aero-cyan); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
-  .status { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; color: #000; background: linear-gradient(to bottom, #a3e635, #65a30d); padding: 10px 20px; border-radius: 50px; border: 1px solid #bef264; box-shadow: 0 5px 15px rgba(163, 230, 53, 0.3), inset 0 2px 2px rgba(255,255,255,0.8); flex-shrink: 0; }
+  .brand-icon { width: 54px; height: 54px; background: linear-gradient(135deg, var(--aero-cyan), var(--aero-blue)); border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3); flex-shrink: 0; }
+  .brand-text h1 { font-size: 26px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1; }
+  .brand-text p { font-size: 13px; color: var(--aero-cyan); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
+  .status { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 800; color: #000; background: linear-gradient(to bottom, #a3e635, #65a30d); padding: 12px 22px; border-radius: 50px; border: 1px solid #bef264; box-shadow: 0 5px 15px rgba(163, 230, 53, 0.3), inset 0 2px 2px rgba(255,255,255,0.8); flex-shrink: 0; }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: #000; animation: pulse 2s infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-  /* LAYOUT */
-  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 24px; align-items: start; width: 100%; }
-  @media (max-width: 1024px) { .layout { grid-template-columns: 1fr; } }
+  /* LAYOUT UTAMA (Desktop vs Mobile) */
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 30px; align-items: start; width: 100%; }
+  @media (max-width: 1150px) { .layout { grid-template-columns: 1fr; gap: 24px; } }
   .main { width: 100%; min-width: 0; }
 
-  /* BENTO CARDS */
-  .bento { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; margin-bottom: 20px; backdrop-filter: blur(20px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(255,255,255,0.02); position: relative; overflow: hidden; width: 100%; }
-  .bento::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%; background: linear-gradient(to bottom, rgba(255,255,255,0.06), transparent); pointer-events: none; border-radius: 24px 24px 0 0; }
-  .sec-title { font-size: 13px; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; text-transform: uppercase; letter-spacing: 1px; }
-  .sec-title .ic { width: 32px; height: 32px; background: rgba(255,255,255,0.05); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--glass-border); flex-shrink: 0; }
+  /* BANNER PROMOSI PANEL */
+  .promo-panel { 
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(6, 182, 212, 0.15) 100%); 
+    border: 1px solid rgba(139, 92, 246, 0.4); 
+    border-radius: 24px; 
+    padding: 28px 30px; 
+    margin-bottom: 24px; 
+    position: relative; 
+    overflow: hidden; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    flex-wrap: wrap; 
+    gap: 20px; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3), inset 0 0 20px rgba(139, 92, 246, 0.1);
+  }
+  .promo-panel::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 60%); pointer-events: none; }
+  .promo-content { display: flex; align-items: center; gap: 20px; flex: 1; min-width: 250px; position: relative; z-index: 2; }
+  .promo-icon-wrapper { width: 60px; height: 60px; background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.5); border-radius: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 0 20px rgba(139, 92, 246, 0.3); }
+  .promo-text h3 { font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 6px; }
+  .promo-text p { font-size: 14px; color: var(--text-muted); line-height: 1.5; max-width: 500px; }
+  .promo-badge { background: #f59e0b; color: #000; font-size: 11px; font-weight: 900; padding: 4px 10px; border-radius: 20px; display: inline-block; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+  .promo-actions { position: relative; z-index: 2; flex-shrink: 0; width: 100%; max-width: max-content; }
+  
+  /* Responsif untuk Banner Promo di HP */
+  @media (max-width: 768px) {
+    .promo-panel { padding: 20px; flex-direction: column; align-items: flex-start; }
+    .promo-content { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .promo-actions { max-width: 100%; width: 100%; }
+    .btn-buy { width: 100%; justify-content: center; padding: 16px; font-size: 15px; }
+  }
 
-  /* BUTTONS */
-  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; }
-  .btn-opt { background: linear-gradient(to bottom, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, rgba(0,0,0,0.1) 100%); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 14px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.2s; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2); width: 100%; }
-  .btn-opt:hover { background: linear-gradient(to bottom, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.1) 100%); transform: translateY(-2px); }
+  .btn-buy { 
+    background: linear-gradient(to bottom, #a78bfa, #7c3aed); 
+    color: #fff; border: 1px solid #c4b5fd; 
+    padding: 14px 28px; border-radius: 50px; font-weight: 800; font-size: 15px; 
+    cursor: pointer; transition: 0.2s; box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+    display: flex; align-items: center; gap: 8px; white-space: nowrap;
+  }
+  .btn-buy:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(124, 58, 237, 0.6); background: linear-gradient(to bottom, #c4b5fd, #8b5cf6); }
+
+  /* BENTO CARDS */
+  .bento { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 24px; padding: 24px; margin-bottom: 24px; backdrop-filter: blur(20px); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(255,255,255,0.02); position: relative; overflow: hidden; width: 100%; }
+  .bento::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 50%; background: linear-gradient(to bottom, rgba(255,255,255,0.04), transparent); pointer-events: none; border-radius: 24px 24px 0 0; }
+  .sec-title { font-size: 14px; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; text-transform: uppercase; letter-spacing: 1px; }
+  .sec-title .ic { width: 36px; height: 36px; background: rgba(255,255,255,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--glass-border); flex-shrink: 0; }
+
+  /* GRID UNTUK TOMBOL & FORM */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+  
+  /* Input Form (Mencegah zoom otomatis di iPhone) */
+  .input-box { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+  .input-box label { font-size: 12px; font-weight: 800; color: #cbd5e1; margin-left: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .input-field { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 12px; padding: 14px 16px; color: #fff; font-family: var(--mono); font-size: 16px; /* 16px wajib untuk iOS */ outline: none; transition: 0.2s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
+  .input-field:focus { border-color: var(--aero-cyan); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5), 0 0 15px rgba(6, 182, 212, 0.2); background: rgba(0,0,0,0.6); }
+  .input-field::placeholder { color: #475569; font-size: 14px; }
+
+  /* BUTTONS (PLATFORM) */
+  .btn-opt { background: linear-gradient(to bottom, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.01) 50%, rgba(0,0,0,0.1) 100%); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 16px; cursor: pointer; display: flex; align-items: center; gap: 14px; transition: all 0.2s; position: relative; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.2); width: 100%; }
+  .btn-opt:hover { background: linear-gradient(to bottom, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 50%, rgba(0,0,0,0.1) 100%); transform: translateY(-2px); }
   .btn-opt.active { border-color: var(--aero-cyan); background: linear-gradient(to bottom, rgba(6, 182, 212, 0.25) 0%, rgba(6, 182, 212, 0.05) 100%); box-shadow: 0 0 20px rgba(6, 182, 212, 0.2), inset 0 2px 5px rgba(255,255,255,0.4); }
-  .btn-opt .svg-ic { width: 36px; height: 36px; border-radius: 10px; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; flex-shrink: 0; }
+  .btn-opt .svg-ic { width: 40px; height: 40px; border-radius: 12px; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; flex-shrink: 0; }
   .btn-opt.active .svg-ic { background: linear-gradient(135deg, var(--aero-cyan), var(--aero-blue)); border-color: #fff; box-shadow: 0 0 15px rgba(6, 182, 212, 0.4); }
-  .btn-opt .svg-ic svg { width: 20px; height: 20px; stroke: var(--text-muted); transition: 0.2s; }
+  .btn-opt .svg-ic svg { width: 22px; height: 22px; stroke: var(--text-muted); transition: 0.2s; }
   .btn-opt.active .svg-ic svg { stroke: #fff; }
-  .btn-opt h4 { font-size: 14px; font-weight: 800; }
-  .btn-opt p { font-size: 11px; color: var(--text-muted); font-weight: 500; line-height: 1.3; }
+  .btn-opt h4 { font-size: 15px; font-weight: 800; }
+  .btn-opt p { font-size: 12px; color: var(--text-muted); font-weight: 500; line-height: 1.3; margin-top: 2px; }
 
   .btn-opt.wa.active { border-color: #25D366; background: linear-gradient(to bottom, rgba(37,211,102,0.25) 0%, rgba(37,211,102,0.05) 100%); box-shadow: 0 0 20px rgba(37,211,102,0.2); }
   .btn-opt.wa.active .svg-ic { background: linear-gradient(135deg, #25D366, #128C7E); }
   .btn-opt.tele.active { border-color: #229ED9; background: linear-gradient(to bottom, rgba(34,158,217,0.25) 0%, rgba(34,158,217,0.05) 100%); box-shadow: 0 0 20px rgba(34,158,217,0.2); }
   .btn-opt.tele.active .svg-ic { background: linear-gradient(135deg, #229ED9, #0e7abf); }
 
-  /* INPUTS */
-  .input-box { display: flex; flex-direction: column; gap: 6px; width: 100%; }
-  .input-box label { font-size: 11px; font-weight: 800; color: #cbd5e1; margin-left: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .input-field { width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 12px; padding: 14px; color: #fff; font-family: var(--mono); font-size: 13px; outline: none; transition: 0.2s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
-  .input-field:focus { border-color: var(--aero-cyan); box-shadow: inset 0 2px 5px rgba(0,0,0,0.5), 0 0 15px rgba(6, 182, 212, 0.2); background: rgba(0,0,0,0.6); }
-  .input-field::placeholder { color: #475569; }
-
   /* TOGGLE */
-  .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(0,0,0,0.2)); border: 1px solid var(--glass-border); border-radius: 16px; cursor: pointer; transition: 0.2s; margin-bottom: 12px; box-shadow: inset 0 1px 2px rgba(255,255,255,0.1); width: 100%; }
-  .toggle-row:hover { background: linear-gradient(to bottom, rgba(255,255,255,0.08), rgba(0,0,0,0.2)); }
-  .toggle-row h4 { font-size: 14px; font-weight: 800; }
-  .toggle-row p { font-size: 12px; color: var(--text-muted); font-weight: 500; }
-  .switch { position: relative; width: 50px; height: 28px; background: rgba(0,0,0,0.6); border-radius: 50px; transition: 0.3s; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 5px rgba(0,0,0,0.8); }
-  .switch::after { content: ''; position: absolute; top: 3px; left: 4px; width: 20px; height: 20px; background: linear-gradient(to bottom, #fff, #cbd5e1); border-radius: 50%; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-  .toggle-row.active .switch { background: var(--aero-lime); border-color: #bef264; box-shadow: 0 0 15px rgba(163, 230, 53, 0.4), inset 0 2px 5px rgba(0,0,0,0.2); }
-  .toggle-row.active .switch::after { transform: translateX(22px); }
+  .toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 18px; background: linear-gradient(to bottom, rgba(255,255,255,0.04), rgba(0,0,0,0.2)); border: 1px solid var(--glass-border); border-radius: 16px; cursor: pointer; transition: 0.2s; margin-bottom: 14px; box-shadow: inset 0 1px 2px rgba(255,255,255,0.1); width: 100%; }
+  .toggle-row h4 { font-size: 15px; font-weight: 800; }
+  .toggle-row p { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+  .switch { position: relative; width: 54px; height: 30px; background: rgba(0,0,0,0.6); border-radius: 50px; transition: 0.3s; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1); }
+  .switch::after { content: ''; position: absolute; top: 3px; left: 4px; width: 22px; height: 22px; background: linear-gradient(to bottom, #fff, #cbd5e1); border-radius: 50%; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+  .toggle-row.active .switch { background: var(--aero-lime); border-color: #bef264; box-shadow: 0 0 15px rgba(163, 230, 53, 0.4); }
+  .toggle-row.active .switch::after { transform: translateX(24px); }
 
   /* FEATURES */
-  .feat-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
-  .feat-chip { background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(0,0,0,0.2)); border: 1px solid var(--glass-border); border-radius: 30px; padding: 10px 14px; display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.2s; user-select: none; box-shadow: inset 0 1px 2px rgba(255,255,255,0.1); }
-  .feat-chip:hover { background: linear-gradient(to bottom, rgba(255,255,255,0.1), rgba(0,0,0,0.2)); }
+  .feat-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+  .feat-chip { background: linear-gradient(to bottom, rgba(255,255,255,0.05), rgba(0,0,0,0.2)); border: 1px solid var(--glass-border); border-radius: 30px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s; user-select: none; box-shadow: inset 0 1px 2px rgba(255,255,255,0.1); }
   .feat-chip.active { border-color: var(--aero-cyan); background: linear-gradient(to bottom, rgba(6, 182, 212, 0.25), rgba(6, 182, 212, 0.05)); box-shadow: 0 0 15px rgba(6, 182, 212, 0.2); }
-  .feat-chip .check { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--text-muted); display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
+  .feat-chip .check { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--text-muted); display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
   .feat-chip.active .check { background: var(--aero-cyan); border-color: var(--aero-cyan); box-shadow: 0 0 10px var(--aero-cyan); }
   .feat-chip .check svg { display: none; stroke: #000; }
   .feat-chip.active .check svg { display: block; }
 
-  /* WARNING */
-  .warn-box { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(0,0,0,0.4)); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 24px; padding: 20px; margin-bottom: 24px; position: relative; overflow: hidden; width: 100%; }
-  .warn-box h4 { color: #f59e0b; font-size: 14px; font-weight: 900; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-  .warn-box p { font-size: 13px; color: #e2e8f0; margin-bottom: 16px; font-weight: 500; }
-  .warn-code { display: flex; justify-content: space-between; align-items: center; background: #000; padding: 12px 16px; border-radius: 12px; font-family: var(--mono); font-size: 13px; color: var(--aero-cyan); margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.1); width: 100%; }
-  .btn-copy { background: linear-gradient(to bottom, #fff, #cbd5e1); border: none; color: #000; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 11px; font-weight: 800; transition: 0.2s; flex-shrink: 0; }
-
-  /* GENERATE BUTTON */
-  .btn-gen { width: 100%; padding: 18px; border: 1px solid #fff; border-radius: 50px; background: linear-gradient(to bottom, #22d3ee 0%, #0284c7 50%, #0369a1 100%); color: #fff; font-size: 16px; font-weight: 900; font-family: var(--font); letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3), inset 0 4px 10px rgba(255,255,255,0.6); transition: all 0.2s; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
-  .btn-gen:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(6, 182, 212, 0.5); }
+  /* WARNING & GENERATE BUTTON */
+  .warn-box { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(0,0,0,0.4)); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 24px; padding: 24px; margin-bottom: 24px; width: 100%; }
+  .warn-box h4 { color: #f59e0b; font-size: 15px; font-weight: 900; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .warn-box p { font-size: 14px; color: #e2e8f0; margin-bottom: 18px; font-weight: 500; }
+  .warn-code { display: flex; justify-content: space-between; align-items: center; background: #000; padding: 14px 18px; border-radius: 12px; font-family: var(--mono); font-size: 13px; color: var(--aero-cyan); margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); width: 100%; }
+  .btn-copy { background: linear-gradient(to bottom, #fff, #cbd5e1); border: none; color: #000; padding: 8px 14px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 800; }
+  .btn-gen { width: 100%; padding: 20px; border: 1px solid #fff; border-radius: 50px; background: linear-gradient(to bottom, #22d3ee 0%, #0284c7 50%, #0369a1 100%); color: #fff; font-size: 17px; font-weight: 900; font-family: var(--font); letter-spacing: 1px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3), inset 0 4px 10px rgba(255,255,255,0.6); transition: all 0.2s; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
   .btn-gen:disabled { opacity: 0.7; cursor: not-allowed; }
 
-  /* PREVIEW SIDEBAR (UNIFIED IPHONE) */
-  .sidebar { position: sticky; top: 24px; display: flex; flex-direction: column; align-items: center; width: 100%; }
+  /* SIDEBAR PREVIEW (IPHONE) */
+  .sidebar { position: sticky; top: 30px; display: flex; flex-direction: column; align-items: center; width: 100%; }
+  @media (max-width: 1150px) { .sidebar { position: relative; top: 0; margin-top: 10px; } }
   
-  .iphone-frame { width: 100%; max-width: 340px; height: 680px; background: #000; border-radius: 50px; padding: 10px; box-shadow: 0 0 0 4px #333, 0 0 0 8px #111, 0 20px 50px rgba(0,0,0,0.8); position: relative; overflow: hidden; display: flex; flex-direction: column; margin: 0 auto; }
-  .dynamic-island { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 100px; height: 28px; background: #000; border-radius: 20px; z-index: 100; }
+  .iphone-frame { 
+    width: 100%; max-width: 380px; 
+    height: 720px; /* Tinggi default */
+    max-height: 80vh; /* Mencegah terpotong di layar pendek */
+    background: #000; border-radius: 50px; padding: 10px; 
+    box-shadow: 0 0 0 4px #333, 0 0 0 8px #111, 0 25px 60px rgba(0,0,0,0.9); 
+    position: relative; overflow: hidden; display: flex; flex-direction: column; margin: 0 auto; 
+  }
+  .dynamic-island { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 110px; height: 30px; background: #000; border-radius: 20px; z-index: 100; }
   .ios-screen { background: #0b141a; border-radius: 40px; overflow: hidden; width: 100%; height: 100%; position: relative; display: flex; flex-direction: column; }
-  .ios-status { height: 48px; padding: 16px 20px 0; display: flex; justify-content: space-between; align-items: center; font-family: -apple-system; font-size: 13px; font-weight: 600; color: #fff; z-index: 10; }
+  .ios-status { height: 52px; padding: 18px 24px 0; display: flex; justify-content: space-between; align-items: center; font-family: -apple-system; font-size: 14px; font-weight: 600; color: #fff; z-index: 10; }
   
   /* WhatsApp iOS */
-  .wa-header { background: #1f2c34; padding: 6px 10px 10px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid rgba(0,0,0,0.5); z-index: 9; }
-  .wa-back { color: #00a884; display: flex; align-items: center; gap: 2px; font-size: 14px; }
-  .wa-av { width: 32px; height: 32px; border-radius: 50%; background: #2a3942; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; color: #fff; margin-left: 2px; }
+  .wa-header { background: #1f2c34; padding: 8px 12px 12px; display: flex; align-items: center; gap: 8px; z-index: 9; }
+  .wa-back { color: #00a884; display: flex; align-items: center; gap: 2px; font-size: 15px; }
+  .wa-av { width: 36px; height: 36px; border-radius: 50%; background: #2a3942; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; margin-left: 2px; }
   .wa-info { flex: 1; text-align: center; }
-  .wa-info h4 { font-size: 14px; font-weight: 600; color: #fff; }
-  .wa-info p { font-size: 10px; color: #8696a0; }
-  .wa-chat { padding: 12px 10px; flex: 1; overflow-y: auto; background-color: #0b141a; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: 250px; background-blend-mode: overlay; display: flex; flex-direction: column; }
-  .bubble-wa { background: #1f2c34; padding: 10px 12px; border-radius: 16px 16px 16px 4px; font-family: -apple-system; font-size: 12.5px; color: #e9edef; line-height: 1.4; max-width: 95%; margin-bottom: 4px; white-space: pre-wrap; box-shadow: 0 1px 1px rgba(0,0,0,0.2); align-self: flex-start; }
-  .bubble-wa .time { font-size: 9px; color: #8696a0; text-align: right; margin-top: 4px; display: flex; justify-content: flex-end; align-items: center; gap: 2px; }
+  .wa-info h4 { font-size: 15px; font-weight: 600; color: #fff; }
+  .wa-info p { font-size: 11px; color: #8696a0; }
+  .wa-chat { padding: 14px 12px; flex: 1; overflow-y: auto; background-color: #0b141a; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-size: 250px; background-blend-mode: overlay; display: flex; flex-direction: column; }
+  .bubble-wa { background: #1f2c34; padding: 12px 14px; border-radius: 16px 16px 16px 4px; font-family: -apple-system; font-size: 13.5px; color: #e9edef; line-height: 1.4; max-width: 95%; margin-bottom: 6px; white-space: pre-wrap; align-self: flex-start; }
+  .bubble-wa .time { font-size: 10px; color: #8696a0; text-align: right; margin-top: 6px; }
 
   /* Telegram iOS */
-  .tele-header-ios { background: #17212b; padding: 6px 10px 10px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(0,0,0,0.5); z-index: 9; }
-  .tele-back { color: #2AABEE; display: flex; align-items: center; gap: 2px; font-size: 14px; }
-  .tele-av-ios { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #2AABEE, #229ED9); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; color: #fff; }
+  .tele-header-ios { background: #17212b; padding: 8px 12px 12px; display: flex; align-items: center; gap: 10px; z-index: 9; }
+  .tele-back { color: #2AABEE; display: flex; align-items: center; gap: 2px; font-size: 15px; }
+  .tele-av-ios { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #2AABEE, #229ED9); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: #fff; }
   .tele-info-ios { flex: 1; text-align: center; }
-  .tele-info-ios h4 { font-size: 14px; font-weight: 600; color: #fff; }
-  .tele-info-ios p { font-size: 10px; color: #7d8e9f; }
-  .tele-chat-ios { padding: 12px 10px; flex: 1; overflow-y: auto; background-color: #0e1621; background-image: url('https://web.telegram.org/k/assets/img/bg.jpeg'); background-size: cover; background-blend-mode: overlay; display: flex; flex-direction: column; }
+  .tele-info-ios h4 { font-size: 15px; font-weight: 600; color: #fff; }
+  .tele-info-ios p { font-size: 11px; color: #7d8e9f; }
+  .tele-chat-ios { padding: 14px 12px; flex: 1; overflow-y: auto; background-color: #0e1621; background-image: url('https://web.telegram.org/k/assets/img/bg.jpeg'); background-size: cover; background-blend-mode: overlay; display: flex; flex-direction: column; }
   
-  .bubble-tele-ios { background: #182533; padding: 8px 10px; border-radius: 14px 14px 14px 4px; font-family: -apple-system; font-size: 13px; color: #fff; line-height: 1.4; max-width: 90%; margin-bottom: 4px; align-self: flex-start; position: relative; }
+  .bubble-tele-ios { background: #182533; padding: 10px 12px; border-radius: 14px 14px 14px 4px; font-family: -apple-system; font-size: 14px; color: #fff; line-height: 1.4; max-width: 90%; margin-bottom: 6px; align-self: flex-start; position: relative; }
   .bubble-tele-ios::after { content: ''; position: absolute; bottom: 0; left: -8px; border: 8px solid transparent; border-right-color: #182533; border-bottom: 0; border-left: 0; }
-  .bubble-tele-ios .time { font-size: 10px; color: #7d8e9f; text-align: right; margin-top: 4px; }
+  .bubble-tele-ios .time { font-size: 11px; color: #7d8e9f; text-align: right; margin-top: 6px; }
   
-  .preview-media { max-width: 100%; border-radius: 12px; display: block; margin-bottom: 6px; background: #000; }
-  .tele-btns-ios { display: flex; flex-direction: column; gap: 6px; margin-top: 6px; width: 100%; }
-  .tele-btn-ios { background: #17212b; color: #2AABEE; padding: 10px; border-radius: 10px; text-align: center; font-size: 13px; font-weight: 500; border: 1px solid #24303f; }
+  .preview-media { max-width: 100%; border-radius: 12px; display: block; margin-bottom: 8px; background: #000; }
+  .tele-btns-ios { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; width: 100%; }
+  .tele-btn-ios { background: #17212b; color: #2AABEE; padding: 12px; border-radius: 10px; text-align: center; font-size: 14px; font-weight: 500; border: 1px solid #24303f; }
 
-  .console-box { background: #000; border: 1px solid var(--glass-border); border-radius: 16px; padding: 16px; font-family: var(--mono); font-size: 11px; color: var(--aero-lime); margin-top: 20px; line-height: 1.8; max-height: 150px; overflow-y: auto; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8); width: 100%; max-width: 340px; }
-  .console-box span { color: var(--text-muted); }
+  .console-box { background: #000; border: 1px solid var(--glass-border); border-radius: 16px; padding: 18px; font-family: var(--mono); font-size: 12px; color: var(--aero-lime); margin-top: 24px; line-height: 1.8; max-height: 160px; overflow-y: auto; width: 100%; max-width: 380px; }
 
-  /* MODAL GENERAL */
-  .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 999; padding: 20px; opacity: 0; transition: 0.3s; }
+  /* MODAL */
+  .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 999; padding: 20px; opacity: 0; transition: 0.3s; }
   .modal.active { display: flex; opacity: 1; }
-  .modal-card { background: linear-gradient(to bottom, rgba(30,41,59,0.9), rgba(15,23,42,0.9)); border: 1px solid var(--glass-border); border-radius: 32px; width: 100%; max-width: 450px; padding: 30px 20px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,255,255,0.05); transform: scale(0.9); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(20px); }
+  .modal-card { background: linear-gradient(to bottom, rgba(30,41,59,0.95), rgba(15,23,42,0.95)); border: 1px solid var(--glass-border); border-radius: 32px; width: 100%; max-width: 460px; padding: 36px 28px; text-align: center; box-shadow: 0 25px 70px rgba(0,0,0,0.9); transform: scale(0.9); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-height: 90vh; overflow-y: auto; }
   .modal.active .modal-card { transform: scale(1); }
-  .modal-icon { width: 70px; height: 70px; background: linear-gradient(135deg, #a3e635, #65a30d); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 10px 20px rgba(163, 230, 53, 0.4), inset 0 4px 10px rgba(255,255,255,0.6); border: 1px solid #bef264; }
-  .modal-card h2 { font-size: 22px; font-weight: 900; margin-bottom: 10px; }
-  .modal-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
-  .modal-warn { background: rgba(0,0,0,0.5); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 16px; padding: 16px; text-align: left; margin-bottom: 24px; }
-  .modal-warn h4 { color: #f59e0b; font-size: 13px; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-  .modal-warn code { display: block; background: #000; padding: 10px; border-radius: 8px; font-family: var(--mono); font-size: 12px; margin-bottom: 8px; color: var(--aero-cyan); border: 1px solid rgba(255,255,255,0.1); }
-  .btn-modal { width: 100%; padding: 16px; background: linear-gradient(to bottom, #a3e635, #65a30d); color: #000; border: 1px solid #bef264; border-radius: 50px; font-weight: 900; font-size: 15px; font-family: var(--font); cursor: pointer; transition: 0.2s; box-shadow: 0 10px 20px rgba(163, 230, 53, 0.3), inset 0 2px 5px rgba(255,255,255,0.6); }
-  .btn-modal:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(163, 230, 53, 0.5); }
+  .modal-icon { width: 80px; height: 80px; background: linear-gradient(135deg, #a3e635, #65a30d); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; box-shadow: 0 10px 25px rgba(163, 230, 53, 0.4); border: 1px solid #bef264; }
+  .modal-card h2 { font-size: 24px; font-weight: 900; margin-bottom: 12px; }
+  .modal-card p { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5; }
+  .modal-warn { background: rgba(0,0,0,0.5); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 16px; padding: 20px; text-align: left; margin-bottom: 28px; }
+  .modal-warn h4 { color: #f59e0b; font-size: 14px; font-weight: 800; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .modal-warn code { display: block; background: #000; padding: 12px; border-radius: 8px; font-family: var(--mono); font-size: 13px; margin-bottom: 10px; color: var(--aero-cyan); border: 1px solid rgba(255,255,255,0.1); }
+  .btn-modal { width: 100%; padding: 18px; background: linear-gradient(to bottom, #a3e635, #65a30d); color: #000; border: 1px solid #bef264; border-radius: 50px; font-weight: 900; font-size: 16px; font-family: var(--font); cursor: pointer; transition: 0.2s; box-shadow: 0 10px 20px rgba(163, 230, 53, 0.3); }
   
-  .btn-modal-blue { background: linear-gradient(to bottom, #22d3ee, #0284c7); border-color: #67e8f9; color: #fff; margin-top: 10px; box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3), inset 0 2px 5px rgba(255,255,255,0.4); }
-  .btn-modal-blue:hover { box-shadow: 0 15px 30px rgba(6, 182, 212, 0.5); }
-
   /* UPLOAD AREA */
-  .upload-area { border: 2px dashed var(--aero-cyan); border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; margin-top: 12px; display: none; transition: 0.2s; background: rgba(0,0,0,0.3); width: 100%; }
-  .upload-area:hover { background: rgba(6, 182, 212, 0.1); }
-  .upload-area img { max-width: 100%; height: 100px; object-fit: cover; border-radius: 12px; margin-top: 12px; display: none; border: 1px solid var(--aero-cyan); box-shadow: 0 0 15px rgba(6, 182, 212, 0.3); }
+  .upload-area { border: 2px dashed var(--aero-cyan); border-radius: 16px; padding: 24px; text-align: center; cursor: pointer; margin-top: 12px; display: none; transition: 0.2s; background: rgba(0,0,0,0.3); width: 100%; }
+  .upload-area img { max-width: 100%; height: 120px; object-fit: cover; border-radius: 12px; margin-top: 16px; display: none; border: 1px solid var(--aero-cyan); }
 
-  /* PROMO PANEL CARD */
-  .promo-panel { background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(6, 182, 212, 0.15)); border: 1px solid rgba(139, 92, 246, 0.4); border-radius: 24px; padding: 24px; margin-bottom: 20px; position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-  .promo-panel::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%); pointer-events: none; }
-  .promo-text h3 { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-  .promo-text p { font-size: 13px; color: var(--text-muted); max-width: 400px; line-height: 1.5; }
-  .promo-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-  .btn-buy { background: linear-gradient(to bottom, #a78bfa, #7c3aed); color: #fff; border: 1px solid #c4b5fd; padding: 12px 24px; border-radius: 50px; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.2s; box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4); }
-  .btn-buy:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(124, 58, 237, 0.6); }
-  .btn-claim { background: transparent; color: #cbd5e1; border: 1px solid var(--glass-border); padding: 12px 24px; border-radius: 50px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.2s; }
-  .btn-claim:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  /* TAMBAHAN RESPONSIVE UNTUK HP LAYAR KECIL */
+  @media (max-width: 480px) {
+    .container { padding: 16px 12px; }
+    header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .grid-2 { grid-template-columns: 1fr; } /* Form jadi 1 kolom di HP */
+    .feat-container { grid-template-columns: 1fr 1fr; } /* Fitur jadi 2 kolom di HP */
+    .iphone-frame { height: 600px; } /* Mockup lebih pendek di HP */
+    .bento { padding: 18px; }
+    .sec-title { font-size: 13px; }
+    .btn-opt { padding: 12px; }
+  }
 </style>
 </head>
 <body>
@@ -193,7 +235,7 @@
   <header>
     <div class="brand">
       <div class="brand-icon">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M12 2l7 4v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-4z"/><path d="M9 12l2 2 4-4"/></svg>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M12 2l7 4v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-4z"/><path d="M9 12l2 2 4-4"/></svg>
       </div>
       <div class="brand-text">
         <h1>CiKiZz</h1>
@@ -208,7 +250,7 @@
       
       <!-- 1. PLATFORM -->
       <div class="bento">
-        <div class="sec-title"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="4"/></svg></div>Pilih Platform</div>
+        <div class="sec-title"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="4"/></svg></div>Pilih Platform</div>
         <div class="grid-2">
           <div class="btn-opt wa active" data-platform="whatsapp" onclick="setPlatform('whatsapp',this)">
             <div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
@@ -223,7 +265,7 @@
 
       <!-- 2. IDENTITY -->
       <div class="bento">
-        <div class="sec-title"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>Bot Identity</div>
+        <div class="sec-title"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>Bot Identity</div>
         
         <!-- WA Config -->
         <div id="wa-config" class="grid-2">
@@ -233,13 +275,13 @@
           <div class="input-box"><label>Pairing Number</label><input id="pairingNumber" class="input-field" placeholder="628xxx" oninput="updatePreview()"></div>
           
           <!-- UPLOAD THUMBNAIL WA -->
-          <div class="input-box" style="grid-column: span 2; margin-top: 8px;">
+          <div class="input-box" style="grid-column: 1 / -1; margin-top: 10px;">
             <label>Thumbnail Menu (Opsional)</label>
-            <div class="upload-area" id="uploadWaArea" onclick="document.getElementById('waMediaInput').click()" style="display:block; padding:15px;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Klik untuk upload foto menu</p>
+            <div class="upload-area" id="uploadWaArea" onclick="document.getElementById('waMediaInput').click()" style="display:block; padding:20px;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p style="font-size:13px; color:var(--text-muted); margin-top:10px;">Klik untuk upload foto menu</p>
               <input type="file" id="waMediaInput" accept="image/*" style="display:none" onchange="handleMediaUpload(this, 'wa')">
-              <img id="waMediaPreview" src="" style="max-height: 80px; display:none; margin: 0 auto;">
+              <img id="waMediaPreview" src="" style="max-height: 100px; display:none; margin: 0 auto;">
             </div>
           </div>
         </div>
@@ -254,13 +296,13 @@
           <div class="input-box"><label>Link Channel (Opsional)</label><input id="teleChannel" class="input-field" placeholder="https://t.me/..." oninput="updatePreview()"></div>
           
           <!-- UPLOAD MEDIA START TELEGRAM -->
-          <div class="input-box" style="grid-column: span 2; margin-top: 8px;">
+          <div class="input-box" style="grid-column: 1 / -1; margin-top: 10px;">
             <label>Media Start (/start) - JPG, PNG, GIF, MP4</label>
-            <div class="upload-area" id="uploadTeleArea" onclick="document.getElementById('teleMediaInput').click()" style="display:block; padding:15px;">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Klik untuk upload (Max 20MB)</p>
+            <div class="upload-area" id="uploadTeleArea" onclick="document.getElementById('teleMediaInput').click()" style="display:block; padding:20px;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p style="font-size:13px; color:var(--text-muted); margin-top:10px;">Klik untuk upload (Max 20MB)</p>
               <input type="file" id="teleMediaInput" accept="image/*,video/mp4" style="display:none" onchange="handleMediaUpload(this, 'tele')">
-              <img id="teleMediaPreview" src="" style="max-height: 80px; display:none; margin: 0 auto;">
+              <img id="teleMediaPreview" src="" style="max-height: 100px; display:none; margin: 0 auto;">
             </div>
           </div>
         </div>
@@ -268,7 +310,7 @@
 
       <!-- 3. BASE CODE & MENU (WA ONLY) -->
       <div class="bento" id="base-config">
-        <div class="sec-title"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>Base Code & Tampilan</div>
+        <div class="sec-title"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>Base Code & Tampilan</div>
         <div class="grid-2">
           <div class="btn-opt active" data-base="esm" onclick="setBase('esm',this)"><div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg></div><div><h4>ESM Plugin</h4><p>Modern (import)</p></div></div>
           <div class="btn-opt" data-base="case" onclick="setBase('case',this)"><div class="svg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><div><h4>CASE</h4><p>Classic (switch)</p></div></div>
@@ -283,7 +325,7 @@
 
       <!-- 4. PANEL PTERODACTYL (WA ONLY) -->
       <div class="bento" id="panel-config">
-        <div class="sec-title"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 7h20M2 17h20"/></svg></div>Panel System</div>
+        <div class="sec-title"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 7h20M2 17h20"/></svg></div>Panel System</div>
         <div class="toggle-row" id="panelToggle" onclick="togglePanel()">
           <div><h4>Aktifkan Fitur Panel</h4><p>Create Panel Pterodactyl</p></div>
           <div class="switch"></div>
@@ -296,67 +338,76 @@
         </div>
       </div>
 
-      <!-- 🛒 PROMO JUAL PANEL PTERODACTYL -->
+      <!-- BANNER PROMOSI PANEL (Hanya Promosi) -->
       <div class="promo-panel">
-        <div class="promo-text">
-          <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline; margin-right:4px; vertical-align:middle;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Belum Punya Server Panel?</h3>
-          <p>Beli panel Pterodactyl otomatis sekarang. Proses instan 24 jam, harga mulai Rp 5.000/bulan. Cocok untuk menjalankan bot tanpa laptop nyala terus.</p>
+        <div class="promo-content">
+          <div class="promo-icon-wrapper">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2.5"><rect x="2" y="2" width="20" height="20" rx="2"/><path d="M7 2v20M17 2v20M2 7h20M2 17h20"/></svg>
+          </div>
+          <div class="promo-text">
+            <div class="promo-badge">Promo Spesial</div>
+            <h3>Belum Punya Server Panel?</h3>
+            <p>Beli panel Pterodactyl otomatis sekarang. Proses instan 24 jam, harga mulai Rp 5.000/bulan.</p>
+          </div>
         </div>
         <div class="promo-actions">
-          <button class="btn-buy" onclick="window.open('https://link-payment-gateway-anda.com', '_blank')">Beli Panel</button>
-          <button class="btn-claim" onclick="openClaimModal()">Sudah Bayar? Klaim Disini</button>
+          <!-- GANTI LINK INI DENGAN LINK PAYMENT GATEWAY KAMU -->
+          <button class="btn-buy" onclick="window.open('https://link-payment-gateway-anda.com', '_blank')">
+            Beli Panel Sekarang
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
         </div>
       </div>
 
       <!-- 5. FITUR BOT -->
       <div class="bento">
-        <div class="sec-title"><div class="ic"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>Pilih Fitur Bot (<span id="featCount" style="color:var(--aero-cyan)">0</span>)</div>
+        <div class="sec-title"><div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>Pilih Fitur Bot (<span id="featCount" style="color:var(--aero-cyan)">0</span>)</div>
         
         <div class="feat-container" id="featureContainer">
             <!-- FITUR WHATSAPP -->
             <div class="wa-feat" style="display: contents;">
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="menu" hidden>Menu</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ping" hidden>Ping</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="owner" hidden>Owner</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="vidsave" hidden>VidSave</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="unblur" hidden>Unblur AI</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="fotolive" hidden>Foto Live</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="web2apk" hidden>Web2APK</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="welcome" hidden>Welcome</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="rch" hidden>RCH</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="bypass" hidden>Bypass</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="menu" hidden>Menu</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="ping" hidden>Ping</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="owner" hidden>Owner</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="vidsave" hidden>VidSave</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="unblur" hidden>Unblur AI</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="fotolive" hidden>Foto Live</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="web2apk" hidden>Web2APK</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="welcome" hidden>Welcome</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="rch" hidden>RCH</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="bypass" hidden>Bypass</div>
             </div>
 
             <!-- FITUR TELEGRAM -->
             <div class="tele-feat" style="display: none;">
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="start" hidden>Start</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="menu" hidden>Menu</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="tiktok" hidden>TikTok DL</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="tiktokslide" hidden>TT Slide</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="iqc" hidden>IQC</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="brat" hidden>Brat</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="bratvid" hidden>Brat Vid</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="cekid" hidden>Cek ID</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="tofigure" hidden>To Figure</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="hytamkan" hidden>Hytamkan</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="gempa" hidden>Gempa</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="gfilter" hidden>Filter Grup</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="backup" hidden>Backup</div>
-                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="owner" hidden>Owner Cmd</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="start" hidden>Start</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="menu" hidden>Menu</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="tiktok" hidden>TikTok DL</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="tiktokslide" hidden>TT Slide</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="iqc" hidden>IQC</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="brat" hidden>Brat</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="bratvid" hidden>Brat Vid</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="cekid" hidden>Cek ID</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="tofigure" hidden>To Figure</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="hytamkan" hidden>Hytamkan</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="gempa" hidden>Gempa</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="gfilter" hidden>Filter Grup</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="backup" hidden>Backup</div>
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="owner" hidden>Owner Cmd</div>
             </div>
         </div>
       </div>
 
       <!-- WARNING INSTALL -->
       <div class="warn-box" id="warn-install">
-        <h4><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> PERINGATAN INSTALASI WAJIB</h4>
+        <h4><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> PERINGATAN INSTALASI WAJIB</h4>
         <p>Setelah meng-extract ZIP, jalankan perintah ini di console Pterodactyl:</p>
         <div class="warn-code"><span>1. npm install</span><button class="btn-copy" onclick="copyText('npm install')">COPY</button></div>
         <div class="warn-code"><span>2. npm install fflate</span><button class="btn-copy" onclick="copyText('npm install fflate')">COPY</button></div>
       </div>
 
       <button class="btn-gen" id="btnGen" onclick="generateScript()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         <span id="btnText">GENERATE SCRIPT</span>
       </button>
     </div>
@@ -367,9 +418,9 @@
       <div class="iphone-frame" id="preview-wa">
         <div class="dynamic-island"></div>
         <div class="ios-screen">
-          <div class="ios-status"><span>12:45</span><div style="display:flex;gap:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg><svg width="20" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+          <div class="ios-status"><span>12:45</span><div style="display:flex;gap:4px"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg><svg width="22" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
           <div class="wa-header">
-            <div class="wa-back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00a884" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg><span>12</span></div>
+            <div class="wa-back"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00a884" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg><span>12</span></div>
             <div class="wa-av" id="waAv">B</div>
             <div class="wa-info"><h4 id="waName">Nama Bot</h4><p id="waSub">online</p></div>
           </div>
@@ -383,9 +434,9 @@
       <div class="iphone-frame" id="preview-tele" style="display:none">
         <div class="dynamic-island"></div>
         <div class="ios-screen">
-          <div class="ios-status"><span>12:45</span><div style="display:flex;gap:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg><svg width="20" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
+          <div class="ios-status"><span>12:45</span><div style="display:flex;gap:4px"><svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg><svg width="22" height="16" viewBox="0 0 24 24" fill="#fff"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg></div></div>
           <div class="tele-header-ios">
-            <div class="tele-back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2AABEE" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></div>
+            <div class="tele-back"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2AABEE" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></div>
             <div class="tele-av-ios" id="teleAv">B</div>
             <div class="tele-info-ios"><h4 id="teleName">Nama Bot</h4><p id="teleSub">bot</p></div>
           </div>
@@ -404,43 +455,16 @@
 <!-- MODAL SCRIPT BERHASIL -->
 <div class="modal" id="modalSuccess">
   <div class="modal-card">
-    <div class="modal-icon"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <div class="modal-icon"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
     <h2>SCRIPT BERHASIL!</h2>
     <p>File ZIP kamu sedang di-download. Jangan lupa ikuti langkah di bawah ini.</p>
     <div class="modal-warn">
-      <h4><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Langkah Instalasi:</h4>
+      <h4><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Langkah Instalasi:</h4>
       <code>1. npm install</code>
       <code>2. npm install fflate</code>
       <code>3. npm start</code>
     </div>
     <button class="btn-modal" onclick="closeModal('modalSuccess')">MENGERTI & TUTUP</button>
-  </div>
-</div>
-
-<!-- MODAL KLAIM PANEL (SETELAH BAYAR) -->
-<div class="modal" id="modalClaim">
-  <div class="modal-card">
-    <div class="modal-icon" style="background: linear-gradient(135deg, #22d3ee, #0284c7); border-color: #67e8f9; box-shadow: 0 10px 20px rgba(6, 182, 212, 0.4);">
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><path d="M12 2l7 4v6c0 5-3.5 9-7 10-3.5-1-7-5-7-10V6l7-4z"/></svg>
-    </div>
-    <h2>KLAIM AKUN PANEL</h2>
-    <p style="margin-bottom: 16px;">Masukkan Email & Username yang kamu gunakan saat membeli. Sistem akan otomatis membuatkan akun panel Pterodactyl kamu.</p>
-    
-    <div class="input-box" style="margin-bottom: 12px; text-align: left;">
-      <label>Email Pembelian</label>
-      <input type="email" id="claimEmail" class="input-field" placeholder="emailkamu@gmail.com">
-    </div>
-    <div class="input-box" style="margin-bottom: 12px; text-align: left;">
-      <label>Username Panel (Tanpa Spasi)</label>
-      <input type="text" id="claimUsername" class="input-field" placeholder="zetsu123">
-    </div>
-    <div class="input-box" style="margin-bottom: 24px; text-align: left;">
-      <label>Password Panel</label>
-      <input type="password" id="claimPassword" class="input-field" placeholder="••••••••">
-    </div>
-
-    <button class="btn-modal btn-modal-blue" id="btnClaim" onclick="submitClaim()">BUAT AKUN PANEL SEKARANG</button>
-    <button class="btn-modal" style="background:transparent; color:#94a3b8; box-shadow:none; border:1px solid var(--glass-border); margin-top:12px;" onclick="closeModal('modalClaim')">Batal</button>
   </div>
 </div>
 
@@ -632,49 +656,6 @@ async function generateScript() {
     document.getElementById('modalSuccess').classList.add('active');
   } catch(e) { alert('Gagal: ' + e.message); }
   finally { btn.disabled = false; btnText.textContent = 'GENERATE SCRIPT'; }
-}
-
-// ============================================================
-// LOGIKA KLAIM PANEL (Setelah Pembayaran)
-// ============================================================
-function openClaimModal() {
-    document.getElementById('modalClaim').classList.add('active');
-}
-
-async function submitClaim() {
-    const email = document.getElementById('claimEmail').value.trim();
-    const username = document.getElementById('claimUsername').value.trim();
-    const password = document.getElementById('claimPassword').value.trim();
-    const btn = document.getElementById('btnClaim');
-
-    if (!email || !username || !password) {
-        return alert('⚠️ Semua kolom harus diisi!');
-    }
-
-    btn.disabled = true;
-    btn.textContent = 'MEMPROSES...';
-
-    try {
-        // Nanti endpoint ini diarahkan ke api vercel yang terhubung ke Pterodactyl API
-        const res = await fetch('/api/claim-panel', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, username, password })
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) throw new Error(data.error || 'Gagal membuat panel');
-        
-        alert('✅ Akun panel berhasil dibuat! Silakan cek email untuk login.');
-        closeModal('modalClaim');
-        
-    } catch (err) {
-        alert('❌ Gagal: ' + err.message);
-    } finally {
-        btn.disabled = false;
-        btn.textContent = 'BUAT AKUN PANEL SEKARANG';
-    }
 }
 
 updatePreview();
