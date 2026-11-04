@@ -216,6 +216,17 @@
           <div class="input-box"><label>Owner Number</label><input id="owner" class="input-field" placeholder="628xxx" oninput="updatePreview()"></div>
           <div class="input-box"><label>Nama Owner</label><input id="ownerName" class="input-field" placeholder="Anton" oninput="updatePreview()"></div>
           <div class="input-box"><label>Pairing Number</label><input id="pairingNumber" class="input-field" placeholder="628xxx" oninput="updatePreview()"></div>
+          
+          <!-- UPLOAD THUMBNAIL WA -->
+          <div class="input-box" style="grid-column: span 2; margin-top: 8px;">
+            <label>Thumbnail Menu (Opsional)</label>
+            <div class="upload-area" id="uploadWaArea" onclick="document.getElementById('waMediaInput').click()" style="display:block; padding:15px;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Klik untuk upload foto menu</p>
+              <input type="file" id="waMediaInput" accept="image/*" style="display:none" onchange="handleMediaUpload(this, 'wa')">
+              <img id="waMediaPreview" src="" style="max-height: 80px; display:none; margin: 0 auto;">
+            </div>
+          </div>
         </div>
 
         <!-- Telegram Config -->
@@ -227,13 +238,13 @@
           <div class="input-box"><label>ID Owner (Telegram)</label><input id="teleOwnerId" class="input-field" placeholder="123456789" oninput="updatePreview()"></div>
           <div class="input-box"><label>Link Channel (Opsional)</label><input id="teleChannel" class="input-field" placeholder="https://t.me/..." oninput="updatePreview()"></div>
           
-          <!-- UPLOAD MEDIA START -->
+          <!-- UPLOAD MEDIA START TELEGRAM -->
           <div class="input-box" style="grid-column: span 2; margin-top: 8px;">
             <label>Media Start (/start) - JPG, PNG, GIF, MP4</label>
             <div class="upload-area" id="uploadTeleArea" onclick="document.getElementById('teleMediaInput').click()" style="display:block; padding:15px;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Klik untuk upload (Max 20MB)</p>
-              <input type="file" id="teleMediaInput" accept="image/*,video/mp4" style="display:none" onchange="handleTeleMedia(this)">
+              <input type="file" id="teleMediaInput" accept="image/*,video/mp4" style="display:none" onchange="handleMediaUpload(this, 'tele')">
               <img id="teleMediaPreview" src="" style="max-height: 80px; display:none; margin: 0 auto;">
             </div>
           </div>
@@ -380,8 +391,7 @@
 </div>
 
 <script>
-// Perubahan 1: ganti teleMediaData menjadi teleMediaUrl
-let state = { platform: 'whatsapp', base: 'esm', menu: '1', usePanel: false, teleMediaUrl: null, teleMediaType: null };
+let state = { platform: 'whatsapp', base: 'esm', menu: '1', usePanel: false, waMediaUrl: null, waMediaType: null, teleMediaUrl: null, teleMediaType: null };
 
 function copyText(t) { navigator.clipboard.writeText(t).then(()=>alert('Copied: '+t)); }
 
@@ -389,20 +399,15 @@ function setPlatform(val, el) {
   state.platform = val;
   document.querySelectorAll('[data-platform]').forEach(e => e.classList.remove('active')); el.classList.add('active');
   
-  // Toggle Form
   document.getElementById('wa-config').style.display = val === 'whatsapp' ? 'grid' : 'none';
   document.getElementById('tele-config').style.display = val === 'telegram' ? 'grid' : 'none';
   document.getElementById('base-config').style.display = val === 'whatsapp' ? 'block' : 'none';
   document.getElementById('panel-config').style.display = val === 'whatsapp' ? 'block' : 'none';
-  
-  // Toggle Install Warning (Hanya muncul untuk WhatsApp)
   document.getElementById('warn-install').style.display = val === 'whatsapp' ? 'block' : 'none';
   
-  // Toggle Preview Frame
   document.getElementById('preview-wa').style.display = val === 'whatsapp' ? 'flex' : 'none';
   document.getElementById('preview-tele').style.display = val === 'telegram' ? 'flex' : 'none';
   
-  // Toggle Fitur
   if(val === 'whatsapp') {
       document.querySelectorAll('.wa-feat').forEach(e => e.style.display = 'contents');
       document.querySelectorAll('.tele-feat').forEach(e => e.style.display = 'none');
@@ -418,12 +423,11 @@ function setMenu(v, el) { state.menu = v; document.querySelectorAll('[data-menu]
 function togglePanel() { state.usePanel = !state.usePanel; const el = document.getElementById('panelToggle'); el.classList.toggle('active', state.usePanel); document.getElementById('panelConfig').style.display = state.usePanel ? 'grid' : 'none'; updatePreview(); }
 function toggleFeat(el) { const cb = el.querySelector('input'); cb.checked = !cb.checked; el.classList.toggle('active', cb.checked); updateFeatCount(); updatePreview(); }
 
-// Perubahan 2: Fungsi upload ke Catbox.moe
-async function handleTeleMedia(input) {
+// Fungsi upload Universal (WA & Telegram)
+async function handleMediaUpload(input, platform) {
     if (input.files && input.files[0]) {
         const file = input.files[0];
         
-        // Batas maksimal file (Catbox mendukung hingga 200MB, kita batasi 20MB)
         if (file.size > 20 * 1024 * 1024) {
             input.value = '';
             return alert('❌ File terlalu besar! Max 20MB.');
@@ -433,17 +437,18 @@ async function handleTeleMedia(input) {
         formData.append('reqtype', 'fileupload');
         formData.append('fileToUpload', file);
 
-        const uploadArea = document.getElementById('uploadTeleArea');
-        const p = uploadArea.querySelector('p');
-        const img = document.getElementById('teleMediaPreview');
+        const areaId = platform === 'wa' ? 'uploadWaArea' : 'uploadTeleArea';
+        const previewId = platform === 'wa' ? 'waMediaPreview' : 'teleMediaPreview';
         
-        // Simpan teks asli untuk dikembalikan jika gagal
+        const uploadArea = document.getElementById(areaId);
+        const p = uploadArea.querySelector('p');
+        const img = document.getElementById(previewId);
         const oldText = p.textContent;
 
         try {
             p.textContent = '⏳ Mengupload media ke server...';
             p.style.color = 'var(--aero-cyan)';
-            img.style.display = 'none'; // Sembunyikan preview lama
+            img.style.display = 'none';
 
             const res = await fetch('https://catbox.moe/user/api.php', {
                 method: 'POST',
@@ -454,15 +459,17 @@ async function handleTeleMedia(input) {
             
             const mediaUrl = await res.text();
             
-            // Perubahan 3: Simpan URL, bukan Base64
-            state.teleMediaUrl = mediaUrl;
-            state.teleMediaType = file.type;
+            if (platform === 'wa') {
+                state.waMediaUrl = mediaUrl;
+                state.waMediaType = file.type;
+            } else {
+                state.teleMediaUrl = mediaUrl;
+                state.teleMediaType = file.type;
+            }
 
             if (file.type.startsWith('image/')) {
                 img.src = mediaUrl;
                 img.style.display = 'block';
-            } else {
-                img.style.display = 'none';
             }
             
             p.textContent = '✅ Media berhasil diupload! Klik untuk ganti.';
@@ -495,6 +502,11 @@ function updatePreview() {
       document.getElementById('waName').textContent = name;
       document.getElementById('waAv').textContent = name.charAt(0).toUpperCase();
       
+      let mediaHtml = '';
+      if (state.waMediaUrl && state.waMediaType && state.waMediaType.startsWith('image/')) {
+          mediaHtml = `<img src="${state.waMediaUrl}" class="preview-media">`;
+      }
+
       let txt = '';
       if(state.menu === '1') txt = `╭─── ⟡ ${name} ⟡ ───\n│ Good Morning, User\n│\n├ ⊛ Role     : Beginner\n├ ⊛ Level    : 0\n├ ⊛ Limit    : Unlimited\n│\n├ ⊛ Runtime  : 2h 14m\n├ ⊛ Commands : ${feats.length}\n├ ⊛ Category : 1\n│\n╰── ■■■■■■■■■■ 100%`;
       else if(state.menu === '2') txt = `⟪ EDEN ACADEMY ⟫\n═══════════════════════\n✧ Student  : User\n✧ Rank     : Beginner\n✧ Level    : 0\n✧ Limit    : Unlimited\n\n✧ Runtime  : 2h 14m\n✧ Commands : ${feats.length}\n✧ Category : 1\n\n  ■■■■■■■■■■ 100%\n═══════════════════════\n⟡ Status : Imperial Scholar`;
@@ -503,7 +515,7 @@ function updatePreview() {
       
       txt += `\n\n╭━━━〔 ${feats.length} FITUR 〕━━━\n` + feats.map(f => '┃ ❒ .' + f).join('\n') + `\n╰━━━━━━━━━━━━━━`;
       
-      document.getElementById('waBubble').innerHTML = txt.replace(/\n/g, '<br>') + `<div class="time">12:00</div>`;
+      document.getElementById('waBubble').innerHTML = mediaHtml + txt.replace(/\n/g, '<br>') + `<div class="time">12:00</div>`;
       
   } else {
       const name = document.getElementById('teleBotName').value || 'Nama Bot';
@@ -514,7 +526,6 @@ function updatePreview() {
       document.getElementById('teleAv').textContent = name.charAt(0).toUpperCase();
       document.getElementById('teleSub').textContent = username;
       
-      // Perubahan 4: Gunakan state.teleMediaUrl
       let mediaHtml = '';
       if (state.teleMediaUrl && state.teleMediaType) {
           if (state.teleMediaType.startsWith('image/')) {
@@ -552,13 +563,13 @@ async function generateScript() {
     if(isWA) {
         const name = document.getElementById('botName').value.trim();
         if(!name) throw new Error('Isi Nama Bot dulu!');
-        payload = { ...payload, botName: name, ownerNumber: document.getElementById('owner').value, ownerName: document.getElementById('ownerName').value, pairingNumber: document.getElementById('pairingNumber').value, base: state.base, menuType: state.menu, usePanel: state.usePanel, features: Array.from(document.querySelectorAll('.wa-feat input:checked')).map(i => i.value) };
+        // Sertakan thumbUrl untuk WhatsApp
+        payload = { ...payload, botName: name, ownerNumber: document.getElementById('owner').value, ownerName: document.getElementById('ownerName').value, pairingNumber: document.getElementById('pairingNumber').value, base: state.base, menuType: state.menu, usePanel: state.usePanel, features: Array.from(document.querySelectorAll('.wa-feat input:checked')).map(i => i.value), thumbUrl: state.waMediaUrl };
     } else {
         const name = document.getElementById('teleBotName').value.trim();
         if(!name) throw new Error('Isi Nama Bot dulu!');
         const token = document.getElementById('teleToken').value.trim();
         if(!token) throw new Error('Isi Token BotFather dulu!');
-        // Perubahan 5: Gunakan thumbUrl bukan thumbData
         payload = { ...payload, botName: name, teleUsername: document.getElementById('teleUsername').value, ownerName: document.getElementById('teleOwner').value, teleToken: token, ownerNumber: document.getElementById('teleOwnerId').value, teleChannel: document.getElementById('teleChannel').value, features: Array.from(document.querySelectorAll('.tele-feat input:checked')).map(i => i.value), thumbUrl: state.teleMediaUrl };
     }
 
