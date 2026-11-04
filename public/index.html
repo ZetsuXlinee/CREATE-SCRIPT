@@ -232,7 +232,7 @@
             <label>Media Start (/start) - JPG, PNG, GIF, MP4</label>
             <div class="upload-area" id="uploadTeleArea" onclick="document.getElementById('teleMediaInput').click()" style="display:block; padding:15px;">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Klik untuk upload (Max 5MB)</p>
+              <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Klik untuk upload (Max 20MB)</p>
               <input type="file" id="teleMediaInput" accept="image/*,video/mp4" style="display:none" onchange="handleTeleMedia(this)">
               <img id="teleMediaPreview" src="" style="max-height: 80px; display:none; margin: 0 auto;">
             </div>
@@ -380,7 +380,8 @@
 </div>
 
 <script>
-let state = { platform: 'whatsapp', base: 'esm', menu: '1', usePanel: false, teleMediaData: null, teleMediaType: null };
+// Perubahan 1: ganti teleMediaData menjadi teleMediaUrl
+let state = { platform: 'whatsapp', base: 'esm', menu: '1', usePanel: false, teleMediaUrl: null, teleMediaType: null };
 
 function copyText(t) { navigator.clipboard.writeText(t).then(()=>alert('Copied: '+t)); }
 
@@ -417,26 +418,62 @@ function setMenu(v, el) { state.menu = v; document.querySelectorAll('[data-menu]
 function togglePanel() { state.usePanel = !state.usePanel; const el = document.getElementById('panelToggle'); el.classList.toggle('active', state.usePanel); document.getElementById('panelConfig').style.display = state.usePanel ? 'grid' : 'none'; updatePreview(); }
 function toggleFeat(el) { const cb = el.querySelector('input'); cb.checked = !cb.checked; el.classList.toggle('active', cb.checked); updateFeatCount(); updatePreview(); }
 
-function handleTeleMedia(input) {
+// Perubahan 2: Fungsi upload ke Catbox.moe
+async function handleTeleMedia(input) {
     if (input.files && input.files[0]) {
         const file = input.files[0];
-        if(file.size > 5 * 1024 * 1024) return alert('File terlalu besar! Max 5MB.');
         
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            state.teleMediaData = e.target.result;
-            state.teleMediaType = file.type; // Simpan tipe file (image/png, video/mp4, dll)
+        // Batas maksimal file (Catbox mendukung hingga 200MB, kita batasi 20MB)
+        if (file.size > 20 * 1024 * 1024) {
+            input.value = '';
+            return alert('❌ File terlalu besar! Max 20MB.');
+        }
+
+        const formData = new FormData();
+        formData.append('reqtype', 'fileupload');
+        formData.append('fileToUpload', file);
+
+        const uploadArea = document.getElementById('uploadTeleArea');
+        const p = uploadArea.querySelector('p');
+        const img = document.getElementById('teleMediaPreview');
+        
+        // Simpan teks asli untuk dikembalikan jika gagal
+        const oldText = p.textContent;
+
+        try {
+            p.textContent = '⏳ Mengupload media ke server...';
+            p.style.color = 'var(--aero-cyan)';
+            img.style.display = 'none'; // Sembunyikan preview lama
+
+            const res = await fetch('https://catbox.moe/user/api.php', {
+                method: 'POST',
+                body: formData
+            });
             
-            const img = document.getElementById('teleMediaPreview');
-            if(file.type.startsWith('image/')) {
-                img.src = e.target.result;
+            if (!res.ok) throw new Error('Gagal mengupload ke server');
+            
+            const mediaUrl = await res.text();
+            
+            // Perubahan 3: Simpan URL, bukan Base64
+            state.teleMediaUrl = mediaUrl;
+            state.teleMediaType = file.type;
+
+            if (file.type.startsWith('image/')) {
+                img.src = mediaUrl;
                 img.style.display = 'block';
             } else {
                 img.style.display = 'none';
             }
+            
+            p.textContent = '✅ Media berhasil diupload! Klik untuk ganti.';
+            p.style.color = '#a3e635';
             updatePreview();
-        };
-        reader.readAsDataURL(file);
+            
+        } catch (error) {
+            alert('❌ Gagal upload media: ' + error.message);
+            p.textContent = oldText;
+            p.style.color = 'var(--text-muted)';
+        }
     }
 }
 
@@ -477,12 +514,13 @@ function updatePreview() {
       document.getElementById('teleAv').textContent = name.charAt(0).toUpperCase();
       document.getElementById('teleSub').textContent = username;
       
+      // Perubahan 4: Gunakan state.teleMediaUrl
       let mediaHtml = '';
-      if (state.teleMediaData && state.teleMediaType) {
+      if (state.teleMediaUrl && state.teleMediaType) {
           if (state.teleMediaType.startsWith('image/')) {
-              mediaHtml = `<img src="${state.teleMediaData}" class="preview-media">`;
+              mediaHtml = `<img src="${state.teleMediaUrl}" class="preview-media">`;
           } else if (state.teleMediaType.startsWith('video/')) {
-              mediaHtml = `<video src="${state.teleMediaData}" class="preview-media" autoplay loop muted playsinline></video>`;
+              mediaHtml = `<video src="${state.teleMediaUrl}" class="preview-media" autoplay loop muted playsinline></video>`;
           }
       }
       
@@ -520,7 +558,8 @@ async function generateScript() {
         if(!name) throw new Error('Isi Nama Bot dulu!');
         const token = document.getElementById('teleToken').value.trim();
         if(!token) throw new Error('Isi Token BotFather dulu!');
-        payload = { ...payload, botName: name, teleUsername: document.getElementById('teleUsername').value, ownerName: document.getElementById('teleOwner').value, teleToken: token, ownerNumber: document.getElementById('teleOwnerId').value, teleChannel: document.getElementById('teleChannel').value, features: Array.from(document.querySelectorAll('.tele-feat input:checked')).map(i => i.value), thumbData: state.teleMediaData };
+        // Perubahan 5: Gunakan thumbUrl bukan thumbData
+        payload = { ...payload, botName: name, teleUsername: document.getElementById('teleUsername').value, ownerName: document.getElementById('teleOwner').value, teleToken: token, ownerNumber: document.getElementById('teleOwnerId').value, teleChannel: document.getElementById('teleChannel').value, features: Array.from(document.querySelectorAll('.tele-feat input:checked')).map(i => i.value), thumbUrl: state.teleMediaUrl };
     }
 
     const res = await fetch('/api/generate', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
