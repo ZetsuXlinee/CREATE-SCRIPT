@@ -1,7 +1,6 @@
-// api/generate.js - ULTIMATE FINAL v3 (8 BUGS FIXED + RCH V2)
+// api/generate.js - ULTIMATE FINAL v4 (WA THUMBNAIL + RCH V2 + 8 BUGS FIXED)
 import JSZip from 'jszip';
 
-// ✅ FIX #1: Mencegah Template Injection & Syntax Error dari input user
 function esc(str) {
   return String(str == null ? '' : str)
     .replace(/\\/g, '\\\\')
@@ -19,12 +18,11 @@ export default async function handler(req, res) {
     const {
       platform, base, menuType, botName, ownerName, ownerNumber,
       pairingNumber, teleToken, teleUsername, teleChannel,
-      features, usePanel, thumbData
+      features, usePanel, thumbUrl
     } = req.body;
 
     if (!botName) return res.status(400).json({ error: 'Isi botName dulu' });
 
-    // Sanitize semua input
     const sBotName      = esc(botName);
     const sOwnerName    = esc(ownerName);
     const sOwnerNumber  = esc(ownerNumber);
@@ -36,7 +34,7 @@ export default async function handler(req, res) {
     const sPanelPtla    = esc(req.body.panelPtla);
     const sPanelEgg     = esc(req.body.panelEgg || '15');
     const sPanelLoc     = esc(req.body.panelLoc || '1');
-    const sMenuType     = esc(menuType || '1'); // ✅ FIX #3: Fallback ke '1' jika kosong
+    const sMenuType     = esc(menuType || '1');
 
     const safe = botName.replace(/[^a-zA-Z0-9-_]/g, '-').toLowerCase() || 'bot';
     const zip = new JSZip();
@@ -56,17 +54,19 @@ export default async function handler(req, res) {
   features: ${JSON.stringify(list)}
 };`);
 
-      // Media start (jpg/png/gif/mp4)
-      if (thumbData && thumbData.startsWith('data:')) {
-        const mimeMatch = thumbData.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/);
-        if (mimeMatch) {
-          const mime = mimeMatch[1];
-          let ext = 'jpg';
-          if (mime === 'image/png') ext = 'png';
-          else if (mime === 'image/gif') ext = 'gif';
-          else if (mime === 'video/mp4') ext = 'mp4';
-          zip.file(`media/start_media.${ext}`, Buffer.from(thumbData.split(',')[1], 'base64'));
-        }
+      // Simpan Media Start (JPG/PNG/GIF/MP4)
+      if (thumbUrl && thumbUrl.startsWith('http')) {
+        try {
+          const fetchRes = await fetch(thumbUrl);
+          if (fetchRes.ok) {
+            const contentType = fetchRes.headers.get('content-type') || '';
+            let ext = 'jpg';
+            if (contentType.includes('png')) ext = 'png';
+            else if (contentType.includes('gif')) ext = 'gif';
+            else if (contentType.includes('mp4')) ext = 'mp4';
+            zip.file(`media/start_media.${ext}`, Buffer.from(await fetchRes.arrayBuffer()));
+          }
+        } catch (err) { console.error('Gagal download thumbTele:', err); }
       }
 
       zip.file('index.js', `const settings = require('./settings.js');
@@ -165,7 +165,6 @@ module.exports = { getM, setM, isMaintenance, muteUser };`);
       const pf = zip.folder('plugins');
 
       if (list.includes('start')) {
-        // ✅ FIX #5: Owner URL fallback jika ownerNumber kosong
         pf.file('start.js', `const fs = require('fs'); const path = require('path'); const settings = require('../settings.js');
 function getUptime() {
   const s = process.uptime(); const d = Math.floor(s / 86400); const h = Math.floor((s % 86400) / 3600); const m = Math.floor((s % 3600) / 60);
@@ -214,7 +213,6 @@ Eksplorasi fitur seru yang tersedia di dalam bot ini.</blockquote>
       }
 
       if (list.includes('menu')) {
-        // ✅ FIX #6: Batasi caption jika melebihi 1024 karakter (Telegram Limit)
         pf.file('menu.js', `const { Markup } = require('telegraf'); const settings = require('../settings.js');
 module.exports = { command: ['menu', 'help'], handler: async (bot, ctx) => {
   let t = '<blockquote>╭━━━〔 <b>' + settings.botName + '</b> 〕━━━✦\\n┃ 👤 Owner: ' + settings.ownerName + '\\n┣━━━〔 <b>' + settings.features.length + ' FITUR</b> 〕━━━\\n';
@@ -318,7 +316,6 @@ module.exports = { command: ['bratvid'], handler: async (bot, ctx) => {
       }
 
       if (list.includes('cekid')) {
-        // ✅ FIX #9: Escape backtick pada ID (fix syntax error Vercel)
         pf.file('cekid.js', `const { createCanvas, loadImage } = require('canvas'); const axios = require('axios'); const settings = require('../settings.js');
 function escapeHtml(text) { return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 async function generateIdCard(user, token) {
@@ -504,7 +501,6 @@ module.exports = { command: ['backup'], handler: async (bot, ctx) => {
     if (platform === 'whatsapp' && base === 'case') {
       zip.file('settings.js', `module.exports = { botName: "${sBotName}", ownerNumber: "${sOwnerNumber}", ownerName: "${sOwnerName}", pairingNumber: "${sPairing}", prefix: ".", features: ${JSON.stringify(list)}, menuType: "${sMenuType}", btnType: "btn", thumbType: "nothumb" };`);
 
-      // ✅ FIX #7 & #8: Hapus dead code (fetch) & tambahkan catch di startBot()
       zip.file('index.js', `const settings = require('./settings.js');
 const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require('noxleys-baileys');
 const pino = require('pino'); const fs = require('fs'); const path = require('path'); const os = require('os');
@@ -567,6 +563,14 @@ startBot().catch(e => { console.error('FATAL:', e); setTimeout(() => startBot().
 
       list.forEach(f => { if (f !== 'panel') zip.file(`plugins/${f}.js`, `module.exports = {};\n`); });
 
+      // Download thumbnail untuk WA CASE
+      if (thumbUrl && thumbUrl.startsWith('http')) {
+        try {
+          const res = await fetch(thumbUrl);
+          if (res.ok) zip.file('thumbnail.jpg', Buffer.from(await res.arrayBuffer()));
+        } catch (e) { console.error('Gagal download thumb WA CASE:', e); }
+      }
+
       const buffer = await zip.generateAsync({ type: 'nodebuffer' });
       res.setHeader('Content-Type', 'application/zip');
       res.setHeader('Content-Disposition', `attachment; filename="${safe}.zip"`);
@@ -576,6 +580,15 @@ startBot().catch(e => { console.error('FATAL:', e); setTimeout(() => startBot().
     // =========================================================================
     // ================= 3. WHATSAPP (ESM) =====================================
     // =========================================================================
+    
+    // Download thumbnail untuk WA ESM
+    if (thumbUrl && thumbUrl.startsWith('http')) {
+      try {
+        const res = await fetch(thumbUrl);
+        if (res.ok) zip.file('thumbnail.jpg', Buffer.from(await res.arrayBuffer()));
+      } catch (e) { console.error('Gagal download thumb WA ESM:', e); }
+    }
+
     zip.file('settings.js', `export default { botName: "${sBotName}", ownerNumber: "${sOwnerNumber}", ownerName: "${sOwnerName}", pairingNumber: "${sPairing}", prefix: ".", features: ${JSON.stringify(list)}, menuType: "${sMenuType}", btnType: "btn", thumbType: "nothumb", panel: { domain: "${sPanelDomain}", ptla: "${sPanelPtla}", egg: "${sPanelEgg}", loc: "${sPanelLoc}" } };`);
 
     zip.file('index.js', `import settings from './settings.js';
@@ -684,7 +697,6 @@ export async function download(videoUrl, format = "") {
     const pf = zip.folder('plugins');
 
     if (list.includes('menu')) {
-      // ✅ FIX #7: Hapus dead code (BOT_AUTHOR)
       pf.file('menu.js', `import moment from 'moment-timezone'; import fs from 'fs'; import os from 'os'; import sharp from 'sharp';
 const BOT_NAME = '${sBotName}';
 const THUMB_URL = 'https://n.uguu.se/oVprmTOj.jpeg';
@@ -734,7 +746,6 @@ export default { command: ['bypass', 'bypass2'], tags: ['tools'], help: ['bypass
 } };`);
     }
 
-    // ✅ FIX #4: RCH v2 (API Cloud baru dari user)
     if (list.includes('rch')) {
       pf.file('rch.js', `import fetch from 'node-fetch';
 export default { command: ['rch', 'reactchannel'], tags: ['tools'], help: ['rch <url_channel> <reaction>'], handler: async (sock, msg, o) => {
@@ -757,7 +768,6 @@ export default { command: ['rch', 'reactchannel'], tags: ['tools'], help: ['rch 
     }
 
     if (list.includes('iqc')) {
-      // ✅ FIX #10: Tambah import pino & downloadMediaMessage
       pf.file('iqc.js', `import axios from 'axios';
 import FormData from 'form-data';
 import pino from 'pino';
@@ -804,7 +814,6 @@ export default { command: ['iqc', 'iqcv2'], tags: ['maker'], help: ['iqc <text>'
     }
 
     if (list.includes('unblur')) {
-      // ✅ FIX #11: Tambah import FormData
       pf.file('unblur.js', `import crypto from 'crypto';
 import FormData from 'form-data';
 import { downloadMediaMessage } from 'noxleys-baileys';
@@ -861,7 +870,6 @@ export default { command: ['fotolive', 'livephoto'], tags: ['maker'], help: ['fo
     }
 
     if (list.includes('welcome')) {
-      // ✅ FIX #2: Import downloadContentFromMessage diambil dari 'noxleys-baileys'
       pf.file('welcome.js', `import fs from 'fs'; import path from 'path'; import Jimp from 'jimp';
 import { downloadContentFromMessage } from 'noxleys-baileys';
 const DIR = './src/database/welcome'; const BGDIR = './src/database/welcome-bg';
@@ -916,7 +924,6 @@ export default { command: ['welcome', 'left'], tags: ['admin'], help: ['welcome 
 } };`);
     }
 
-    // Fallback: features yang belum punya handler
     const handled = ['menu', 'vidsave', 'bypass', 'rch', 'iqc', 'web2apk', 'unblur', 'fotolive', 'welcome'];
     list.forEach(f => {
       if (handled.includes(f)) return;
