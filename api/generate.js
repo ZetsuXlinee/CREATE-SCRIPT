@@ -1,4 +1,4 @@
-// api/generate.js - ULTIMATE FINAL (WA CASE/ESM + TELEGRAM FULL FITUR)
+// api/generate.js - ULTIMATE FINAL (WA CASE/ESM + TELEGRAM FULL FITUR & MEDIA START)
 import JSZip from 'jszip';
 
 export default async function handler(req, res) {
@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     const {
       platform, base, menuType, botName, ownerName, ownerNumber,
       pairingNumber, teleToken, teleUsername, teleChannel,
-      features, usePanel
+      features, usePanel, thumbData // <-- MEDIA BASE64 DARI WEB
     } = req.body;
 
     if(!botName) return res.status(400).json({ error: 'Isi botName dulu' });
@@ -31,6 +31,22 @@ export default async function handler(req, res) {
   features: ${JSON.stringify(list)}
 };`;
       zip.file('settings.js', settingsTele);
+
+      // Simpan Media Start (JPG/PNG/GIF/MP4)
+      let startMediaExt = null;
+      if (thumbData && thumbData.startsWith('data:')) {
+          const mimeMatch = thumbData.match(/data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/);
+          if (mimeMatch) {
+              const mime = mimeMatch[1];
+              if (mime === 'image/png') startMediaExt = 'png';
+              else if (mime === 'image/gif') startMediaExt = 'gif';
+              else if (mime === 'video/mp4') startMediaExt = 'mp4';
+              else startMediaExt = 'jpg';
+              
+              const base64Data = thumbData.split(',')[1];
+              zip.file(`media/start_media.${startMediaExt}`, Buffer.from(base64Data, 'base64'));
+          }
+      }
 
       const indexTele = `const settings = require('./settings.js');
 const { Telegraf } = require('telegraf');
@@ -82,7 +98,7 @@ plugins.forEach(p => {
     }
 });
 
-// Register onMessage (untuk fitur yang menunggu foto/balasan)
+// Register onMessage
 bot.on('message', async (ctx) => {
     for (const p of plugins) {
         if (p.onMessage && p.name !== 'gfilter') {
@@ -97,7 +113,6 @@ process.once('SIGTERM', () => bot.stop('SIGTERM'));
 `;
       zip.file('index.js', indexTele);
 
-      // Package.json Telegram
       const pkgDeps = { 
         telegraf: "^4.15.3", axios: "^1.7.2", "node-fetch": "^3.3.2", "moment-timezone": "^0.5.45", 
         "form-data": "^4.0.0", "sharp": "^0.34.5", "fflate": "^0.8.2", "archiver": "^7.0.1", 
@@ -105,12 +120,10 @@ process.once('SIGTERM', () => bot.stop('SIGTERM'));
       };
       zip.file('package.json', JSON.stringify({ name: safe, version: "1.0.0", type: "commonjs", main: "index.js", scripts: { start: "node index.js" }, dependencies: pkgDeps }, null, 2));
       
-      // Database Init
       zip.file('database/maintenance.json', JSON.stringify({ maintenance: false }, null, 2));
       zip.file('database/users.json', '{}');
       zip.file('database/groups.json', '[]');
 
-      // Folder Lib
       const tlib = zip.folder('lib');
       tlib.file('helper_tg.js', `const fs = require('fs'); const path = require('path');
 const mFile = path.join(__dirname, '..', 'database', 'maintenance.json');
@@ -136,34 +149,76 @@ module.exports = { getM, setM, isMaintenance, muteUser };`);
 
       const pf = zip.folder('plugins');
 
-      // START
+      // START (TAMPILAN BARU & MEDIA)
       if (list.includes('start')) {
         pf.file('start.js', `const fs = require('fs'); const path = require('path'); const settings = require('../settings.js');
+function getUptime() {
+    const s = process.uptime(); const d = Math.floor(s / 86400); const h = Math.floor((s % 86400) / 3600); const m = Math.floor((s % 3600) / 60);
+    return [d ? d + 'd' : '', h ? h + 'h' : '', m ? m + 'm' : '', Math.floor(s % 60) + 's'].filter(Boolean).join(' ');
+}
 module.exports = { command: ['start'], handler: async (bot, ctx) => {
     const userId = ctx.from.id; const usersFile = path.join(__dirname, '..', 'database', 'users.json');
     let users = {}; try { users = JSON.parse(fs.readFileSync(usersFile)); } catch {}
     if(!users[userId]) { users[userId] = { id: userId, name: ctx.from.first_name }; fs.writeFileSync(usersFile, JSON.stringify(users, null, 2)); }
-    const menuText = \`👋 Halo *\${ctx.from.first_name}*!\\n\\nSelamat datang di *\${settings.botName}*.\\nKlik tombol di bawah untuk melihat menu.\`;
-    const opts = { parse_mode: 'Markdown', reply_markup: { inline_keyboard: [[{ text: "Menu Utama", callback_data: "/menu" }]] } };
-    try { await ctx.replyWithPhoto('https://n.uguu.se/oVprmTOj.jpeg', { caption: menuText, ...opts }); } catch { await ctx.reply(menuText, opts); }
+    
+    const botName = settings.botName.toUpperCase();
+    const textStart = \`<blockquote>👋 <b>Halo, \${ctx.from.first_name}!</b>
+
+Selamat datang di <b>\${botName}</b>.
+Eksplorasi fitur seru yang tersedia di dalam bot ini.</blockquote>
+
+<blockquote>⚡ <b>Status:</b> Online
+⏱️ <b>Uptime:</b> \${getUptime()}
+👑 <b>Owner:</b> \${settings.ownerName}</blockquote>\`;
+
+    const buttons = [
+        [{ text: "≡ Menu Utama", callback_data: "/menu" }],
+        [
+            { text: "👑 Owner", url: \`https://t.me/\${settings.ownerNumber}\` },
+            { text: "📢 Channel", url: settings.channelInfo || "https://t.me/telegram" }
+        ],
+        [{ text: "➕ Tambah ke Grup", url: \`https://t.me/\${settings.username.replace('@', '')}?startgroup=true\` }]
+    ];
+
+    const opts = { parse_mode: 'HTML', reply_markup: { inline_keyboard: buttons } };
+
+    const mediaPath = path.join(__dirname, '..', 'media');
+    const mp4 = path.join(mediaPath, 'start_media.mp4');
+    const gif = path.join(mediaPath, 'start_media.gif');
+    const jpg = path.join(mediaPath, 'start_media.jpg');
+    const png = path.join(mediaPath, 'start_media.png');
+
+    try {
+        if (fs.existsSync(mp4)) {
+            await ctx.replyWithVideo({ source: mp4 }, { caption: textStart, ...opts });
+        } else if (fs.existsSync(gif)) {
+            await ctx.replyWithAnimation({ source: gif }, { caption: textStart, ...opts });
+        } else if (fs.existsSync(jpg)) {
+            await ctx.replyWithPhoto({ source: jpg }, { caption: textStart, ...opts });
+        } else if (fs.existsSync(png)) {
+            await ctx.replyWithPhoto({ source: png }, { caption: textStart, ...opts });
+        } else {
+            await ctx.reply(textStart, opts);
+        }
+    } catch (e) {
+        await ctx.reply(textStart, opts);
+    }
 } };`);
       }
 
-      // MENU
       if (list.includes('menu')) {
         pf.file('menu.js', `const { Markup } = require('telegraf'); const settings = require('../settings.js');
 module.exports = { command: ['menu','help'], handler: async (bot, ctx) => {
-    let t = '╭━━━〔 ' + settings.botName + ' 〕━━━✦\\n┃ 👤 Owner: ' + settings.ownerName + '\\n┣━━━〔 '+settings.features.length+' FITUR 〕━━━\\n';
-    settings.features.forEach(f=>{ t += '┃ ❒ /' + f + '\\n'; }); t += '╰━━━━━━━━━━━━━━\\n';
+    let t = '<blockquote>╭━━━〔 <b>' + settings.botName + '</b> 〕━━━✦\\n┃ 👤 Owner: ' + settings.ownerName + '\\n┣━━━〔 <b>'+settings.features.length+' FITUR</b> 〕━━━\\n';
+    settings.features.forEach(f=>{ t += '┃ ❒ /' + f + '\\n'; }); t += '╰━━━━━━━━━━━━━━</blockquote>';
     let buttons = [], row = [];
     settings.features.forEach(f => { row.push(Markup.button.callback('/' + f, f)); if (row.length === 2) { buttons.push(row); row = []; } });
     if (row.length > 0) buttons.push(row);
-    const opts = { parse_mode: 'Markdown', reply_markup: Markup.inlineKeyboard(buttons) };
+    const opts = { parse_mode: 'HTML', reply_markup: Markup.inlineKeyboard(buttons) };
     try { await ctx.replyWithPhoto('https://n.uguu.se/oVprmTOj.jpeg', { caption: t, ...opts }); } catch { await ctx.reply(t, opts); }
 } };`);
       }
 
-      // TIKTOK DL
       if (list.includes('tiktok')) {
         pf.file('tiktok.js', `const axios = require('axios'); const settings = require('../settings.js');
 module.exports = { command: ['tiktok', 'tt'], handler: async (bot, ctx) => {
@@ -180,7 +235,6 @@ module.exports = { command: ['tiktok', 'tt'], handler: async (bot, ctx) => {
 } };`);
       }
 
-      // TIKTOK SLIDE
       if (list.includes('tiktokslide')) {
         pf.file('tiktokslide.js', `const axios = require('axios'); const settings = require('../settings.js');
 module.exports = { command: ['tiktokslide', 'ttslide'], handler: async (bot, ctx) => {
@@ -199,7 +253,6 @@ module.exports = { command: ['tiktokslide', 'ttslide'], handler: async (bot, ctx
 } };`);
       }
 
-      // IQC
       if (list.includes('iqc')) {
         pf.file('iqc.js', `const axios = require('axios'); const settings = require('../settings.js');
 module.exports = { command: ['iqc'], handler: async (bot, ctx) => {
@@ -214,7 +267,6 @@ module.exports = { command: ['iqc'], handler: async (bot, ctx) => {
 } };`);
       }
 
-      // BRAT
       if (list.includes('brat')) {
         pf.file('brat.js', `const axios = require('axios'); const settings = require('../settings.js');
 module.exports = { command: ['brat'], handler: async (bot, ctx) => {
@@ -228,7 +280,6 @@ module.exports = { command: ['brat'], handler: async (bot, ctx) => {
 } };`);
       }
 
-      // BRAT VID
       if (list.includes('bratvid')) {
         pf.file('bratvid.js', `const axios = require('axios'); const fs = require('fs'); const path = require('path'); const { exec } = require('child_process'); const settings = require('../settings.js');
 module.exports = { command: ['bratvid'], handler: async (bot, ctx) => {
@@ -246,7 +297,6 @@ module.exports = { command: ['bratvid'], handler: async (bot, ctx) => {
 } };`);
       }
 
-      // CEK ID
       if (list.includes('cekid')) {
         pf.file('cekid.js', `const { createCanvas, loadImage } = require('canvas'); const axios = require('axios'); const settings = require('../settings.js');
 function escapeHtml(text) { return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
@@ -275,7 +325,6 @@ module.exports = { command: ['cekid'], handler: async (bot, ctx) => {
 } };`);
       }
 
-      // TOFIGURE & HYTAMKAN (Pakai Catbox + Betabotz)
       if (list.includes('tofigure') || list.includes('hytamkan')) {
         pf.file('image_edit.js', `const axios = require('axios'); const FormData = require('form-data'); const settings = require('../settings.js');
 const pendingToFigure = new Set(); const pendingHitam = new Set();
@@ -321,7 +370,6 @@ module.exports = { command: ['tofigure', 'hytamkan', 'hitamkan'], handler: async
 } };`);
       }
 
-      // GEMPA
       if (list.includes('gempa')) {
         pf.file('gempa.js', `const axios = require('axios');
 module.exports = { command: ['gempa'], handler: async (bot, ctx) => {
@@ -331,15 +379,12 @@ module.exports = { command: ['gempa'], handler: async (bot, ctx) => {
 } };`);
       }
 
-      // GROUP FILTER
       if (list.includes('gfilter')) {
         pf.file('gfilter.js', `const fs = require('fs'); const path = require('path'); const { muteUser } = require('../lib/helper_tg.js');
 module.exports = { name: 'gfilter', command: [], handler: async () => {}, onMessage: async (bot, ctx) => {
     if (!ctx.message || ctx.from?.is_bot) return false;
     const chatId = ctx.chat.id.toString(); if (!chatId.startsWith("-")) return false;
     const senderId = ctx.from.id;
-    
-    // Ambil admin
     let admins = []; try { admins = await ctx.telegram.getChatAdministrators(chatId); } catch { return false; }
     const isAdmin = admins.some(a => a.user.id === senderId);
     if (isAdmin) return false;
@@ -348,14 +393,12 @@ module.exports = { name: 'gfilter', command: [], handler: async () => {}, onMess
     const text = (ctx.message.text || ctx.message.caption || "").toLowerCase();
     if (ctx.message.text && ctx.message.text.trim().startsWith('/')) return false;
 
-    // ANTI FOTO
     if (ctx.message.photo && ctx.message.photo.length > 0) {
         await ctx.telegram.deleteMessage(chatId, ctx.message.message_id).catch(()=>{});
         const warn = await ctx.reply(\`❌ <b>\${mentionUser}</b>, foto tidak diizinkan!\`, { parse_mode: 'HTML' });
         setTimeout(() => { ctx.telegram.deleteMessage(chatId, warn.message_id).catch(()=>{}); }, 10000);
         return true;
     }
-    // ANTI LINK
     if (/(https?:\\/\\/|t\\.me\\/|telegram\\.me\\/|www\\.)/i.test(text)) {
         await ctx.telegram.deleteMessage(chatId, ctx.message.message_id).catch(()=>{});
         const warn = await ctx.reply(\`⚠️ <b>\${mentionUser}</b> Link tidak diizinkan!\`, { parse_mode: 'HTML' });
@@ -366,7 +409,6 @@ module.exports = { name: 'gfilter', command: [], handler: async () => {}, onMess
 } };`);
       }
 
-      // OWNER CMD (Maintenance, Mute)
       if (list.includes('owner')) {
         pf.file('owner.js', `const { setM, getM, muteUser } = require('../lib/helper_tg.js'); const settings = require('../settings.js');
 module.exports = { command: ['maintenance', 'mt', 'mute'], handler: async (bot, ctx) => {
@@ -385,7 +427,6 @@ module.exports = { command: ['maintenance', 'mt', 'mute'], handler: async (bot, 
 } };`);
       }
 
-      // BACKUP
       if (list.includes('backup')) {
         pf.file('backup.js', `const fs = require('fs'); const path = require('path'); const archiver = require('archiver'); const settings = require('../settings.js');
 module.exports = { command: ['backup'], handler: async (bot, ctx) => {
@@ -541,15 +582,7 @@ startBot();
     if (list.includes('fotolive')) { pf.file('fotolive.js', `import fs from 'fs'; import os from 'os'; import path from 'path'; import ffmpeg from 'fluent-ffmpeg'; import { downloadMediaMessage, prepareWAMessageMedia, generateWAMessageFromContent } from 'noxleys-baileys'; import pino from 'pino'; export default { command: ['fotolive', 'livephoto'], tags: ['maker'], help: ['fotolive'], handler: async (sock, msg, o) => { const q = msg.message?.extendedTextMessage?.contextInfo?.quotedMessage; const isVideo = msg.message.videoMessage || q?.videoMessage; if (!isVideo) return sock.sendMessage(o.remoteJid, { text: 'Balas/reply video yang valid untuk dijadikan Live Photo!\\n\\nContoh:\\nReply video + ketik .' + o.command }, { quoted: msg }); const vid = path.join(os.tmpdir(), 'vid_'+Date.now()+'.mp4'); const thumb = path.join(os.tmpdir(), 'thumb_'+Date.now()+'.jpg'); await sock.sendMessage(o.remoteJid, { react: { text: '⏳', key: msg.key } }).catch(()=>{}); await sock.sendMessage(o.remoteJid, { text: '⏳ Memproses Live Photo...' }, { quoted: msg }); try { const targetMsg = q ? { message: q, key: { ...msg.key, id: msg.message.extendedTextMessage.contextInfo.stanzaId } } : msg; const buf = await downloadMediaMessage(targetMsg, 'buffer', {}, { logger: pino() }); fs.writeFileSync(vid, buf); await new Promise((res,rej)=>{ ffmpeg(vid).outputOptions(['-vframes 1']).output(thumb).on('end',res).on('error',rej).run(); }); const tBuf = fs.readFileSync(thumb); const iM = await prepareWAMessageMedia({ image: tBuf }, { upload: sock.waUploadToServer }); const vM = await prepareWAMessageMedia({ video: buf }, { upload: sock.waUploadToServer }); const pMsg = generateWAMessageFromContent(o.remoteJid, { imageMessage: { ...iM.imageMessage, contextInfo: { pairedMediaType: 5, statusSourceType: 0 } } }, { quoted: msg }); await sock.relayMessage(o.remoteJid, pMsg.message, { messageId: pMsg.key.id }); await sock.relayMessage(o.remoteJid, { videoMessage: { ...vM.videoMessage, contextInfo: { pairedMediaType: 6, statusSourceType: 0 } }, messageContextInfo: { messageAssociation: { associationType: 12, parentMessageKey: pMsg.key } } }, {}); await sock.sendMessage(o.remoteJid, { react: { text: '✅', key: msg.key } }).catch(()=>{}); } catch(e) { await sock.sendMessage(o.remoteJid, { text: '❌ Gagal: ' + e.message }, { quoted: msg }); await sock.sendMessage(o.remoteJid, { react: { text: '❌', key: msg.key } }).catch(()=>{}); } finally { try { fs.unlinkSync(vid); fs.unlinkSync(thumb); } catch {} } } };`); }
     if (list.includes('welcome')) { pf.file('welcome.js', `import fs from 'fs'; import path from 'path'; import Jimp from 'jimp'; import { downloadContentFromMessage } from 'noxleyss'; import settings from '../settings.js'; const DIR = './src/database/welcome'; const BGDIR = './src/database/welcome-bg'; function getPath(id) { return path.join(DIR, id.replace(/[^a-zA-Z0-9]/g, '_') + '.json'); } function load(id) { try { return JSON.parse(fs.readFileSync(getPath(id))); } catch { return { welcomeOn: false, leftOn: false, welcomeCaption: "👋 Selamat datang @user di {group}", leftCaption: "👋 Dadah @user" }; } } function save(id, d) { fs.writeFileSync(getPath(id), JSON.stringify(d, null, 2)); } async function genImg(pp, bgPath, name, group, type) { const W=800, H=500; let bg = bgPath && fs.existsSync(bgPath) ? await Jimp.read(bgPath) : new Jimp(W, H, type==='welcome' ? '#0f172a' : '#2a0f0f'); bg.cover(W,H); const ov = new Jimp(W,H, type==='welcome' ? '#00000080' : '#000000a0'); bg.composite(ov,0,0); let p; try { p = await Jimp.read(pp); } catch { p = new Jimp(200,200,type==='welcome'?'#38bdf8':'#ef4444'); } p.resize(200,200).circle(); bg.composite(p, (W-200)/2, 60); const font = await Jimp.loadFont(Jimp.FONT_SANS_32_WHITE); const fontSmall = await Jimp.loadFont(Jimp.FONT_SANS_16_WHITE); bg.print(font, 0, 300, { text: type==='welcome'?'WELCOME':'GOODBYE', alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER }, W, 40); bg.print(font, 0, 350, { text: name, alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER }, W, 40); bg.print(fontSmall, 0, 400, { text: group.toUpperCase(), alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER }, W, 30); return await bg.getBufferAsync(Jimp.MIME_JPEG); } export default { command: ['welcome', 'left'], tags: ['admin'], help: ['welcome on/off'], handler: async (sock, msg, o) => { if (!o.isGroup) return; const conf = load(o.remoteJid); const cmd = o.command.includes('left') ? 'left' : 'welcome'; const sub = (o.args[0]||'').toLowerCase(); if (sub === 'on') { if(cmd==='welcome') conf.welcomeOn=true; else conf.leftOn=true; save(o.remoteJid, conf); return sock.sendMessage(o.remoteJid, { text: '✅ ON' }, { quoted: msg }); } if (sub === 'off') { if(cmd==='welcome') conf.welcomeOn=false; else conf.leftOn=false; save(o.remoteJid, conf); return sock.sendMessage(o.remoteJid, { text: '❌ OFF' }, { quoted: msg }); } if (sub === 'setbg') { const q = msg.message.extendedTextMessage?.contextInfo?.quotedMessage; const imgMsg = q?.imageMessage || msg.message?.imageMessage; if(!imgMsg) return sock.sendMessage(o.remoteJid, { text: 'Reply foto!' }, { quoted: msg }); const str = await downloadContentFromMessage(imgMsg, 'image'); let buf = Buffer.from([]); for await(const c of str) buf = Buffer.concat([buf,c]); if(!fs.existsSync(BGDIR)) fs.mkdirSync(BGDIR,{recursive:true}); fs.writeFileSync(path.join(BGDIR, o.remoteJid.replace(/[^a-zA-Z0-9]/g,'_')+'_'+cmd+'.jpg'), buf); return sock.sendMessage(o.remoteJid, { text: '✅ BG disimpan' }, { quoted: msg }); } return sock.sendMessage(o.remoteJid, { text: 'Format: .welcome on/off/setbg' }, { quoted: msg }); }, onParticipantsUpdate: async (sock, update) => { const conf = load(update.id); if(!conf.welcomeOn && !conf.leftOn) return; if(update.action !== 'add' && update.action !== 'remove') return; for(const p of update.participants) { try { const pp = await sock.profilePictureUrl(p, 'image').catch(()=>null); const buf = pp ? Buffer.from(await (await fetch(pp)).arrayBuffer()) : null; const type = update.action==='add'?'welcome':'left'; const bg = path.join(BGDIR, update.id.replace(/[^a-zA-Z0-9]/g,'_')+'_'+type+'.jpg'); const name = p.split('@')[0]; const meta = await sock.groupMetadata(update.id); const img = await genImg(buf, bg, name, meta.subject, type); const cap = (type==='welcome'?conf.welcomeCaption:conf.leftCaption).replace(/@user/g,'@'+name).replace(/{user}/g,name).replace(/{group}/g,meta.subject); await sock.sendMessage(update.id, { image: img, caption: cap, mentions: [p] }); } catch {} } } };`); }
 
-    // DUMMY PLUGINS (Untuk fitur yang tidak diimplementasikan penuh)
-    list.forEach(f => {
-        if (['menu','vidsave','bypass','rch','iqc','web2apk','unblur','fotolive','welcome'].includes(f)) return;
-        if (f === 'panel' && usePanel) {
-             pf.file('panel.js', `import fetch from "node-fetch"; import settings from "../settings.js"; export default { command: ['panel'], tags: ['panel'], help: ['panel'], handler: async (sock, msg, o) => { await sock.sendMessage(o.remoteJid, { text: 'Silakan cek menu panel di file asli / sesuaikan.' }, { quoted: msg }); } };`);
-        } else if (f !== 'panel') {
-             pf.file(f+'.js', `export default { command: ['${f}'], tags: ['tools'], help: ['${f}'], handler: async (sock, msg, o) => { await sock.sendMessage(o.remoteJid, { text: 'Fitur ${f} belum diimplementasikan penuh di versi ini.' }, { quoted: msg }); } };`);
-        }
-    });
+    list.forEach(f => { if (['menu','vidsave','bypass','rch','iqc','web2apk','unblur','fotolive','welcome'].includes(f)) return; if (f === 'panel' && usePanel) { pf.file('panel.js', `import fetch from "node-fetch"; import settings from "../settings.js"; export default { command: ['panel'], tags: ['panel'], help: ['panel'], handler: async (sock, msg, o) => { await sock.sendMessage(o.remoteJid, { text: 'Silakan cek menu panel di file asli / sesuaikan.' }, { quoted: msg }); } };`); } else if (f !== 'panel') { pf.file(f+'.js', `export default { command: ['${f}'], tags: ['tools'], help: ['${f}'], handler: async (sock, msg, o) => { await sock.sendMessage(o.remoteJid, { text: 'Fitur ${f} belum diimplementasikan penuh di versi ini.' }, { quoted: msg }); } };`); } });
 
     const buffer = await zip.generateAsync({ type: 'nodebuffer' });
     res.setHeader('Content-Type', 'application/zip');
