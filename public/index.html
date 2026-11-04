@@ -161,6 +161,7 @@
   .btn-modal { width: 100%; padding: 16px; background: linear-gradient(to bottom, #a3e635, #65a30d); color: #000; border: 1px solid #bef264; border-radius: 50px; font-weight: 900; font-size: 15px; font-family: var(--font); cursor: pointer; transition: 0.2s; box-shadow: 0 10px 20px rgba(163, 230, 53, 0.3), inset 0 2px 5px rgba(255,255,255,0.6); }
   .btn-modal:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(163, 230, 53, 0.5); }
 
+  /* UPLOAD AREA */
   .upload-area { border: 2px dashed var(--aero-cyan); border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; margin-top: 12px; display: none; transition: 0.2s; background: rgba(0,0,0,0.3); width: 100%; }
   .upload-area:hover { background: rgba(6, 182, 212, 0.1); }
   .upload-area img { max-width: 100%; height: 100px; object-fit: cover; border-radius: 12px; margin-top: 12px; display: none; border: 1px solid var(--aero-cyan); box-shadow: 0 0 15px rgba(6, 182, 212, 0.3); }
@@ -176,7 +177,7 @@
       </div>
       <div class="brand-text">
         <h1>CiKiZz</h1>
-        <p>Ultimate Bento Generator</p>
+        <p>Buat Script Bot Kalian</p>
       </div>
     </div>
     <div class="status"><div class="dot"></div> SYSTEM ONLINE</div>
@@ -220,6 +221,17 @@
           <div class="input-box"><label>Token BotFather</label><input id="teleToken" class="input-field" placeholder="12345:ABC..." oninput="updatePreview()"></div>
           <div class="input-box"><label>ID Owner (Telegram)</label><input id="teleOwnerId" class="input-field" placeholder="123456789" oninput="updatePreview()"></div>
           <div class="input-box"><label>Link Channel (Opsional)</label><input id="teleChannel" class="input-field" placeholder="https://t.me/..." oninput="updatePreview()"></div>
+          
+          <!-- UPLOAD MEDIA START -->
+          <div class="input-box" style="grid-column: span 2; margin-top: 8px;">
+            <label>Media Start (/start) - JPG, PNG, GIF, MP4</label>
+            <div class="upload-area" id="uploadTeleArea" onclick="document.getElementById('teleMediaInput').click()" style="display:block; padding:15px;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--aero-cyan)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <p style="font-size:12px; color:var(--text-muted); margin-top:8px;">Klik untuk upload (Max 5MB)</p>
+              <input type="file" id="teleMediaInput" accept="image/*,video/mp4" style="display:none" onchange="handleTeleMedia(this)">
+              <img id="teleMediaPreview" src="" style="max-height: 80px; display:none; margin: 0 auto;">
+            </div>
+          </div>
         </div>
       </div>
 
@@ -274,6 +286,7 @@
 
             <!-- FITUR TELEGRAM -->
             <div class="tele-feat" style="display: none;">
+                <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="start" hidden>Start</div>
                 <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="menu" hidden>Menu</div>
                 <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="tiktok" hidden>TikTok DL</div>
                 <div class="feat-chip" onclick="toggleFeat(this)"><div class="check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><input type="checkbox" value="tiktokslide" hidden>TT Slide</div>
@@ -357,7 +370,7 @@
 </div>
 
 <script>
-let state = { platform: 'whatsapp', base: 'esm', menu: '1', usePanel: false };
+let state = { platform: 'whatsapp', base: 'esm', menu: '1', usePanel: false, teleMediaData: null };
 
 function copyText(t) { navigator.clipboard.writeText(t).then(()=>alert('Copied: '+t)); }
 
@@ -390,6 +403,27 @@ function setBase(v, el) { state.base = v; document.querySelectorAll('[data-base]
 function setMenu(v, el) { state.menu = v; document.querySelectorAll('[data-menu]').forEach(e => e.classList.remove('active')); el.classList.add('active'); updatePreview(); }
 function togglePanel() { state.usePanel = !state.usePanel; const el = document.getElementById('panelToggle'); el.classList.toggle('active', state.usePanel); document.getElementById('panelConfig').style.display = state.usePanel ? 'grid' : 'none'; updatePreview(); }
 function toggleFeat(el) { const cb = el.querySelector('input'); cb.checked = !cb.checked; el.classList.toggle('active', cb.checked); updateFeatCount(); updatePreview(); }
+
+function handleTeleMedia(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        if(file.size > 5 * 1024 * 1024) return alert('File terlalu besar! Max 5MB.');
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            state.teleMediaData = e.target.result;
+            const img = document.getElementById('teleMediaPreview');
+            if(file.type.startsWith('image/')) {
+                img.src = e.target.result;
+                img.style.display = 'block';
+            } else {
+                img.style.display = 'none';
+            }
+            alert('Media Start berhasil diupload!');
+        };
+        reader.readAsDataURL(file);
+    }
+}
 
 function updateFeatCount() {
     let count = 0;
@@ -428,10 +462,18 @@ function updatePreview() {
       document.getElementById('teleAv').textContent = name.charAt(0).toUpperCase();
       document.getElementById('teleSub').textContent = username;
       
-      let txt = `🤖 *${name}*\n\nSilakan pilih menu di bawah ini:`;
+      let txt = `👋 *Halo, User!*\n\nSelamat datang di *${name}*.\nKlik tombol di bawah untuk mulai.`;
+      
+      if (state.teleMediaData) {
+          txt = `🖼️ [Media Start Terlampir]\n\n` + txt;
+      }
+      
       document.getElementById('teleBubble').innerHTML = txt.replace(/\n/g, '<br>') + `<div class="time">12:00</div>`;
       
-      let btnsHtml = feats.slice(0, 4).map(f => `<div class="tele-btn">/${f}</div>`).join('');
+      let btnsHtml = `<div class="tele-btn">≡ Menu Utama</div>`;
+      if(feats.includes('owner')) btnsHtml += `<div class="tele-btn">👑 Owner</div>`;
+      if(feats.includes('start')) btnsHtml += `<div class="tele-btn">➕ Tambah ke Grup</div>`;
+      
       document.getElementById('teleBtns').innerHTML = btnsHtml;
   }
 
@@ -458,7 +500,7 @@ async function generateScript() {
         if(!name) throw new Error('Isi Nama Bot dulu!');
         const token = document.getElementById('teleToken').value.trim();
         if(!token) throw new Error('Isi Token BotFather dulu!');
-        payload = { ...payload, botName: name, teleUsername: document.getElementById('teleUsername').value, ownerName: document.getElementById('teleOwner').value, teleToken: token, ownerNumber: document.getElementById('teleOwnerId').value, teleChannel: document.getElementById('teleChannel').value, features: Array.from(document.querySelectorAll('.tele-feat input:checked')).map(i => i.value) };
+        payload = { ...payload, botName: name, teleUsername: document.getElementById('teleUsername').value, ownerName: document.getElementById('teleOwner').value, teleToken: token, ownerNumber: document.getElementById('teleOwnerId').value, teleChannel: document.getElementById('teleChannel').value, features: Array.from(document.querySelectorAll('.tele-feat input:checked')).map(i => i.value), thumbData: state.teleMediaData };
     }
 
     const res = await fetch('/api/generate', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload) });
