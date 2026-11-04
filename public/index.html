@@ -423,64 +423,94 @@ function setMenu(v, el) { state.menu = v; document.querySelectorAll('[data-menu]
 function togglePanel() { state.usePanel = !state.usePanel; const el = document.getElementById('panelToggle'); el.classList.toggle('active', state.usePanel); document.getElementById('panelConfig').style.display = state.usePanel ? 'grid' : 'none'; updatePreview(); }
 function toggleFeat(el) { const cb = el.querySelector('input'); cb.checked = !cb.checked; el.classList.toggle('active', cb.checked); updateFeatCount(); updatePreview(); }
 
-// Fungsi upload Universal (WA & Telegram)
+// ============================================================
+// Fungsi Upload ke Pone.rs (Menggunakan XMLHttpRequest untuk Progress)
+// ============================================================
+function uploadToPone(file, onProgress) {
+  return new Promise((resolve, reject) => {
+    const formData = new FormData();
+    formData.append('files[]', file, file.name);
+
+    const xhr = new XMLHttpRequest();
+    
+    xhr.upload.addEventListener('progress', (e) => {
+      if (e.lengthComputable && onProgress) {
+        onProgress(Math.round((e.loaded / e.total) * 100));
+      }
+    });
+
+    xhr.addEventListener('load', () => {
+      try {
+        const res = JSON.parse(xhr.responseText);
+        if (res.success && res.files && res.files[0]) {
+          // Kadang pone.rs mengembalikan string '\/'
+          const finalUrl = res.files[0].url.replaceAll('\\/', '/');
+          resolve(finalUrl);
+        } else {
+          reject(new Error(res.message || 'Gagal upload ke Pone.rs'));
+        }
+      } catch (e) {
+        reject(new Error('Response tidak valid. Mungkin API Pone.rs sedang down atau CORS error.'));
+      }
+    });
+
+    xhr.addEventListener('error', () => reject(new Error('Network error / CORS diblokir browser')));
+    xhr.addEventListener('timeout', () => reject(new Error('Upload timeout')));
+    xhr.timeout = 60000; 
+
+    xhr.open('POST', 'https://pone.rs/upload.php');
+    xhr.send(formData);
+  });
+}
+
 async function handleMediaUpload(input, platform) {
-    if (input.files && input.files[0]) {
-        const file = input.files[0];
-        
-        if (file.size > 20 * 1024 * 1024) {
-            input.value = '';
-            return alert('❌ File terlalu besar! Max 20MB.');
+    if (!input.files || !input.files[0]) return;
+
+    const file = input.files[0];
+    if (file.size > 20 * 1024 * 1024) {
+        input.value = '';
+        return alert('❌ File terlalu besar! Max 20MB.');
+    }
+
+    const areaId    = platform === 'wa' ? 'uploadWaArea' : 'uploadTeleArea';
+    const previewId = platform === 'wa' ? 'waMediaPreview' : 'teleMediaPreview';
+    const uploadArea = document.getElementById(areaId);
+    const p          = uploadArea.querySelector('p');
+    const img        = document.getElementById(previewId);
+    const oldText    = p.textContent;
+
+    p.style.color = 'var(--aero-cyan)';
+    p.textContent = '⏳ Menyiapkan upload...';
+    img.style.display = 'none';
+
+    try {
+        let mediaUrl = null;
+
+        mediaUrl = await uploadToPone(file, (percent) => {
+            p.textContent = `⏳ Mengupload ke Pone.rs... ${percent}%`;
+        });
+
+        if (platform === 'wa') {
+            state.waMediaUrl  = mediaUrl;
+            state.waMediaType = file.type;
+        } else {
+            state.teleMediaUrl  = mediaUrl;
+            state.teleMediaType = file.type;
         }
 
-        const formData = new FormData();
-        formData.append('reqtype', 'fileupload');
-        formData.append('fileToUpload', file);
-
-        const areaId = platform === 'wa' ? 'uploadWaArea' : 'uploadTeleArea';
-        const previewId = platform === 'wa' ? 'waMediaPreview' : 'teleMediaPreview';
-        
-        const uploadArea = document.getElementById(areaId);
-        const p = uploadArea.querySelector('p');
-        const img = document.getElementById(previewId);
-        const oldText = p.textContent;
-
-        try {
-            p.textContent = '⏳ Mengupload media ke server...';
-            p.style.color = 'var(--aero-cyan)';
-            img.style.display = 'none';
-
-            const res = await fetch('https://catbox.moe/user/api.php', {
-                method: 'POST',
-                body: formData
-            });
-            
-            if (!res.ok) throw new Error('Gagal mengupload ke server');
-            
-            const mediaUrl = await res.text();
-            
-            if (platform === 'wa') {
-                state.waMediaUrl = mediaUrl;
-                state.waMediaType = file.type;
-            } else {
-                state.teleMediaUrl = mediaUrl;
-                state.teleMediaType = file.type;
-            }
-
-            if (file.type.startsWith('image/')) {
-                img.src = mediaUrl;
-                img.style.display = 'block';
-            }
-            
-            p.textContent = '✅ Media berhasil diupload! Klik untuk ganti.';
-            p.style.color = '#a3e635';
-            updatePreview();
-            
-        } catch (error) {
-            alert('❌ Gagal upload media: ' + error.message);
-            p.textContent = oldText;
-            p.style.color = 'var(--text-muted)';
+        if (file.type.startsWith('image/')) {
+            img.src = mediaUrl;
+            img.style.display = 'block';
         }
+
+        p.textContent = `✅ Upload sukses ke Pone.rs! Klik untuk ganti.`;
+        p.style.color = '#a3e635';
+        updatePreview();
+
+    } catch (error) {
+        alert('❌ Gagal upload media: ' + error.message + '\n\nJika ini CORS error, artinya API Pone.rs memblokir akses browser. Coba matikan adblocker.');
+        p.textContent = oldText;
+        p.style.color = 'var(--text-muted)';
     }
 }
 
@@ -563,7 +593,6 @@ async function generateScript() {
     if(isWA) {
         const name = document.getElementById('botName').value.trim();
         if(!name) throw new Error('Isi Nama Bot dulu!');
-        // Sertakan thumbUrl untuk WhatsApp
         payload = { ...payload, botName: name, ownerNumber: document.getElementById('owner').value, ownerName: document.getElementById('ownerName').value, pairingNumber: document.getElementById('pairingNumber').value, base: state.base, menuType: state.menu, usePanel: state.usePanel, features: Array.from(document.querySelectorAll('.wa-feat input:checked')).map(i => i.value), thumbUrl: state.waMediaUrl };
     } else {
         const name = document.getElementById('teleBotName').value.trim();
